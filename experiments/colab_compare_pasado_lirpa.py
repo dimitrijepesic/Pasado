@@ -146,6 +146,19 @@ def main():
         map_location="cpu"))
     selected = [i for i in range(len(ds)) if i in correct][:args.num_images]
 
+    # The saved Pasado numbers are averages over exactly 30 images
+    # (get_lipschitz.py: num_images_to_test = 30, break at correct_images == 30).
+    # Averaging auto_LiRPA over a different number of images compares a
+    # k-image mean against a 30-image mean -- not the same quantity, and the
+    # difference is large: image 0 alone has an exact |dF/dt| of 245.2 on
+    # `big`, well above the 30-image precise average of 168.1. Only --num-images
+    # 30 yields a valid ratio.
+    if args.num_images != 30:
+        print(f"\n*** WARNING: --num-images {args.num_images} != 30. The saved "
+              f"Pasado values are 30-image averages, so the printed ratios are "
+              f"NOT apples-to-apples and must not be reported. Use 30. ***\n",
+              flush=True)
+
     def saved(kind):
         p = os.path.join(SEC, "results", f"{kind}_{args.network}.pth")
         return torch.load(p, map_location="cpu") if os.path.exists(p) else None
