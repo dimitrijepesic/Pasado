@@ -158,9 +158,17 @@ def main():
 
     for img_no, idx in enumerate(selected, start=1):
         img = ds[idx][0].flatten().unsqueeze(0).to(torch.float64).to(dev)
-        model = BoundedModule(HazeJacobian(net),
-                              (torch.zeros(1, 1, device=dev), img), device=dev)
         for ei, eps in enumerate(EPSILONS):
+            # Fresh module per (image, epsilon). BoundedModule accumulates
+            # cached intermediate bounds and alpha parameters on every
+            # compute_jacobian_bounds call and never releases them; with the
+            # sparse options force-disabled on the Jacobian path (see the
+            # module docstring) that is ~10 GB per call on `big`. Reusing one
+            # module across epsilons is what OOM-killed the 16 GB local runs,
+            # and 16 accumulated calls would threaten even an 80 GB A100.
+            model = BoundedModule(HazeJacobian(net),
+                                  (torch.zeros(1, 1, device=dev), img),
+                                  device=dev)
             t0 = torch.full((1, 1), eps / 2, device=dev)
             bt = BoundedTensor(t0, PerturbationLpNorm(
                 norm=float("inf"), eps=eps / 2))
@@ -173,9 +181,12 @@ def main():
             t_sums[ei] += time.perf_counter() - begin
             lc_sums[ei] += torch.maximum(lb.abs(), ub.abs()).max().item()
             counts[ei] += 1
-        del model
-        if dev == "cuda":
-            torch.cuda.empty_cache()
+            del model, lb, ub
+            if dev == "cuda":
+                torch.cuda.empty_cache()
+            print(f"  img {img_no} eps={eps:.6f} "
+                  f"lirpa={lc_sums[ei]/counts[ei]:.6g} "
+                  f"({t_sums[ei]/counts[ei]:.1f}s avg)", flush=True)
 
         rows = [{
             "epsilon": e,
