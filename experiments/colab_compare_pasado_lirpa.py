@@ -40,6 +40,7 @@ Colab usage:
 """
 import argparse
 import csv
+import gc
 import os
 import time
 
@@ -166,7 +167,10 @@ def main():
             # module docstring) that is ~10 GB per call on `big`. Reusing one
             # module across epsilons is what OOM-killed the 16 GB local runs,
             # and 16 accumulated calls would threaten even an 80 GB A100.
-            model = BoundedModule(HazeJacobian(net),
+            # A fresh network too, not just a fresh BoundedModule: tracing
+            # attaches bound state to the traced modules, so reusing one `net`
+            # across pairs keeps every previous solve's graph reachable.
+            model = BoundedModule(HazeJacobian(build_network(args.network).to(dev)),
                                   (torch.zeros(1, 1, device=dev), img),
                                   device=dev)
             t0 = torch.full((1, 1), eps / 2, device=dev)
@@ -181,7 +185,13 @@ def main():
             t_sums[ei] += time.perf_counter() - begin
             lc_sums[ei] += torch.maximum(lb.abs(), ub.abs()).max().item()
             counts[ei] += 1
+            # gc.collect() before empty_cache(), and both are needed: the bound
+            # graph is a cycle of nodes referencing each other, so plain
+            # refcounting never frees it and empty_cache() only returns blocks
+            # already freed. Without the collect, an 80 GB A100 filled up after
+            # six solves (76 GiB still live).
             del model, lb, ub
+            gc.collect()
             if dev == "cuda":
                 torch.cuda.empty_cache()
             print(f"  img {img_no} eps={eps:.6f} "
