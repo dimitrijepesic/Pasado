@@ -1,0 +1,9 @@
+datetime_utc,experiment,variant,n,m,dtype,warmup,reps,median_ms,min_ms,max_ms
+2026-07-20T22:13:24+00:00,lin_reg_tensor,loop,1,25,float64,3,15,0.2690,0.2644,0.4923
+2026-07-20T22:13:24+00:00,lin_reg_tensor,batched,1,25,float64,3,15,0.2629,0.2555,2.3530
+2026-07-20T22:13:24+00:00,lin_reg_tensor,loop,10,25,float64,3,15,2.2663,2.0976,3.5547
+2026-07-20T22:13:24+00:00,lin_reg_tensor,batched,10,25,float64,3,15,0.4057,0.3825,0.4528
+2026-07-20T22:13:25+00:00,lin_reg_tensor,loop,100,25,float64,3,15,28.7814,23.1539,41.9616
+2026-07-20T22:13:25+00:00,lin_reg_tensor,batched,100,25,float64,3,15,1.9726,1.8224,2.4262
+2026-07-20T22:13:29+00:00,lin_reg_tensor,loop,1024,25,float64,3,15,163.8825,138.1868,251.6018
+2026-07-20T22:13:29+00:00,lin_reg_tensor,batched,1024,25,float64,3,15,26.0227,23.1441,35.0908

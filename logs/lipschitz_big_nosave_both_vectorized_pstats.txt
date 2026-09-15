@@ -1,0 +1,1138 @@
+======================================================================
+TOP 150 BY CUMULATIVE TIME
+======================================================================
+Wed Jul 15 18:05:12 2026    profiles/lipschitz_big_nosave_both_vectorized.prof
+
+         61160104 function calls (61033910 primitive calls) in 1249.394 seconds
+
+   Ordered by: cumulative time
+   List reduced from 13055 to 150 due to restriction <150>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+  125/124    0.305    0.002 1853.574   14.948 threading.py:641(wait)
+      480    0.172    0.000  693.977    1.446 get_lipschitz.py:72(forward_zono_precise)
+        1    0.152    0.152  666.798  666.798 get_lipschitz.py:1(<module>)
+  124/123    0.284    0.002  577.524    4.695 threading.py:327(wait)
+     1920    7.107    0.004  549.453    0.286 precise_transformer.py:604(PreciseSigmoidDualZonotope)
+     1920   75.881    0.040  492.600    0.257 precise_transformer.py:519(sigmoid_prime_product_tensor)
+      480    0.172    0.000  434.846    0.906 get_lipschitz.py:54(forward_zono)
+     9600  416.259    0.043  416.267    0.043 SimpleZono.py:169(AffineZonotope)
+     4800    0.026    0.000  414.504    0.086 SimpleZono.py:396(AffineDualZonotope)
+     1920    0.341    0.000  197.937    0.103 SimpleZono.py:437(SigmoidDualZonotope)
+  1966080   18.351    0.000  161.047    0.000 precise_transformer.py:64(lin_reg_tensor)
+     3840   51.343    0.013  140.163    0.037 SimpleZono.py:125(__mul__)
+    24960    0.459    0.000  127.321    0.005 SimpleZono.py:54(get_coeff_abs)
+  1966080  119.598    0.000  119.598    0.000 {built-in method torch._C._linalg.linalg_lstsq}
+     1920   33.207    0.017  107.176    0.056 precise_transformer.py:7(get_linspace)
+  1989120   89.430    0.000   89.430    0.000 {built-in method torch.cat}
+     3840    9.706    0.003   77.841    0.020 SimpleZono.py:294(SigmoidZonotope)
+    56640   73.069    0.001   73.069    0.001 {built-in method torch.abs}
+      480    1.883    0.004   64.545    0.134 get_lipschitz.py:63(forward_interval)
+  1966080   33.601    0.000   60.713    0.000 precise_transformer.py:15(sigmoid_prime_times_y)
+    24960   60.114    0.002   60.114    0.002 {built-in method torch.sum}
+     2400    0.582    0.000   52.628    0.022 Duals.py:122(__matmul__)
+     7200   23.722    0.003   51.854    0.007 HyperDuals.py:29(imatmul)
+    12480    1.517    0.000   50.571    0.004 SimpleZono.py:70(expand)
+  1966080    4.078    0.000   44.659    0.000 functional.py:1363(cartesian_prod)
+     1920   14.923    0.008   40.813    0.021 precise_transformer.py:472(compute_max_error)
+  1966080   39.214    0.000   39.214    0.000 {built-in method torch.cartesian_prod}
+     8640    0.304    0.000   36.495    0.004 SimpleZono.py:58(get_lb)
+     8640    0.281    0.000   35.451    0.004 SimpleZono.py:64(get_ub)
+      402    0.017    0.000   29.753    0.074 __init__.py:1(<module>)
+  3932160   21.140    0.000   21.140    0.000 {built-in method torch.linspace}
+       46    0.001    0.000   14.927    0.325 library.py:683(wrap)
+  2006400    2.221    0.000   14.571    0.000 _tensor.py:40(wrapped)
+  3972480   14.278    0.000   14.278    0.000 {built-in method torch.sigmoid}
+  3941280   13.833    0.000   13.833    0.000 {built-in method torch.max}
+    50400   13.010    0.000   13.010    0.000 {built-in method torch.matmul}
+    11520    6.379    0.001   12.175    0.001 SimpleZono.py:16(traceify)
+  1991040    0.778    0.000   11.322    0.000 _tensor.py:1114(__rsub__)
+  1991040   10.544    0.000   10.544    0.000 {built-in method torch.rsub}
+  1968000    9.548    0.000    9.548    0.000 {built-in method torch.ones}
+     4800    3.122    0.001    9.105    0.002 Duals.py:268(abstract_di)
+    23072    8.541    0.000    8.541    0.000 {built-in method torch.zeros}
+  7865776    8.309    0.000    8.309    0.000 {method 'item' of 'torch._C.TensorBase' objects}
+     5760    5.561    0.001    5.561    0.001 {method 'unbind' of 'torch._C.TensorBase' objects}
+     1920    0.190    0.000    5.544    0.003 precise_transformer.py:346(check_nonlinear_boundary_tensor)
+    24000    5.406    0.000    5.406    0.000 {built-in method torch.minimum}
+    19232    4.873    0.000    4.873    0.000 {built-in method torch.tensor}
+    11520    4.593    0.000    4.593    0.000 {built-in method torch.eye}
+    13456    0.264    0.000    4.449    0.000 Duals.py:12(__init__)
+  501/496    2.546    0.005    4.234    0.009 {method 'acquire' of '_thread.lock' objects}
+      171    0.011    0.000    4.144    0.024 library.py:127(define)
+  3932180    3.640    0.000    3.640    0.000 {method 'size' of 'torch._C.TensorBase' objects}
+    14400    3.526    0.000    3.526    0.000 {built-in method torch.sign}
+     2998    0.048    0.000    3.370    0.001 <frozen importlib._bootstrap_external>:1093(get_code)
+     3840    0.192    0.000    3.208    0.001 precise_transformer.py:133(inverse_sigmoid_2nd_deriv)
+        1    0.000    0.000    3.030    3.030 precise_transformer.py:1(<module>)
+    30752    2.981    0.000    2.981    0.000 {built-in method torch.le}
+        9    0.001    0.000    2.854    0.317 base.py:1(<module>)
+        1    0.000    0.000    2.748    2.748 _chunking.py:1(<module>)
+        1    0.000    0.000    2.747    2.747 _param_validation.py:1(<module>)
+        2    0.000    0.000    2.471    1.236 _array_api.py:1(<module>)
+        1    0.000    0.000    2.460    2.460 _fully_shard.py:1(<module>)
+        1    0.000    0.000    2.458    2.458 _fsdp_init.py:1(<module>)
+        1    0.000    0.000    2.457    2.457 _fsdp_state.py:1(<module>)
+        1    0.000    0.000    2.455    2.455 _fsdp_param_group.py:1(<module>)
+        1    0.000    0.000    2.406    2.406 _fsdp_collectives.py:1(<module>)
+     2998    0.019    0.000    2.389    0.001 <frozen importlib._bootstrap_external>:1214(get_data)
+        1    0.000    0.000    2.274    2.274 validation.py:1(<module>)
+     3840    0.716    0.000    1.933    0.001 precise_transformer.py:86(inverse_poly_tensor)
+        1    0.000    0.000    1.793    1.793 fixes.py:1(<module>)
+    12000    1.681    0.000    1.681    0.000 {built-in method torch.stack}
+    19200    0.224    0.000    1.680    0.000 SimpleZono.py:10(copy_centers)
+       33    0.003    0.000    1.634    0.050 utils.py:1(<module>)
+        2    0.001    0.000    1.495    0.747 exc.py:1(<module>)
+     2998    1.405    0.000    1.405    0.000 {built-in method _io.open_code}
+        1    0.001    0.001    1.399    1.399 symbolic_shapes.py:1(<module>)
+    32672    1.380    0.000    1.380    0.000 {built-in method torch.all}
+     1920    0.007    0.000    1.329    0.001 precise_transformer.py:29(lst_as_tensor)
+     3282    0.037    0.000    1.142    0.000 <frozen importlib._bootstrap>:1240(_find_spec)
+     1920    0.409    0.000    1.106    0.001 precise_transformer.py:219(check_corners_tensor)
+     3840    0.584    0.000    1.095    0.000 precise_transformer.py:326(_max_objective_over_x_candidates)
+     3251    0.005    0.000    1.068    0.000 <frozen importlib._bootstrap_external>:1551(find_spec)
+       12    0.000    0.000    1.066    0.089 _jit_internal.py:1047(_overload)
+     3251    0.012    0.000    1.063    0.000 <frozen importlib._bootstrap_external>:1522(_get_spec)
+      169    0.001    0.000    1.050    0.006 inspect.py:1052(findsource)
+  1966100    0.714    0.000    1.024    0.000 _VF.py:27(__getattr__)
+     4195    0.044    0.000    1.000    0.000 <frozen importlib._bootstrap_external>:1624(find_spec)
+      133    0.001    0.000    0.914    0.007 library.py:178(_register_fake)
+     3002    0.903    0.000    0.903    0.000 {method 'read' of '_io.BufferedReader' objects}
+    26384    0.893    0.000    0.901    0.000 {built-in method builtins.all}
+      133    0.001    0.000    0.883    0.007 fake_impl.py:34(register)
+    19217    0.100    0.000    0.873    0.000 fromnumeric.py:3325(prod)
+      133    0.001    0.000    0.860    0.006 utils.py:36(get_source)
+      133    0.002    0.000    0.859    0.006 inspect.py:1661(getframeinfo)
+    12205    0.857    0.000    0.857    0.000 {built-in method nt.stat}
+    11979    0.008    0.000    0.852    0.000 <frozen importlib._bootstrap_external>:145(_path_stat)
+      122    0.769    0.006    0.837    0.007 custom_ops.py:635(_register_to_dispatcher)
+      166    0.817    0.005    0.819    0.005 {built-in method _io.open}
+        1    0.005    0.005    0.798    0.798 _stats_py.py:1(<module>)
+3225/3132    0.008    0.000    0.784    0.000 <frozen importlib._bootstrap>:806(module_from_spec)
+    19235    0.213    0.000    0.774    0.000 fromnumeric.py:66(_wrapreduction)
+7412/7314    0.136    0.000    0.746    0.000 {built-in method builtins.__build_class__}
+    15360    0.492    0.000    0.735    0.000 precise_transformer.py:126(filter_range)
+     2998    0.234    0.000    0.711    0.000 <frozen importlib._bootstrap_external>:782(_compile_bytecode)
+  3972480    0.697    0.000    0.697    0.000 {built-in method torch._C._has_torch_function}
+        1    0.000    0.000    0.694    0.694 _flat_param.py:1(<module>)
+  404/402    0.031    0.000    0.679    0.002 inspect.py:1000(getmodule)
+    15360    0.675    0.000    0.675    0.000 {method 'pow' of 'torch._C.TensorBase' objects}
+       15    0.001    0.000    0.666    0.044 api.py:1(<module>)
+79859/74445    0.041    0.000    0.658    0.000 {built-in method builtins.hasattr}
+  192/189    0.001    0.000    0.653    0.003 <frozen importlib._bootstrap_external>:1318(create_module)
+  192/189    0.471    0.002    0.651    0.003 {built-in method _imp.create_dynamic}
+    11520    0.299    0.000    0.638    0.000 precise_transformer.py:112(bool_to_nan)
+2168048/2167398    0.504    0.000    0.629    0.000 {built-in method builtins.getattr}
+     7680    0.008    0.000    0.626    0.000 precise_transformer.py:81(cuberoot)
+     1920    0.029    0.000    0.608    0.000 Duals.py:257(Sigmoid_di)
+        1    0.000    0.000    0.595    0.595 _fsdp_extensions.py:1(<module>)
+    19200    0.572    0.000    0.572    0.000 {method 'expand' of 'torch._C.TensorBase' objects}
+        1    0.000    0.000    0.562    0.562 _shard_utils.py:1(<module>)
+      604    0.001    0.000    0.521    0.001 _docscrape.py:579(__init__)
+        2    0.000    0.000    0.517    0.258 batchnorm.py:1(<module>)
+        2    0.000    0.000    0.517    0.258 _functions.py:1(<module>)
+ 2947/161    0.003    0.000    0.498    0.003 __init__.py:71(import_module)
+ 2947/161    0.002    0.000    0.498    0.003 <frozen importlib._bootstrap>:1375(_gcd_import)
+     4417    0.006    0.000    0.474    0.000 <frozen importlib._bootstrap_external>:155(_path_is_mode_type)
+  2294994    0.473    0.000    0.473    0.000 {method 'append' of 'list' objects}
+     2998    0.470    0.000    0.470    0.000 {built-in method marshal.loads}
+     4044    0.005    0.000    0.469    0.000 <frozen importlib._bootstrap_external>:164(_path_isfile)
+        1    0.406    0.406    0.466    0.466 __init__.py:168(_load_dll_libraries)
+      674    0.002    0.000    0.465    0.001 dataclasses.py:1294(wrap)
+      674    0.035    0.000    0.463    0.001 dataclasses.py:929(_process_class)
+      455    0.005    0.000    0.463    0.001 _array_api.py:926(decorator)
+     3175    0.015    0.000    0.458    0.000 <frozen ntpath>:702(realpath)
+      612    0.003    0.000    0.457    0.001 _docscrape.py:140(__init__)
+        1    0.000    0.000    0.455    0.455 _conv_ops.py:1(<module>)
+        1    0.000    0.000    0.447    0.447 polyfuncs.py:1(<module>)
+    11520    0.100    0.000    0.445    0.000 precise_transformer.py:40(inv_sigmoid)
+        1    0.000    0.000    0.445    0.445 specialpolys.py:1(<module>)
+    19250    0.430    0.000    0.430    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+  192/136    0.001    0.000    0.429    0.003 <frozen importlib._bootstrap_external>:1326(exec_module)
+  192/136    0.114    0.001    0.428    0.003 {built-in method _imp.exec_dynamic}
+      251    0.000    0.000    0.421    0.002 linecache.py:32(getlines)
+       79    0.001    0.000    0.421    0.005 linecache.py:102(updatecache)
+     6359    0.420    0.000    0.420    0.000 {built-in method nt._getfinalpathname}
+        1    0.000    0.000    0.417    0.417 rings.py:1(<module>)
+       28    0.001    0.000    0.409    0.015 tokenize.py:451(open)
+        1    0.000    0.000    0.405    0.405 _csr.py:1(<module>)
+   250/53    0.003    0.000    0.403    0.008 _ops.py:374(fallthrough)
+        1    0.000    0.000    0.400    0.400 _compressed.py:1(<module>)
+        1    0.000    0.000    0.397    0.397 _dtensor_spec.py:1(<module>)
+
+
+
+
+======================================================================
+TOP 150 BY SELF (INTERNAL) TIME
+======================================================================
+Wed Jul 15 18:05:12 2026    profiles/lipschitz_big_nosave_both_vectorized.prof
+
+         61160104 function calls (61033910 primitive calls) in 1249.394 seconds
+
+   Ordered by: internal time
+   List reduced from 13055 to 150 due to restriction <150>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+     9600  416.259    0.043  416.267    0.043 SimpleZono.py:169(AffineZonotope)
+  1966080  119.598    0.000  119.598    0.000 {built-in method torch._C._linalg.linalg_lstsq}
+  1989120   89.430    0.000   89.430    0.000 {built-in method torch.cat}
+     1920   75.881    0.040  492.600    0.257 precise_transformer.py:519(sigmoid_prime_product_tensor)
+    56640   73.069    0.001   73.069    0.001 {built-in method torch.abs}
+    24960   60.114    0.002   60.114    0.002 {built-in method torch.sum}
+     3840   51.343    0.013  140.163    0.037 SimpleZono.py:125(__mul__)
+  1966080   39.214    0.000   39.214    0.000 {built-in method torch.cartesian_prod}
+  1966080   33.601    0.000   60.713    0.000 precise_transformer.py:15(sigmoid_prime_times_y)
+     1920   33.207    0.017  107.176    0.056 precise_transformer.py:7(get_linspace)
+     7200   23.722    0.003   51.854    0.007 HyperDuals.py:29(imatmul)
+  3932160   21.140    0.000   21.140    0.000 {built-in method torch.linspace}
+  1966080   18.351    0.000  161.047    0.000 precise_transformer.py:64(lin_reg_tensor)
+     1920   14.923    0.008   40.813    0.021 precise_transformer.py:472(compute_max_error)
+  3972480   14.278    0.000   14.278    0.000 {built-in method torch.sigmoid}
+  3941280   13.833    0.000   13.833    0.000 {built-in method torch.max}
+    50400   13.010    0.000   13.010    0.000 {built-in method torch.matmul}
+  1991040   10.544    0.000   10.544    0.000 {built-in method torch.rsub}
+     3840    9.706    0.003   77.841    0.020 SimpleZono.py:294(SigmoidZonotope)
+  1968000    9.548    0.000    9.548    0.000 {built-in method torch.ones}
+    23072    8.541    0.000    8.541    0.000 {built-in method torch.zeros}
+  7865776    8.309    0.000    8.309    0.000 {method 'item' of 'torch._C.TensorBase' objects}
+     1920    7.107    0.004  549.453    0.286 precise_transformer.py:604(PreciseSigmoidDualZonotope)
+    11520    6.379    0.001   12.175    0.001 SimpleZono.py:16(traceify)
+     5760    5.561    0.001    5.561    0.001 {method 'unbind' of 'torch._C.TensorBase' objects}
+    24000    5.406    0.000    5.406    0.000 {built-in method torch.minimum}
+    19232    4.873    0.000    4.873    0.000 {built-in method torch.tensor}
+    11520    4.593    0.000    4.593    0.000 {built-in method torch.eye}
+  1966080    4.078    0.000   44.659    0.000 functional.py:1363(cartesian_prod)
+  3932180    3.640    0.000    3.640    0.000 {method 'size' of 'torch._C.TensorBase' objects}
+    14400    3.526    0.000    3.526    0.000 {built-in method torch.sign}
+     4800    3.122    0.001    9.105    0.002 Duals.py:268(abstract_di)
+    30752    2.981    0.000    2.981    0.000 {built-in method torch.le}
+  501/496    2.546    0.005    4.234    0.009 {method 'acquire' of '_thread.lock' objects}
+  2006400    2.221    0.000   14.571    0.000 _tensor.py:40(wrapped)
+      480    1.883    0.004   64.545    0.134 get_lipschitz.py:63(forward_interval)
+    12000    1.681    0.000    1.681    0.000 {built-in method torch.stack}
+    12480    1.517    0.000   50.571    0.004 SimpleZono.py:70(expand)
+     2998    1.405    0.000    1.405    0.000 {built-in method _io.open_code}
+    32672    1.380    0.000    1.380    0.000 {built-in method torch.all}
+     3002    0.903    0.000    0.903    0.000 {method 'read' of '_io.BufferedReader' objects}
+    26384    0.893    0.000    0.901    0.000 {built-in method builtins.all}
+    12205    0.857    0.000    0.857    0.000 {built-in method nt.stat}
+      166    0.817    0.005    0.819    0.005 {built-in method _io.open}
+  1991040    0.778    0.000   11.322    0.000 _tensor.py:1114(__rsub__)
+      122    0.769    0.006    0.837    0.007 custom_ops.py:635(_register_to_dispatcher)
+     3840    0.716    0.000    1.933    0.001 precise_transformer.py:86(inverse_poly_tensor)
+  1966100    0.714    0.000    1.024    0.000 _VF.py:27(__getattr__)
+  3972480    0.697    0.000    0.697    0.000 {built-in method torch._C._has_torch_function}
+    15360    0.675    0.000    0.675    0.000 {method 'pow' of 'torch._C.TensorBase' objects}
+     3840    0.584    0.000    1.095    0.000 precise_transformer.py:326(_max_objective_over_x_candidates)
+     2400    0.582    0.000   52.628    0.022 Duals.py:122(__matmul__)
+    19200    0.572    0.000    0.572    0.000 {method 'expand' of 'torch._C.TensorBase' objects}
+2168048/2167398    0.504    0.000    0.629    0.000 {built-in method builtins.getattr}
+    15360    0.492    0.000    0.735    0.000 precise_transformer.py:126(filter_range)
+  2294994    0.473    0.000    0.473    0.000 {method 'append' of 'list' objects}
+  192/189    0.471    0.002    0.651    0.003 {built-in method _imp.create_dynamic}
+     2998    0.470    0.000    0.470    0.000 {built-in method marshal.loads}
+    24960    0.459    0.000  127.321    0.005 SimpleZono.py:54(get_coeff_abs)
+    19250    0.430    0.000    0.430    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+     6359    0.420    0.000    0.420    0.000 {built-in method nt._getfinalpathname}
+     1920    0.409    0.000    1.106    0.001 precise_transformer.py:219(check_corners_tensor)
+        1    0.406    0.406    0.466    0.466 __init__.py:168(_load_dll_libraries)
+     1920    0.341    0.000  197.937    0.103 SimpleZono.py:437(SigmoidDualZonotope)
+    11520    0.315    0.000    0.315    0.000 {built-in method torch.sqrt}
+  125/124    0.305    0.002 1853.574   14.948 threading.py:641(wait)
+     8640    0.304    0.000   36.495    0.004 SimpleZono.py:58(get_lb)
+    11520    0.299    0.000    0.638    0.000 precise_transformer.py:112(bool_to_nan)
+   3819/0    0.291    0.000    0.000          {built-in method builtins.exec}
+  124/123    0.284    0.002  577.524    4.695 threading.py:327(wait)
+     8640    0.281    0.000   35.451    0.004 SimpleZono.py:64(get_ub)
+     3360    0.270    0.000    0.386    0.000 Duals.py:38(__add__)
+    13456    0.264    0.000    4.449    0.000 Duals.py:12(__init__)
+    11520    0.245    0.000    0.245    0.000 {built-in method torch.isreal}
+     6720    0.240    0.000    0.344    0.000 SimpleZono.py:350(__add__)
+     2998    0.234    0.000    0.711    0.000 <frozen importlib._bootstrap_external>:782(_compile_bytecode)
+    19200    0.224    0.000    1.680    0.000 SimpleZono.py:10(copy_centers)
+    19235    0.213    0.000    0.774    0.000 fromnumeric.py:66(_wrapreduction)
+     3840    0.192    0.000    3.208    0.001 precise_transformer.py:133(inverse_sigmoid_2nd_deriv)
+     1920    0.190    0.000    5.544    0.003 precise_transformer.py:346(check_nonlinear_boundary_tensor)
+    11520    0.188    0.000    0.188    0.000 {built-in method torch.log}
+     5760    0.185    0.000    0.185    0.000 {built-in method torch.min}
+      480    0.172    0.000  434.846    0.906 get_lipschitz.py:54(forward_zono)
+      480    0.172    0.000  693.977    1.446 get_lipschitz.py:72(forward_zono_precise)
+    15360    0.157    0.000    0.157    0.000 {built-in method torch.logical_and}
+        1    0.152    0.152  666.798  666.798 get_lipschitz.py:1(<module>)
+    20656    0.144    0.000    0.205    0.000 <frozen importlib._bootstrap_external>:101(_path_join)
+     3840    0.144    0.000    0.147    0.000 SimpleZono.py:80(__add__)
+     1920    0.142    0.000    0.267    0.000 HyperDuals.py:104(isquare)
+    40320    0.136    0.000    0.136    0.000 SimpleZono.py:51(get_num_noise_symbs)
+7412/7314    0.136    0.000    0.746    0.000 {built-in method builtins.__build_class__}
+671842/671796    0.133    0.000    0.142    0.000 {built-in method builtins.isinstance}
+     1557    0.127    0.000    0.127    0.000 {method 'write' of '_io.TextIOWrapper' objects}
+    18240    0.121    0.000    0.127    0.000 SimpleZono.py:337(__init__)
+     1920    0.116    0.000    0.316    0.000 SimpleZono.py:23(IntervalsToZonotope)
+  192/136    0.114    0.001    0.428    0.003 {built-in method _imp.exec_dynamic}
+630444/613853    0.114    0.000    0.123    0.000 {built-in method builtins.len}
+    14400    0.102    0.000    0.171    0.000 container.py:124(_get_item_by_idx)
+    11520    0.100    0.000    0.445    0.000 precise_transformer.py:40(inv_sigmoid)
+    19217    0.100    0.000    0.873    0.000 fromnumeric.py:3325(prod)
+    21120    0.098    0.000    0.098    0.000 {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+     3840    0.097    0.000    0.097    0.000 {built-in method torch.isinf}
+     3004    0.097    0.000    0.097    0.000 {built-in method nt._path_exists}
+    11520    0.094    0.000    0.094    0.000 {method 'float' of 'torch._C.TensorBase' objects}
+     3840    0.094    0.000    0.191    0.000 precise_transformer.py:119(inf_to_nan)
+    15360    0.086    0.000    0.086    0.000 {built-in method torch.logical_not}
+      480    0.081    0.000    0.141    0.000 Duals.py:60(__mul__)
+     9620    0.077    0.000    0.077    0.000 {built-in method torch.empty}
+     3840    0.076    0.000    0.076    0.000 {built-in method torch.nan_to_num}
+     1920    0.074    0.000    0.075    0.000 SimpleZono.py:116(__neg__)
+     3073    0.066    0.000    0.066    0.000 {method '__exit__' of '_io._IOBase' objects}
+     9120    0.066    0.000    0.066    0.000 {built-in method torch.maximum}
+     7680    0.062    0.000    0.062    0.000 {method 'type' of 'torch._C.TensorBase' objects}
+    14400    0.062    0.000    0.273    0.000 container.py:133(__getitem__)
+    11040    0.057    0.000    0.057    0.000 {method 'flatten' of 'torch._C.TensorBase' objects}
+   201278    0.056    0.000    0.084    0.000 utils.py:304(<genexpr>)
+        2    0.054    0.027    0.054    0.027 {built-in method _wmi.exec_query}
+     9594    0.053    0.000    0.053    0.000 {method 'set_' of 'torch._C.TensorBase' objects}
+     9634    0.052    0.000    0.138    0.000 _guards.py:1459(detect_fake_mode)
+    11520    0.052    0.000    0.052    0.000 {built-in method torch.numel}
+    13052    0.050    0.000    0.050    0.000 {method 'sub' of 're.Pattern' objects}
+   364995    0.050    0.000    0.050    0.000 {method 'read' of '_io.BytesIO' objects}
+     2998    0.048    0.000    3.370    0.001 <frozen importlib._bootstrap_external>:1093(get_code)
+       10    0.048    0.005    0.048    0.005 {method 'uniform_' of 'torch._C.TensorBase' objects}
+    14440    0.044    0.000    0.044    0.000 module.py:1954(__getattr__)
+     1147    0.044    0.000    0.081    0.000 inspect.py:891(cleandoc)
+     4195    0.044    0.000    1.000    0.000 <frozen importlib._bootstrap_external>:1624(find_spec)
+     8223    0.044    0.000    0.131    0.000 <frozen importlib._bootstrap>:304(acquire)
+     1920    0.044    0.000    0.114    0.000 HyperDuals.py:13(imul)
+      480    0.042    0.000    0.042    0.000 {built-in method torch._ops.profiler._record_function_enter_new}
+      384    0.041    0.000    0.041    0.000 {built-in method nt.listdir}
+79859/74445    0.041    0.000    0.658    0.000 {built-in method builtins.hasattr}
+44243/42778    0.041    0.000    0.096    0.000 {built-in method __new__ of type object at 0x00007FFD76D448A0}
+     2841    0.040    0.000    0.121    0.000 inspect.py:2375(_signature_from_function)
+     6914    0.040    0.000    0.040    0.000 {method 'findall' of 're.Pattern' objects}
+4779/3169    0.039    0.000    0.222    0.000 inspect.py:2479(_signature_from_callable)
+     2524    0.038    0.000    0.040    0.000 _ops.py:803(__init__)
+      479    0.038    0.000    0.090    0.000 assumptions.py:614(_prepare_class_assumptions)
+    10803    0.037    0.000    0.077    0.000 _docscrape.py:168(_is_at_section)
+     3282    0.037    0.000    1.142    0.000 <frozen importlib._bootstrap>:1240(_find_spec)
+   226298    0.037    0.000    0.037    0.000 {method 'startswith' of 'str' objects}
+       14    0.036    0.003    0.036    0.003 {built-in method _ctypes.LoadLibrary}
+      674    0.035    0.000    0.463    0.001 dataclasses.py:929(_process_class)
+    14004    0.034    0.000    0.092    0.000 _docscrape.py:67(read_to_condition)
+     2400    0.033    0.000    0.033    0.000 HyperDuals.py:58(iadd)
+   6100/0    0.033    0.000    0.000          <frozen importlib._bootstrap>:1349(_find_and_load)
+     4901    0.032    0.000    0.040    0.000 inspect.py:3016(__init__)
+     1920    0.032    0.000    0.032    0.000 {built-in method torch.ge}
+67732/67638    0.032    0.000    0.039    0.000 {method 'join' of 'str' objects}
+22668/3490    0.031    0.000    0.016    0.000 {built-in method builtins.any}
+
+
+
+
+======================================================================
+CALLERS OF FUNCTIONS OF INTEREST
+======================================================================
+
+
+---- callers of *sigmoid_prime_product_tensor* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'sigmoid_prime_product_tensor'>
+
+Function                                                  was called by...
+                                                              ncalls  tottime  cumtime
+precise_transformer.py:519(sigmoid_prime_product_tensor)  <- 1909/326   75.636   81.249  precise_transformer.py:604(PreciseSigmoidDualZonotope)
+
+
+
+
+---- callers of *lin_reg_tensor* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'lin_reg_tensor'>
+
+Function                                   was called by...
+                                               ncalls  tottime  cumtime
+precise_transformer.py:64(lin_reg_tensor)  <- 1946068/136548   18.148   10.829  precise_transformer.py:519(sigmoid_prime_product_tensor)
+                                                 2048    0.021    0.190  threading.py:327(wait)
+                                            17042/3739    0.171    0.406  threading.py:641(wait)
+                                                  921    0.011    0.097  {method 'acquire' of '_thread.lock' objects}
+
+
+
+
+---- callers of *lstsq* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'lstsq'>
+
+Function                                         was called by...
+                                                     ncalls  tottime  cumtime
+{built-in method torch._C._linalg.linalg_lstsq}  <- 1966065/136548  119.597    8.065  precise_transformer.py:64(lin_reg_tensor)
+                                                        8/1    0.000    0.000  threading.py:327(wait)
+
+
+
+
+---- callers of *compute_max_error* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'compute_max_error'>
+
+Function                                       was called by...
+                                                   ncalls  tottime  cumtime
+precise_transformer.py:472(compute_max_error)  <- 1889/889   14.485   19.641  precise_transformer.py:519(sigmoid_prime_product_tensor)
+                                                        3    0.008    0.053  threading.py:327(wait)
+                                                    24/13    0.418    0.346  threading.py:641(wait)
+                                                        4    0.012    0.080  {method 'acquire' of '_thread.lock' objects}
+
+
+
+
+---- callers of *check_corners_tensor* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'check_corners_tensor'>
+
+Function                                          was called by...
+                                                      ncalls  tottime  cumtime
+precise_transformer.py:219(check_corners_tensor)  <-    1920    0.409    1.106  precise_transformer.py:472(compute_max_error)
+
+
+
+
+---- callers of *check_corners* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'check_corners'>
+
+Function                                          was called by...
+                                                      ncalls  tottime  cumtime
+precise_transformer.py:219(check_corners_tensor)  <-    1920    0.409    1.106  precise_transformer.py:472(compute_max_error)
+
+
+
+
+---- callers of *check_nonlinear_boundary_tensor* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'check_nonlinear_boundary_tensor'>
+
+Function                                                     was called by...
+                                                                 ncalls  tottime  cumtime
+precise_transformer.py:346(check_nonlinear_boundary_tensor)  <-    1920    0.190    5.544  precise_transformer.py:472(compute_max_error)
+
+
+
+
+---- callers of *check_nonlinear_boundary* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'check_nonlinear_boundary'>
+
+Function                                                     was called by...
+                                                                 ncalls  tottime  cumtime
+precise_transformer.py:346(check_nonlinear_boundary_tensor)  <-    1920    0.190    5.544  precise_transformer.py:472(compute_max_error)
+
+
+
+
+---- callers of *PreciseSigmoidDualZonotope* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'PreciseSigmoidDualZonotope'>
+
+Function                                                was called by...
+                                                            ncalls  tottime  cumtime
+precise_transformer.py:604(PreciseSigmoidDualZonotope)  <- 1871/324    6.896   90.045  get_lipschitz.py:72(forward_zono_precise)
+                                                              49/2    0.211    0.862  threading.py:641(wait)
+
+
+
+
+---- callers of *get_linspace* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'get_linspace'>
+
+Function                                was called by...
+                                            ncalls  tottime  cumtime
+precise_transformer.py:7(get_linspace)  <- 1913/295   33.132   15.578  precise_transformer.py:519(sigmoid_prime_product_tensor)
+
+
+
+
+---- callers of *sigmoid_prime_times_y* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'sigmoid_prime_times_y'>
+
+Function                                          was called by...
+                                                      ncalls  tottime  cumtime
+precise_transformer.py:15(sigmoid_prime_times_y)  <- 1956838/261136   33.445    7.222  precise_transformer.py:519(sigmoid_prime_product_tensor)
+                                                        1749    0.025    0.044  threading.py:327(wait)
+                                                   7491/7151    0.131    0.221  threading.py:641(wait)
+
+
+
+
+---- callers of *matmul* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 5 due to restriction <'matmul'>
+
+Function                        was called by...
+                                    ncalls  tottime  cumtime
+Duals.py:122(__matmul__)        <- 2398/333    0.582    8.610  get_lipschitz.py:63(forward_interval)
+                                         1    0.000    0.002  threading.py:641(wait)
+HyperDuals.py:29(imatmul)       <- 7196/421   23.715    4.635  Duals.py:122(__matmul__)
+                                         1    0.004    0.009  threading.py:327(wait)
+                                         1    0.003    0.005  threading.py:641(wait)
+{built-in method torch.matmul}  <- 50393/2953   13.007    1.452  HyperDuals.py:29(imatmul)
+                                         6    0.003    0.003  {method 'acquire' of '_thread.lock' objects}
+matmul.py:1(<module>)           <-       1    0.000    0.029  {built-in method builtins.exec}
+matmul.py:24(MatMul)            <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+
+
+
+
+---- callers of *cartesian_prod* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 2 due to restriction <'cartesian_prod'>
+
+Function                                was called by...
+                                            ncalls  tottime  cumtime
+functional.py:1363(cartesian_prod)      <- 1956730/195799    4.058    3.980  precise_transformer.py:7(get_linspace)
+                                              6144    0.014    0.152  threading.py:327(wait)
+                                          2181/808    0.005    0.014  threading.py:641(wait)
+                                              1024    0.001    0.014  {method 'acquire' of '_thread.lock' objects}
+{built-in method torch.cartesian_prod}  <- 1966076/195799   39.214    3.478  functional.py:1363(cartesian_prod)
+
+
+
+
+---- callers of *linspace* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 4 due to restriction <'linspace'>
+
+Function                                   was called by...
+                                               ncalls  tottime  cumtime
+precise_transformer.py:7(get_linspace)     <- 1913/295   33.132   15.578  precise_transformer.py:519(sigmoid_prime_product_tensor)
+{built-in method torch.linspace}           <- 3923339/764867   21.096    3.886  precise_transformer.py:7(get_linspace)
+                                            7260/1672    0.039    0.005  threading.py:327(wait)
+                                                 1561    0.006    0.006  {method 'acquire' of '_thread.lock' objects}
+function_base.py:27(linspace)              <-       1    0.000    0.001  _morestats.py:1(<module>)
+                                                    1    0.000    0.000  _plot.py:126(LearningCurveDisplay)
+                                                    1    0.000    0.000  _validation.py:1(<module>)
+function_base.py:22(_linspace_dispatcher)  <-       1    0.000    0.000  _morestats.py:1(<module>)
+                                                    1    0.000    0.000  _plot.py:126(LearningCurveDisplay)
+                                                    1    0.000    0.000  _validation.py:1(<module>)
+
+
+
+
+---- callers of *AffineDualZonotope* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'AffineDualZonotope'>
+
+Function                               was called by...
+                                           ncalls  tottime  cumtime
+SimpleZono.py:396(AffineDualZonotope)  <- 2322/31    0.013    3.297  get_lipschitz.py:54(forward_zono)
+                                         2329/123    0.013    8.674  get_lipschitz.py:72(forward_zono_precise)
+                                            149/2    0.001    0.275  threading.py:641(wait)
+
+
+
+
+---- callers of *SigmoidZonotope* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'SigmoidZonotope'>
+
+Function                            was called by...
+                                        ncalls  tottime  cumtime
+SimpleZono.py:294(SigmoidZonotope)  <- 1918/513    5.779   12.720  SimpleZono.py:437(SigmoidDualZonotope)
+                                          1920    3.927   32.847  precise_transformer.py:604(PreciseSigmoidDualZonotope)
+
+
+
+
+---- callers of *expand* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 50 due to restriction <'expand'>
+
+Function                                                         was called by...
+                                                                     ncalls  tottime  cumtime
+SimpleZono.py:70(expand)                                         <- 1919/1074    0.063    5.686  SimpleZono.py:125(__mul__)
+                                                                    3835/99    0.095    0.437  SimpleZono.py:294(SigmoidZonotope)
+                                                                        960    0.003    0.016  SimpleZono.py:325(HyperDualIntervalToDualZonotope)
+                                                                       1912    0.861   12.117  SimpleZono.py:437(SigmoidDualZonotope)
+                                                                   3828/419    0.493    1.624  precise_transformer.py:604(PreciseSigmoidDualZonotope)
+                                                                         15    0.002    0.083  threading.py:327(wait)
+                                                                        9/4    0.000    0.022  threading.py:641(wait)
+{method 'expand' of 'torch._C.TensorBase' objects}               <-   19200    0.572    0.572  SimpleZono.py:10(copy_centers)
+{method 'expandtabs' of 'str' objects}                           <-    9448    0.005    0.005  doccer.py:29(docformat)
+                                                                         15    0.000    0.000  doccer.py:311(unindent_string)
+                                                                       1147    0.003    0.003  inspect.py:891(cleandoc)
+conv_expanded_weights.py:1(<module>)                             <-       1    0.000    0.006  {built-in method builtins.exec}
+hyperexpand.py:1(<module>)                                       <-       1    0.000    0.003  {built-in method builtins.exec}
+expanded_weights_utils.py:1(<module>)                            <-       1    0.000    0.002  {built-in method builtins.exec}
+expanded_weights_impl.py:83(implements_per_sample_grads)         <-       3    0.000    0.000  conv_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  embedding_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  group_norm_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  instance_norm_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  layer_norm_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  linear_expanded_weights.py:1(<module>)
+layer_norm_expanded_weights.py:1(<module>)                       <-       1    0.000    0.000  {built-in method builtins.exec}
+expanded_weights_impl.py:1(<module>)                             <-       1    0.000    0.000  {built-in method builtins.exec}
+__init__.py:269(_expand_vars)                                    <-       4    0.000    0.000  __init__.py:448(get_paths)
+embedding_expanded_weights.py:1(<module>)                        <-       1    0.000    0.000  {built-in method builtins.exec}
+group_norm_expanded_weights.py:1(<module>)                       <-       1    0.000    0.000  {built-in method builtins.exec}
+instance_norm_expanded_weights.py:1(<module>)                    <-       1    0.000    0.000  {built-in method builtins.exec}
+linear_expanded_weights.py:1(<module>)                           <-       1    0.000    0.000  {built-in method builtins.exec}
+gettext.py:231(_expand_lang)                                     <-       6    0.000    0.000  gettext.py:488(find)
+_reductions_impl.py:30(_deco_axis_expand)                        <-      13    0.000    0.000  _reductions_impl.py:1(<module>)
+expanding.py:1(<module>)                                         <-       1    0.000    0.000  {built-in method builtins.exec}
+<frozen ntpath>:343(expanduser)                                  <-       2    0.000    0.000  __init__.py:123(joinuser)
+                                                                         32    0.000    0.000  __init__.py:269(_expand_vars)
+                                                                          1    0.000    0.000  hub.py:184(_get_torch_home)
+                                                                          1    0.000    0.000  tempfile.py:156(_candidate_tempdir_list)
+                                                                          1    0.000    0.000  vision.py:33(__init__)
+conv_expanded_weights.py:22(ConvPerSampleGrad)                   <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:476(Hyper_Function)                               <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+<frozen ntpath>:403(expandvars)                                  <-       1    0.000    0.000  tempfile.py:156(_candidate_tempdir_list)
+expanding.py:42(Expanding)                                       <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+layer_norm_expanded_weights.py:16(LayerNormPerSampleGrad)        <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+embedding_expanded_weights.py:14(EmbeddingPerSampleGrad)         <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1347(ReduceOrder)                                 <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+expanded_weights_impl.py:104(ExpandedWeight)                     <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+group_norm_expanded_weights.py:17(GroupNormPerSampleGrad)        <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+linear_expanded_weights.py:15(LinearPerSampleGrad)               <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+expanded_weights_impl.py:84(decorator)                           <-       3    0.000    0.000  conv_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  embedding_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  group_norm_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  instance_norm_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  layer_norm_expanded_weights.py:1(<module>)
+                                                                          1    0.000    0.000  linear_expanded_weights.py:1(<module>)
+hyperexpand.py:608(G_Function)                                   <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+instance_norm_expanded_weights.py:16(InstanceNormPerSampleGrad)  <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1140(MeijerShiftC)                                <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:674(Formula)                                      <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:885(MeijerFormula)                                <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:809(FormulaCollection)                            <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+expanding.py:1392(ExpandingGroupby)                              <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:926(MeijerFormulaCollection)                      <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:949(Operator)                                     <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1002(MultOperator)                                <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1009(ShiftA)                                      <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1022(ShiftB)                                      <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1162(MeijerUnShiftA)                              <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1035(UnShiftA)                                    <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1076(UnShiftB)                                    <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1200(MeijerUnShiftB)                              <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1118(MeijerShiftA)                                <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1129(MeijerShiftB)                                <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1151(MeijerShiftD)                                <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1247(MeijerUnShiftC)                              <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1298(MeijerUnShiftD)                              <-       1    0.000    0.000  {built-in method builtins.__build_class__}
+
+
+
+
+---- callers of *traceify* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'traceify'>
+
+Function                    was called by...
+                                ncalls  tottime  cumtime
+SimpleZono.py:16(traceify)  <-    1920    0.027    0.168  SimpleZono.py:23(IntervalsToZonotope)
+                                  3825    2.184    4.003  SimpleZono.py:125(__mul__)
+                                  3840    3.084    5.992  SimpleZono.py:294(SigmoidZonotope)
+                                  1888    1.042    1.942  precise_transformer.py:519(sigmoid_prime_product_tensor)
+                                     3    0.001    0.003  threading.py:327(wait)
+                                    34    0.034    0.053  threading.py:641(wait)
+                                    10    0.006    0.013  {method 'acquire' of '_thread.lock' objects}
+
+
+
+
+======================================================================
+CALLEES OF FUNCTIONS OF INTEREST
+======================================================================
+
+
+---- callees of *sigmoid_prime_product_tensor* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'sigmoid_prime_product_tensor'>
+
+Function                                                  called...
+                                                              ncalls  tottime  cumtime
+precise_transformer.py:519(sigmoid_prime_product_tensor)  ->    1888    1.042    1.942  SimpleZono.py:16(traceify)
+                                                                1885    0.002    0.002  SimpleZono.py:38(__init__)
+                                                                3840    0.146   18.315  SimpleZono.py:58(get_lb)
+                                                                3840    0.144   18.022  SimpleZono.py:64(get_ub)
+                                                                  16    0.000    0.001  _monitor.py:56(get_instances)
+                                                            1913/295   33.132   15.578  precise_transformer.py:7(get_linspace)
+                                                           1956838/261136   33.445    7.222  precise_transformer.py:15(sigmoid_prime_times_y)
+                                                                1889    0.007    1.308  precise_transformer.py:29(lst_as_tensor)
+                                                           1946068/136548   18.148   10.829  precise_transformer.py:64(lin_reg_tensor)
+                                                            1889/889   14.485   19.641  precise_transformer.py:472(compute_max_error)
+                                                                   8    0.000    0.000  std.py:108(__enter__)
+                                                                   8    0.000    0.000  std.py:111(__exit__)
+                                                                   8    0.000    0.000  std.py:759(get_lock)
+                                                                  24    0.000    0.000  threading.py:306(__exit__)
+                                                                   3    0.000    0.000  threading.py:315(_acquire_restore)
+                                                                  24    0.000    0.000  threading.py:605(is_set)
+                                                                   7    0.039    0.120  threading.py:641(wait)
+                                                            1890/838    0.870    0.424  {built-in method builtins.all}
+                                                                3804    0.005    0.005  {built-in method builtins.len}
+                                                                   8    0.000    0.000  {built-in method time.time}
+                                                                1885    6.248    6.248  {built-in method torch.cat}
+                                                                1890    0.128    0.128  {built-in method torch.stack}
+                                                                5670    4.608    4.608  {built-in method torch.tensor}
+                                                                   3    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+
+
+
+
+---- callees of *lin_reg_tensor* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'lin_reg_tensor'>
+
+Function                                   called...
+                                               ncalls  tottime  cumtime
+precise_transformer.py:64(lin_reg_tensor)  ->      15    0.000    0.000  threading.py:315(_acquire_restore)
+                                            1966065/136548  119.597    8.065  {built-in method torch._C._linalg.linalg_lstsq}
+                                            1966078/1176098    9.956    6.057  {built-in method torch.cat}
+                                            1966079/1504188    9.503    7.079  {built-in method torch.ones}
+                                                   15    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+                                              3932145    3.640    3.640  {method 'size' of 'torch._C.TensorBase' objects}
+
+
+
+
+---- callees of *lstsq* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'lstsq'>
+
+Function                                         called...
+                                                     ncalls  tottime  cumtime
+{built-in method torch._C._linalg.linalg_lstsq}  -> 
+
+
+
+
+---- callees of *compute_max_error* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'compute_max_error'>
+
+Function                                       called...
+                                                   ncalls  tottime  cumtime
+precise_transformer.py:472(compute_max_error)  ->    1920    0.409    1.106  precise_transformer.py:219(check_corners_tensor)
+                                                     1920    0.190    5.544  precise_transformer.py:346(check_nonlinear_boundary_tensor)
+                                                        1    0.000    0.000  threading.py:315(_acquire_restore)
+                                                     9600    0.004    0.004  {built-in method builtins.len}
+                                                3930999/1854327   13.267    6.468  {built-in method torch.max}
+                                                  1965499    0.409    0.409  {method 'append' of 'list' objects}
+                                                        1    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+                                                     5760    5.561    5.561  {method 'unbind' of 'torch._C.TensorBase' objects}
+
+
+
+
+---- callees of *check_corners_tensor* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'check_corners_tensor'>
+
+Function                                          called...
+                                                      ncalls  tottime  cumtime
+precise_transformer.py:219(check_corners_tensor)  ->    1920    0.013    0.082  _tensor.py:40(wrapped)
+                                                        3840    0.258    0.258  {built-in method torch.max}
+                                                        1920    0.139    0.139  {built-in method torch.min}
+                                                        1920    0.075    0.075  {built-in method torch.sigmoid}
+                                                        3840    0.111    0.111  {built-in method torch.stack}
+                                                        5760    0.033    0.033  {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+
+
+
+
+---- callees of *check_corners* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'check_corners'>
+
+Function                                          called...
+                                                      ncalls  tottime  cumtime
+precise_transformer.py:219(check_corners_tensor)  ->    1920    0.013    0.082  _tensor.py:40(wrapped)
+                                                        3840    0.258    0.258  {built-in method torch.max}
+                                                        1920    0.139    0.139  {built-in method torch.min}
+                                                        1920    0.075    0.075  {built-in method torch.sigmoid}
+                                                        3840    0.111    0.111  {built-in method torch.stack}
+                                                        5760    0.033    0.033  {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+
+
+
+
+---- callees of *check_nonlinear_boundary_tensor* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'check_nonlinear_boundary_tensor'>
+
+Function                                                     called...
+                                                                 ncalls  tottime  cumtime
+precise_transformer.py:346(check_nonlinear_boundary_tensor)  ->    3840    0.094    0.191  precise_transformer.py:119(inf_to_nan)
+                                                                  15360    0.492    0.735  precise_transformer.py:126(filter_range)
+                                                                   3840    0.192    3.208  precise_transformer.py:133(inverse_sigmoid_2nd_deriv)
+                                                                   3840    0.584    1.095  precise_transformer.py:326(_max_objective_over_x_candidates)
+                                                                   3840    0.104    0.104  {built-in method torch.stack}
+                                                                   3840    0.022    0.022  {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+
+
+
+
+---- callees of *check_nonlinear_boundary* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'check_nonlinear_boundary'>
+
+Function                                                     called...
+                                                                 ncalls  tottime  cumtime
+precise_transformer.py:346(check_nonlinear_boundary_tensor)  ->    3840    0.094    0.191  precise_transformer.py:119(inf_to_nan)
+                                                                  15360    0.492    0.735  precise_transformer.py:126(filter_range)
+                                                                   3840    0.192    3.208  precise_transformer.py:133(inverse_sigmoid_2nd_deriv)
+                                                                   3840    0.584    1.095  precise_transformer.py:326(_max_objective_over_x_candidates)
+                                                                   3840    0.104    0.104  {built-in method torch.stack}
+                                                                   3840    0.022    0.022  {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+
+
+
+
+---- callees of *PreciseSigmoidDualZonotope* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'PreciseSigmoidDualZonotope'>
+
+Function                                                called...
+                                                            ncalls  tottime  cumtime
+precise_transformer.py:604(PreciseSigmoidDualZonotope)  ->    7669    0.038    0.038  SimpleZono.py:51(get_num_noise_symbs)
+                                                          3828/419    0.493    1.624  SimpleZono.py:70(expand)
+                                                              1920    3.927   32.847  SimpleZono.py:294(SigmoidZonotope)
+                                                              1908    0.024    0.025  SimpleZono.py:337(__init__)
+                                                                50    0.000    0.002  _monitor.py:56(get_instances)
+                                                          1909/326   75.636   81.249  precise_transformer.py:519(sigmoid_prime_product_tensor)
+                                                                25    0.000    0.000  std.py:108(__enter__)
+                                                                25    0.000    0.000  std.py:111(__exit__)
+                                                                25    0.000    0.000  std.py:759(get_lock)
+                                                                 4    0.000    0.000  threading.py:306(__exit__)
+                                                                 8    0.000    0.000  threading.py:315(_acquire_restore)
+                                                                75    0.000    0.000  threading.py:605(is_set)
+                                                                24    0.065    3.048  threading.py:641(wait)
+                                                                25    0.000    0.000  {built-in method time.time}
+                                                                 8    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+
+
+
+
+---- callees of *get_linspace* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'get_linspace'>
+
+Function                                called...
+                                            ncalls  tottime  cumtime
+precise_transformer.py:7(get_linspace)  -> 1956730/195799    4.058    3.980  functional.py:1363(cartesian_prod)
+                                                 4    0.000    0.000  threading.py:306(__exit__)
+                                                 6    0.000    0.000  threading.py:315(_acquire_restore)
+                                              1913    0.002    0.002  {built-in method builtins.len}
+                                         3923339/764867   21.096    3.886  {built-in method torch.linspace}
+                                         7846686/1209073    8.282    1.170  {method 'item' of 'torch._C.TensorBase' objects}
+                                                 6    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+
+
+
+
+---- callees of *sigmoid_prime_times_y* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'sigmoid_prime_times_y'>
+
+Function                                          called...
+                                                      ncalls  tottime  cumtime
+precise_transformer.py:15(sigmoid_prime_times_y)  ->       6    0.000    0.000  _monitor.py:56(get_instances)
+                                                     1966078    2.110   13.298  _tensor.py:40(wrapped)
+                                                           3    0.000    0.000  std.py:108(__enter__)
+                                                           3    0.000    0.000  std.py:111(__exit__)
+                                                           3    0.000    0.000  std.py:759(get_lock)
+                                                           2    0.000    0.000  threading.py:315(_acquire_restore)
+                                                           9    0.000    0.000  threading.py:605(is_set)
+                                                           2    0.000    0.000  threading.py:641(wait)
+                                                           3    0.000    0.000  {built-in method time.time}
+                                                   3932155/522272   13.814    1.629  {built-in method torch.sigmoid}
+                                                           2    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+
+
+
+
+---- callees of *matmul* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 5 due to restriction <'matmul'>
+
+Function                        called...
+                                    ncalls  tottime  cumtime
+Duals.py:122(__matmul__)        ->    2398    0.058    0.172  Duals.py:12(__init__)
+                                  7196/421   23.715    4.635  HyperDuals.py:29(imatmul)
+                                      2398    0.033    0.033  HyperDuals.py:58(iadd)
+                                         1    0.000    0.000  threading.py:306(__exit__)
+                                         1    0.000    0.000  threading.py:315(_acquire_restore)
+                                      2400    0.001    0.001  {built-in method builtins.isinstance}
+                                         1    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+HyperDuals.py:29(imatmul)       ->       1    0.000    0.000  threading.py:315(_acquire_restore)
+                                     28798    6.265    6.265  {built-in method torch.abs}
+                                 50393/2953   13.007    1.452  {built-in method torch.matmul}
+                                     14400    5.335    5.335  {built-in method torch.minimum}
+                                     14400    3.526    3.526  {built-in method torch.sign}
+                                         1    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+{built-in method torch.matmul}  -> 
+matmul.py:1(<module>)           ->       1    0.000    0.000  <frozen importlib._bootstrap>:463(_lock_unlock_module)
+                                         6    0.000    0.000  <frozen importlib._bootstrap>:645(parent)
+                                         5    0.000    0.029  <frozen importlib._bootstrap>:1349(_find_and_load)
+                                         3    0.000    0.000  <frozen importlib._bootstrap>:1390(_handle_fromlist)
+                                         1    0.000    0.000  core.py:16(exhaust)
+                                         1    0.000    0.000  core.py:104(do_one)
+                                         1    0.000    0.000  operations.py:623(register_handlerclass)
+                                         1    0.000    0.000  rl.py:10(rm_id)
+                                         1    0.000    0.000  tools.py:38(typed)
+                                         1    0.000    0.000  {built-in method builtins.__build_class__}
+matmul.py:24(MatMul)            ->       1    0.000    0.000  special.py:181(__new__)
+
+
+
+
+---- callees of *cartesian_prod* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 2 due to restriction <'cartesian_prod'>
+
+Function                                called...
+                                            ncalls  tottime  cumtime
+functional.py:1363(cartesian_prod)      -> 1966080    0.714    1.024  _VF.py:27(__getattr__)
+                                                 4    0.000    0.000  threading.py:315(_acquire_restore)
+                                           1966080    0.343    0.343  {built-in method torch._C._has_torch_function}
+                                         1966076/195799   39.214    3.478  {built-in method torch.cartesian_prod}
+                                                 4    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+{built-in method torch.cartesian_prod}  -> 
+
+
+
+
+---- callees of *linspace* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 4 due to restriction <'linspace'>
+
+Function                                   called...
+                                               ncalls  tottime  cumtime
+precise_transformer.py:7(get_linspace)     -> 1956730/195799    4.058    3.980  functional.py:1363(cartesian_prod)
+                                                    4    0.000    0.000  threading.py:306(__exit__)
+                                                    6    0.000    0.000  threading.py:315(_acquire_restore)
+                                                 1913    0.002    0.002  {built-in method builtins.len}
+                                            3923339/764867   21.096    3.886  {built-in method torch.linspace}
+                                            7846686/1209073    8.282    1.170  {method 'item' of 'torch._C.TensorBase' objects}
+                                                    6    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+{built-in method torch.linspace}           -> 
+function_base.py:27(linspace)              ->       3    0.000    0.000  fromnumeric.py:3516(_ndim_dispatcher)
+                                                    3    0.000    0.000  fromnumeric.py:3520(ndim)
+                                                    3    0.000    0.000  numeric.py:1910(isscalar)
+                                                    3    0.000    0.000  {built-in method _operator.index}
+                                                    3    0.000    0.000  {built-in method numpy.arange}
+                                                    3    0.000    0.000  {method 'as_arrays' of 'numpy._core._multiarray_umath._array_converter' objects}
+                                                    3    0.000    0.000  {method 'astype' of 'numpy.ndarray' objects}
+                                                    3    0.000    0.000  {method 'reshape' of 'numpy.ndarray' objects}
+                                                    3    0.000    0.000  {method 'result_type' of 'numpy._core._multiarray_umath._array_converter' objects}
+                                                    3    0.000    0.000  {method 'wrap' of 'numpy._core._multiarray_umath._array_converter' objects}
+function_base.py:22(_linspace_dispatcher)  -> 
+
+
+
+
+---- callees of *AffineDualZonotope* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'AffineDualZonotope'>
+
+Function                               called...
+                                           ncalls  tottime  cumtime
+SimpleZono.py:396(AffineDualZonotope)  -> 9523/126  411.547    5.779  SimpleZono.py:169(AffineZonotope)
+                                             4751    0.045    0.047  SimpleZono.py:337(__init__)
+                                               49    0.000    0.000  threading.py:315(_acquire_restore)
+                                               49    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+
+
+
+
+---- callees of *SigmoidZonotope* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'SigmoidZonotope'>
+
+Function                            called...
+                                        ncalls  tottime  cumtime
+SimpleZono.py:294(SigmoidZonotope)  ->    3840    3.084    5.992  SimpleZono.py:16(traceify)
+                                          3838    0.004    0.004  SimpleZono.py:38(__init__)
+                                          7676    0.034    0.034  SimpleZono.py:51(get_num_noise_symbs)
+                                          3840    0.140   17.827  SimpleZono.py:58(get_lb)
+                                          3840    0.123   17.243  SimpleZono.py:64(get_ub)
+                                       3835/99    0.095    0.437  SimpleZono.py:70(expand)
+                                             6    0.000    0.000  _monitor.py:56(get_instances)
+                                          7680    0.038    0.264  _tensor.py:40(wrapped)
+                                             3    0.000    0.000  std.py:108(__enter__)
+                                             3    0.000    0.000  std.py:111(__exit__)
+                                             3    0.000    0.000  std.py:759(get_lock)
+                                             3    0.000    0.000  threading.py:306(__exit__)
+                                             2    0.000    0.000  threading.py:315(_acquire_restore)
+                                             9    0.000    0.000  threading.py:605(is_set)
+                                             2    0.000    0.004  threading.py:641(wait)
+                                             3    0.000    0.000  {built-in method time.time}
+                                          3840    0.090    0.090  {built-in method torch.all}
+                                     3838/1025   12.283    3.430  {built-in method torch.cat}
+                                          3840    0.047    0.047  {built-in method torch.min}
+                                         30720    0.293    0.293  {built-in method torch.sigmoid}
+                                             2    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+
+
+
+
+---- callees of *expand* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 50 due to restriction <'expand'>
+
+Function                                                         called...
+                                                                     ncalls  tottime  cumtime
+SimpleZono.py:70(expand)                                         ->       5    0.000    0.000  threading.py:315(_acquire_restore)
+                                                                  12475/322   42.482    1.321  {built-in method torch.cat}
+                                                                  12479/1371    6.566    0.808  {built-in method torch.zeros}
+                                                                          5    0.000    0.000  {method 'remove' of 'collections.deque' objects}
+{method 'expand' of 'torch._C.TensorBase' objects}               -> 
+{method 'expandtabs' of 'str' objects}                           -> 
+conv_expanded_weights.py:1(<module>)                             ->       3    0.000    0.000  <frozen importlib._bootstrap>:645(parent)
+                                                                          1    0.000    0.005  <frozen importlib._bootstrap>:1349(_find_and_load)
+                                                                          3    0.000    0.000  expanded_weights_impl.py:83(implements_per_sample_grads)
+                                                                          3    0.000    0.000  expanded_weights_impl.py:84(decorator)
+                                                                          1    0.000    0.000  typing.py:3794(__getattr__)
+                                                                          1    0.000    0.000  {built-in method builtins.__build_class__}
+hyperexpand.py:1(<module>)                                       ->       1    0.000    0.000  <frozen importlib._bootstrap>:463(_lock_unlock_module)
+                                                                          1    0.000    0.002  <frozen importlib._bootstrap>:1349(_find_and_load)
+                                                                          7    0.000    0.000  <frozen importlib._bootstrap>:1390(_handle_fromlist)
+                                                                          2    0.000    0.000  symbol.py:494(__new__)
+                                                                         21    0.000    0.001  {built-in method builtins.__build_class__}
+expanded_weights_utils.py:1(<module>)                            ->       1    0.000    0.000  <frozen importlib._bootstrap>:645(parent)
+                                                                          1    0.000    0.002  <frozen importlib._bootstrap>:1349(_find_and_load)
+expanded_weights_impl.py:83(implements_per_sample_grads)         ->       8    0.000    0.000  functools.py:36(update_wrapper)
+                                                                          8    0.000    0.000  functools.py:66(wraps)
+layer_norm_expanded_weights.py:1(<module>)                       ->       2    0.000    0.000  <frozen importlib._bootstrap>:645(parent)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:83(implements_per_sample_grads)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:84(decorator)
+                                                                          1    0.000    0.000  {built-in method builtins.__build_class__}
+expanded_weights_impl.py:1(<module>)                             ->       1    0.000    0.000  <frozen importlib._bootstrap>:1390(_handle_fromlist)
+                                                                          8    0.000    0.000  _ops.py:880(__hash__)
+                                                                          3    0.000    0.000  contextlib.py:276(contextmanager)
+                                                                          1    0.000    0.000  {built-in method builtins.__build_class__}
+__init__.py:269(_expand_vars)                                    ->      32    0.000    0.000  <frozen ntpath>:343(expanduser)
+                                                                         32    0.000    0.000  __init__.py:252(_subst_vars)
+                                                                          4    0.000    0.000  __init__.py:261(_extend_dict)
+                                                                          4    0.000    0.000  __init__.py:540(get_config_vars)
+                                                                         32    0.000    0.000  {built-in method nt._path_normpath}
+                                                                          4    0.000    0.000  {method 'items' of 'dict' objects}
+embedding_expanded_weights.py:1(<module>)                        ->       2    0.000    0.000  <frozen importlib._bootstrap>:645(parent)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:83(implements_per_sample_grads)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:84(decorator)
+                                                                          1    0.000    0.000  typing.py:3794(__getattr__)
+                                                                          1    0.000    0.000  {built-in method builtins.__build_class__}
+group_norm_expanded_weights.py:1(<module>)                       ->       2    0.000    0.000  <frozen importlib._bootstrap>:645(parent)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:83(implements_per_sample_grads)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:84(decorator)
+                                                                          1    0.000    0.000  {built-in method builtins.__build_class__}
+instance_norm_expanded_weights.py:1(<module>)                    ->       2    0.000    0.000  <frozen importlib._bootstrap>:645(parent)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:83(implements_per_sample_grads)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:84(decorator)
+                                                                          1    0.000    0.000  {built-in method builtins.__build_class__}
+linear_expanded_weights.py:1(<module>)                           ->       2    0.000    0.000  <frozen importlib._bootstrap>:645(parent)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:83(implements_per_sample_grads)
+                                                                          1    0.000    0.000  expanded_weights_impl.py:84(decorator)
+                                                                          1    0.000    0.000  {built-in method builtins.__build_class__}
+gettext.py:231(_expand_lang)                                     ->       6    0.000    0.000  locale.py:381(normalize)
+                                                                         15    0.000    0.000  {method 'append' of 'list' objects}
+                                                                         18    0.000    0.000  {method 'find' of 'str' objects}
+                                                                          6    0.000    0.000  {method 'reverse' of 'list' objects}
+_reductions_impl.py:30(_deco_axis_expand)                        ->      13    0.000    0.000  functools.py:36(update_wrapper)
+                                                                         13    0.000    0.000  functools.py:66(wraps)
+expanding.py:1(<module>)                                         ->       2    0.000    0.000  _decorators.py:514(set_module)
+                                                                          2    0.000    0.000  _decorators.py:527(decorator)
+                                                                          1    0.000    0.000  typing.py:3794(__getattr__)
+                                                                          2    0.000    0.000  {built-in method builtins.__build_class__}
+<frozen ntpath>:343(expanduser)                                  ->       2    0.000    0.000  <frozen _collections_abc>:815(__contains__)
+                                                                          2    0.000    0.000  <frozen os>:711(__getitem__)
+                                                                         39    0.000    0.000  {built-in method builtins.isinstance}
+                                                                          2    0.000    0.000  {built-in method builtins.len}
+                                                                         37    0.000    0.000  {built-in method nt.fspath}
+                                                                         37    0.000    0.000  {method 'startswith' of 'str' objects}
+conv_expanded_weights.py:22(ConvPerSampleGrad)                   ->       1    0.000    0.000  <frozen _collections_abc>:473(__new__)
+hyperexpand.py:476(Hyper_Function)                               -> 
+<frozen ntpath>:403(expandvars)                                  ->       1    0.000    0.000  <frozen os>:711(__getitem__)
+                                                                          1    0.000    0.000  {built-in method builtins.isinstance}
+                                                                          2    0.000    0.000  {built-in method builtins.len}
+                                                                          1    0.000    0.000  {built-in method nt.fspath}
+                                                                          1    0.000    0.000  {method 'index' of 'str' objects}
+expanding.py:42(Expanding)                                       ->       2    0.000    0.000  typing.py:2696(overload)
+                                                                          1    0.000    0.000  typing.py:2754(final)
+layer_norm_expanded_weights.py:16(LayerNormPerSampleGrad)        -> 
+embedding_expanded_weights.py:14(EmbeddingPerSampleGrad)         -> 
+hyperexpand.py:1347(ReduceOrder)                                 -> 
+expanded_weights_impl.py:104(ExpandedWeight)                     -> 
+group_norm_expanded_weights.py:17(GroupNormPerSampleGrad)        -> 
+linear_expanded_weights.py:15(LinearPerSampleGrad)               -> 
+expanded_weights_impl.py:84(decorator)                           -> 
+hyperexpand.py:608(G_Function)                                   -> 
+instance_norm_expanded_weights.py:16(InstanceNormPerSampleGrad)  -> 
+hyperexpand.py:1140(MeijerShiftC)                                -> 
+hyperexpand.py:674(Formula)                                      -> 
+hyperexpand.py:885(MeijerFormula)                                -> 
+hyperexpand.py:809(FormulaCollection)                            -> 
+expanding.py:1392(ExpandingGroupby)                              -> 
+hyperexpand.py:926(MeijerFormulaCollection)                      -> 
+hyperexpand.py:949(Operator)                                     -> 
+hyperexpand.py:1002(MultOperator)                                -> 
+hyperexpand.py:1009(ShiftA)                                      -> 
+hyperexpand.py:1022(ShiftB)                                      -> 
+hyperexpand.py:1162(MeijerUnShiftA)                              -> 
+hyperexpand.py:1035(UnShiftA)                                    -> 
+hyperexpand.py:1076(UnShiftB)                                    -> 
+hyperexpand.py:1200(MeijerUnShiftB)                              -> 
+hyperexpand.py:1118(MeijerShiftA)                                -> 
+hyperexpand.py:1129(MeijerShiftB)                                -> 
+hyperexpand.py:1151(MeijerShiftD)                                -> 
+hyperexpand.py:1247(MeijerUnShiftC)                              -> 
+hyperexpand.py:1298(MeijerUnShiftD)                              -> 
+
+
+
+
+---- callees of *traceify* ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'traceify'>
+
+Function                    called...
+                                ncalls  tottime  cumtime
+SimpleZono.py:16(traceify)  ->   11520    0.156    1.151  SimpleZono.py:10(copy_centers)
+                                 11520    4.593    4.593  {built-in method torch.eye}
+                                 11520    0.052    0.052  {built-in method torch.numel}
+
+
+
+
+======================================================================
+ADDENDUM: DIRECT CALLERS OF AffineZonotope AND get_coeff_abs
+======================================================================
+
+
+---- callers matching SimpleZono\.py:169 ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'SimpleZono\\.py:169'>
+
+Function                           was called by...
+                                       ncalls  tottime  cumtime
+SimpleZono.py:169(AffineZonotope)  <- 9523/126  411.547    5.779  SimpleZono.py:396(AffineDualZonotope)
+                                         76/1    4.625    0.127  threading.py:327(wait)
+
+
+
+
+---- callers matching get_coeff_abs ----
+   Ordered by: cumulative time
+   List reduced from 13055 to 1 due to restriction <'get_coeff_abs'>
+
+Function                         was called by...
+                                     ncalls  tottime  cumtime
+SimpleZono.py:54(get_coeff_abs)  <- 8635/299    0.174    1.478  SimpleZono.py:58(get_lb)
+                                  8638/1020    0.122    4.042  SimpleZono.py:64(get_ub)
+                                  7655/1562    0.162   11.450  SimpleZono.py:125(__mul__)
+                                       19/1    0.000    0.012  threading.py:641(wait)
+                                         10    0.000    0.098  {method 'acquire' of '_thread.lock' objects}
+
+

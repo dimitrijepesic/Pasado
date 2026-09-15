@@ -1,0 +1,250 @@
+diff --git a/Section_5_4/get_lipschitz.py b/Section_5_4/get_lipschitz.py
+index d7e441b..32d8b21 100644
+--- a/Section_5_4/get_lipschitz.py
++++ b/Section_5_4/get_lipschitz.py
+@@ -21,6 +21,7 @@ import argparse
+ parser = argparse.ArgumentParser(description='Get haze Lipschitz constant of MNIST Network')
+ parser.add_argument('--network', choices=['3layer', '4layer', '5layer', 'big'], help='neural network architecture',
+                     default='3layer')
++parser.add_argument("--no-save", action="store_true")
+ args = parser.parse_args()
+ 
+ num_images_to_test = 30
+@@ -221,11 +222,13 @@ for epsilon in test_range:  # change back to 2,18
+     pbar_total.update(1)
+ 
+ pbar_total.close()
+-os.system('mkdir -p results')
+-torch.save(lc_zonos, f'results/lc_zonos_{network}.pth')
+-torch.save(lc_intervals, f'results/lc_intervals_{network}.pth')
+-torch.save(lc_zonos_precise, f'results/lc_precise_{network}.pth')
+-
+-torch.save(time_zonos, f'results/time_zonos_{network}.pth')
+-torch.save(time_intervals, f'results/time_intervals_{network}.pth')
+-torch.save(time_precise, f'results/time_precise_{network}.pth')
++
++if not args.no_save:
++    os.system('mkdir -p results')
++    torch.save(lc_zonos, f'results/lc_zonos_{network}.pth')
++    torch.save(lc_intervals, f'results/lc_intervals_{network}.pth')
++    torch.save(lc_zonos_precise, f'results/lc_precise_{network}.pth')
++
++    torch.save(time_zonos, f'results/time_zonos_{network}.pth')
++    torch.save(time_intervals, f'results/time_intervals_{network}.pth')
++    torch.save(time_precise, f'results/time_precise_{network}.pth')
+diff --git a/Section_5_4/lipschitz.sh b/Section_5_4/lipschitz.sh
+index bf2a2ea..2aec285 100755
+--- a/Section_5_4/lipschitz.sh
++++ b/Section_5_4/lipschitz.sh
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+ 
+-python3 get_lipschitz.py --network 3layer
+-python3 get_lipschitz.py --network 4layer
+-python3 get_lipschitz.py --network 5layer
+-python3 get_lipschitz.py --network big
++time python3 get_lipschitz.py --network 3layer
++time python3 get_lipschitz.py --network 4layer
++time python3 get_lipschitz.py --network 5layer
++time python3 get_lipschitz.py --network big
+diff --git a/forward_mode_tensorized_src/precise_transformer.py b/forward_mode_tensorized_src/precise_transformer.py
+index 7cac8e3..0f56489 100644
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -1,8 +1,41 @@
++import os
+ import torch
+ from sklearn import linear_model
+ from SimpleZono import *
+ 
+ 
++# ---------------------------------------------------------------------------
++# Experimental implementation selectors (Phase 3 / Phase 6 of the 5.4 sprint).
++#
++# PASADO_VECTORIZED_PRECISE=1 (default)  -> compute_max_error uses the vectorized
++#     check_corners_tensor / check_nonlinear_boundary_tensor path.
++# PASADO_VECTORIZED_PRECISE=0            -> falls back to the original per-neuron
++#     check_corners / check_nonlinear_boundary Python-loop path.
++#
++# The selector affects ONLY the corner and nonlinear-boundary error checks. The
++# linear regression, the ABCs, the np.random perturbation of A, and every bound
++# computation are byte-for-byte identical on both paths, so a seeded run differs
++# only by floating-point reordering inside the two checks.
++#
++# The module-level flags are read at *call* time, so an in-process harness can
++# flip e.g. `precise_transformer.USE_VECTORIZED_PRECISE = False` between runs.
++# ---------------------------------------------------------------------------
++USE_VECTORIZED_PRECISE = os.environ.get("PASADO_VECTORIZED_PRECISE", "1") != "0"
++
++# PASADO_VEC_BOUNDARY lets the nonlinear-boundary check be toggled independently
++# of the corner check, so the benchmark matrix can express the "corners only"
++# intermediate variant. Default follows PASADO_VECTORIZED_PRECISE. It only has an
++# effect when ABCs_tensor is supplied (i.e. USE_VECTORIZED_PRECISE is on).
++USE_VECTORIZED_BOUNDARY = os.environ.get("PASADO_VEC_BOUNDARY", "1") != "0"
++
++# PASADO_BATCHED_LSTSQ=1 -> sigmoid_prime_product_tensor solves all per-neuron
++#     regressions with a single batched lin_reg_tensor_batched call.
++# PASADO_BATCHED_LSTSQ=0 (default) -> original per-neuron lin_reg_tensor loop.
++# Wired in Phase 6 once the batched solver is validated; default stays off until
++# then so production behavior is unchanged.
++USE_BATCHED_LSTSQ = os.environ.get("PASADO_BATCHED_LSTSQ", "0") != "0"
++
++
+ # lx, ly, ux, uy are TENSORS/VECTORS who have as many columns as neurons/variables in a layer
+ def get_linspace(lx, ux, ly, uy, STEPS=5):
+     xs = [torch.linspace(lx[i].item(), ux[i].item(), steps=STEPS) for i in range(lx.shape[0])]
+@@ -209,6 +242,35 @@ def check_corners(ABCs, lx, ux, ly, uy):
+     return maxs
+ 
+ 
++# EXPERIMENTAL / vectorized version of check_corners.
++# Same semantics as check_corners, but ABCs is passed as a single [n,3] tensor
++# (columns A,B,C) instead of a Python list of (A,B,C) tuples, and all n neurons
++# are evaluated in one batch instead of a Python for-loop.
++#
++# Used by compute_max_error when ABCs_tensor is provided; check_corners is kept
++# as the default (ABCs_tensor=None) path for rollback.
++def check_corners_tensor(ABCs_tensor, lx, ux, ly, uy):
++    A = ABCs_tensor[:, 0]
++    B = ABCs_tensor[:, 1]
++    C = ABCs_tensor[:, 2]
++
++    # all_corners per neuron, in the same order as check_corners:
++    # (lx,ly), (lx,uy), (ux,ly), (ux,uy)  -> shape [n, 4]
++    xs = torch.stack((lx, lx, ux, ux), dim=1)
++    ys = torch.stack((ly, uy, ly, uy), dim=1)
++
++    sig = torch.sigmoid(xs)
++    sigmoid_prime_y = (1.0 - sig) * sig * ys
++    planar = A.unsqueeze(1) * xs + B.unsqueeze(1) * ys + C.unsqueeze(1)
++
++    evaluation = sigmoid_prime_y - planar  # [n, 4], same as objective_fn per corner
++
++    row_max = torch.max(evaluation, dim=1).values
++    row_min = torch.min(evaluation, dim=1).values
++
++    return torch.max(row_max, -row_min)  # [n]
++
++
+ def check_corners_softplus(ABCs, lx, ux, ly, uy):
+     maxs = []
+     for i in range(lx.size()[0]):
+@@ -294,6 +356,70 @@ def check_nonlinear_boundary(lx, ux, ly, uy, ABCs):
+     return maxs, maxs_uy
+ 
+ 
++def _max_objective_over_x_candidates(A, B, C, xs, ys):
++    # xs: [n, k] candidate x-roots per neuron, ys: [n, 1] the fixed y (ly or uy)
++    # for that neuron, broadcast against xs. Same math as objective_fn, batched,
++    # with NaN candidates (filtered-out roots) mapped to -inf before the max so
++    # they can never win - mirrors the per-neuron loop in check_nonlinear_boundary.
++    sig = torch.sigmoid(xs)
++    sigmoid_prime_y = (1.0 - sig) * sig * ys
++    planar = A.unsqueeze(1) * xs + B.unsqueeze(1) * ys + C.unsqueeze(1)
++    evaluation = sigmoid_prime_y - planar
++    evaluation = torch.nan_to_num(evaluation, -float("Inf"))
++    return torch.max(evaluation, dim=1).values
++
++
++# EXPERIMENTAL / vectorized version of check_nonlinear_boundary.
++# Same semantics, but ABCs is passed as a single [n,3] tensor (columns A,B,C)
++# instead of a Python list of (A,B,C) tuples, and the two per-neuron
++# objective-max loops are replaced with batched tensor ops.
++#
++# Used by compute_max_error when ABCs_tensor is provided; check_nonlinear_boundary
++# is kept as the default (ABCs_tensor=None) path for rollback.
++def check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor):
++    A = ABCs_tensor[:, 0]
++    B = ABCs_tensor[:, 1]
++    C = ABCs_tensor[:, 2]
++
++    A_by_ly = A / ly
++    A_by_uy = A / uy
++    A_by_ly = inf_to_nan(A_by_ly)  # Checks the case ly=0 (meaning A/ly is undefined)
++    A_by_uy = inf_to_nan(A_by_uy)
++
++    l = -1.0 / (6.0 * np.sqrt(3.0))
++    u = -l
++
++    A_by_ly = filter_range(l, u, A_by_ly)  # checks the case A/ly is NOT in [-.1,.1] (not in image of sigmoid''(x))
++    A_by_uy = filter_range(l, u, A_by_uy)
++
++    root1, root2, root3 = inverse_sigmoid_2nd_deriv(
++        A_by_ly)  # because of the nature of sigmoid''(x), only at most 2 of these will be real
++
++    # checks if the roots (where the extrema is reached) is within [lx,ux], if not the root is replaced with NaN
++    root1 = filter_range(lx, ux, root1)
++    root2 = filter_range(lx, ux, root2)
++    root3 = filter_range(lx, ux, root3)
++
++    roots_x = torch.stack((root1, root2, root3), dim=1)  # [n, 3]
++    roots_y = ly.unsqueeze(1)  # [n, 1], broadcasts against roots_x
++
++    maxs = _max_objective_over_x_candidates(A, B, C, roots_x, roots_y)  # [n]
++
++    # NEED TO DO ALL THIS AGAIN FOR A_by_uy
++    root1_uy, root2_uy, root3_uy = inverse_sigmoid_2nd_deriv(A_by_uy)
++
++    root1_uy = filter_range(lx, ux, root1_uy)
++    root2_uy = filter_range(lx, ux, root2_uy)
++    root3_uy = filter_range(lx, ux, root3_uy)
++
++    roots_x_uy = torch.stack((root1_uy, root2_uy, root3_uy), dim=1)  # [n, 3]
++    roots_y_uy = uy.unsqueeze(1)  # [n, 1]
++
++    maxs_uy = _max_objective_over_x_candidates(A, B, C, roots_x_uy, roots_y_uy)  # [n]
++
++    return maxs, maxs_uy
++
++
+ def check_nonlinear_boundary_softplus(lx, ux, ly, uy, ABCs):
+     A_by_ly = torch.tensor([ABCs[i][0] / ly[i] for i in range(
+         len(ABCs))])
+@@ -376,14 +502,29 @@ def check_corners_negated(ABCs,lx,ux,ly,uy):
+ """
+ 
+ 
+-def compute_max_error(lx, ux, ly, uy, ABCs):
++def compute_max_error(lx, ux, ly, uy, ABCs, ABCs_tensor=None):
+     # checks along the linear function boundaries (by just checking the corners)
+-    errors = check_corners(ABCs, lx, ux, ly, uy)  # This seems to be correct
++    if ABCs_tensor is not None:
++        # EXPERIMENTAL: vectorized corner check. Returns a [n] tensor instead of
++        # a list of n 0-dim tensors, so unbind it back into a list to keep the
++        # rest of this function (and lst_as_tensor downstream) unchanged.
++        errors = list(check_corners_tensor(ABCs_tensor, lx, ux, ly, uy).unbind(0))
++    else:
++        errors = check_corners(ABCs, lx, ux, ly, uy)  # This seems to be correct
+ 
+     # still need to check along the nonlinear boudnary, e.g.
+     # f'(x)*l_y...
+     # f'(x)*u_y...
+-    errors2_ly, errors2_uy = check_nonlinear_boundary(lx, ux, ly, uy, ABCs)
++    if ABCs_tensor is not None and USE_VECTORIZED_BOUNDARY:
++        # EXPERIMENTAL: vectorized nonlinear-boundary check. Also returns [n]
++        # tensors instead of lists of 0-dim tensors; unbind for the same reason
++        # as the corner-check branch above.
++        errors2_ly_t, errors2_uy_t = check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor)
++        errors2_ly = list(errors2_ly_t.unbind(0))
++        errors2_uy = list(errors2_uy_t.unbind(0))
++    else:
++        errors2_ly, errors2_uy = check_nonlinear_boundary(lx, ux, ly, uy, ABCs)
++
+     max_errors = []
+     assert (len(errors) == len(errors2_ly) and len(errors) == len(errors2_uy))
+     for i in range(len(errors)):
+@@ -429,8 +570,13 @@ def sigmoid_prime_product_tensor(x, y):
+     Bs = torch.tensor([x[1] for x in ABCs])
+     Cs = torch.tensor([x[2] for x in ABCs])
+ 
++    # EXPERIMENTAL: tensor form of ABCs for the vectorized corner check. When the
++    # selector is off we pass ABCs_tensor=None so compute_max_error falls back to
++    # the original per-neuron check_corners / check_nonlinear_boundary path.
++    ABCs_tensor = torch.stack((As, Bs, Cs), dim=1) if USE_VECTORIZED_PRECISE else None
++
+     # Everything up to this point works (the linear regression and the lower and upper bounds of the input Zonotopes)
+-    errors = compute_max_error(lx, ux, ly, uy, ABCs)
++    errors = compute_max_error(lx, ux, ly, uy, ABCs, ABCs_tensor)
+     errors = lst_as_tensor(errors)
+     errors = traceify(errors)
+ 

@@ -1,0 +1,33 @@
+variant=batched  (1 image, eps=0.002, 3layer precise forward)
+total operator calls: 15056
+
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                          Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg    # of Calls  
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                  aten::select        12.96%      21.486ms        15.07%      24.973ms      13.514us          1848  
+                     aten::max        11.82%      19.597ms        14.59%      24.174ms      59.251us           408  
+                   aten::copy_         4.41%       7.315ms         4.41%       7.315ms      13.521us           541  
+            aten::linalg_lstsq         4.40%       7.293ms        20.28%      33.617ms       8.404ms             4  
+                      aten::mm         4.09%       6.773ms         4.09%       6.784ms     565.375us            12  
+                   aten::stack         3.87%       6.411ms         8.75%      14.502ms      67.766us           214  
+                aten::linspace         3.59%       5.957ms         5.48%       9.086ms      11.357us           800  
+                     aten::min         3.31%       5.492ms         3.39%       5.622ms       1.405ms             4  
+              aten::as_strided         3.08%       5.111ms         3.08%       5.111ms       1.725us          2963  
+                aten::meshgrid         3.02%       4.998ms         6.33%      10.499ms      52.496us           200  
+                    aten::item         3.01%       4.982ms         3.87%       6.413ms       7.598us           844  
+                 aten::flatten         3.00%       4.964ms        10.02%      16.611ms      40.613us           409  
+                     aten::cat         2.65%       4.390ms         2.73%       4.524ms      19.844us           228  
+                 aten::maximum         2.58%       4.270ms         2.58%       4.270ms      10.621us           402  
+                  aten::unbind         2.58%       4.269ms         6.35%      10.531ms       1.755ms             6  
+               aten::unsqueeze         2.40%       3.972ms         2.92%       4.848ms       7.301us           664  
+                   aten::clone         2.13%       3.534ms         6.13%      10.161ms      25.402us           400  
+                  aten::expand         2.12%       3.518ms         2.51%       4.166ms      10.261us           406  
+          aten::cartesian_prod         2.02%       3.341ms        25.32%      41.958ms     209.788us           200  
+                     aten::div         1.91%       3.159ms         1.91%       3.159ms     131.646us            24  
+           aten::empty_strided         1.80%       2.984ms         1.80%       2.984ms      21.783us           137  
+              aten::is_nonzero         1.77%       2.934ms         1.83%       3.029ms     378.637us             8  
+                     aten::log         1.55%       2.570ms         1.55%       2.570ms     214.208us            12  
+                   aten::empty         1.52%       2.524ms         1.52%       2.524ms       2.801us           901  
+                     aten::mul         1.43%       2.367ms         3.32%       5.500ms      53.920us           102  
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 165.739ms
