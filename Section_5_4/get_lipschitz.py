@@ -21,6 +21,17 @@ import argparse
 parser = argparse.ArgumentParser(description='Get haze Lipschitz constant of MNIST Network')
 parser.add_argument('--network', choices=['3layer', '4layer', '5layer', 'big'], help='neural network architecture',
                     default='3layer')
+parser.add_argument("--no-save", action="store_true")
+# Splitting the haze interval [0, eps] into k pieces and taking the max over
+# them is already the mechanism this benchmark implements; it just ships with
+# k = 1. Exposing it is needed to compare against a Branch-and-Bound baseline
+# at an equal split budget, instead of letting only the baseline split.
+parser.add_argument("--n-splits", type=int, default=1)
+# Each epsilon is an independent pass over the images; restricting the set only
+# skips iterations of the outer loop. Needed so large --n-splits sweeps can
+# target the epsilons that have an auto_LiRPA counterpart instead of all 16.
+parser.add_argument("--eps-indices", type=int, nargs="+", default=None,
+                    help="indices into the default 16-epsilon range; default all")
 args = parser.parse_args()
 
 num_images_to_test = 30
@@ -118,9 +129,11 @@ time_zonos = []
 time_intervals = []
 time_precise = []
 
-n_splits = 1
+n_splits = args.n_splits
 
 test_range = [10 ** (-k / 4) * 2 for k in range(2, 18)]
+if args.eps_indices is not None:
+    test_range = [test_range[i] for i in args.eps_indices]
 pbar_total = tqdm(total=len(test_range), position=0)
 
 for epsilon in test_range:  # change back to 2,18
@@ -221,11 +234,20 @@ for epsilon in test_range:  # change back to 2,18
     pbar_total.update(1)
 
 pbar_total.close()
-os.system('mkdir -p results')
-torch.save(lc_zonos, f'results/lc_zonos_{network}.pth')
-torch.save(lc_intervals, f'results/lc_intervals_{network}.pth')
-torch.save(lc_zonos_precise, f'results/lc_precise_{network}.pth')
 
-torch.save(time_zonos, f'results/time_zonos_{network}.pth')
-torch.save(time_intervals, f'results/time_intervals_{network}.pth')
-torch.save(time_precise, f'results/time_precise_{network}.pth')
+print('lc_precise', lc_zonos_precise)
+print('lc_zonos', lc_zonos)
+print('time_precise', time_precise)
+
+if not args.no_save:
+    os.system('mkdir -p results')
+    # Split runs write to their own files so a k>1 experiment can never
+    # overwrite the reference k=1 results the comparison is measured against.
+    sfx = '' if n_splits == 1 else f'_split{n_splits}'
+    torch.save(lc_zonos, f'results/lc_zonos_{network}{sfx}.pth')
+    torch.save(lc_intervals, f'results/lc_intervals_{network}{sfx}.pth')
+    torch.save(lc_zonos_precise, f'results/lc_precise_{network}{sfx}.pth')
+
+    torch.save(time_zonos, f'results/time_zonos_{network}{sfx}.pth')
+    torch.save(time_intervals, f'results/time_intervals_{network}{sfx}.pth')
+    torch.save(time_precise, f'results/time_precise_{network}{sfx}.pth')
