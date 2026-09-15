@@ -7,7 +7,7 @@ in-process: for each (input, eps) pair it evaluates all three abstract
 domains (Interval, Zonotope/Affine, Pasado), exactly like wrapper() in
 adult_script.py.
 
-Run from Section_5_5:  ../.venv/Scripts/python.exe profile_adult.py
+Run from Section_5_5:  python ../experiments/profile_adult.py
 Raw stats are dumped to results/profile_adult.prof (open with snakeviz/pstats).
 """
 
@@ -16,6 +16,10 @@ import os
 import pickle
 import pstats
 
+import sys
+
+# Moved from Section_5_5/ to experiments/ on 2026-09-15; adult_eval still lives there.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "Section_5_5"))
 from adult_eval import adult_interval, adult_affine, adult_pasado, continuous_idx
 
 N_INPUTS = 3
