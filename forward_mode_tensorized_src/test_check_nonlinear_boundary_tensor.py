@@ -1,40 +1,17 @@
-"""
-Unit test for check_nonlinear_boundary_tensor (vectorized) against
-check_nonlinear_boundary (the original per-neuron loop).
-
-Both functions find the largest error of the planar approximation along the
-nonlinear edges of each neuron's input box. That needs the roots of a cubic
-equation, filtered to the box, so the tests include the awkward inputs: a zero
-in ly or uy (division by zero), roots outside the box, zero-width boxes, and
-the coefficient A passing through zero. The functions are called directly; the
-full analysis is not run.
-
-Run with:  python test_check_nonlinear_boundary_tensor.py   (from forward_mode_tensorized_src/)
-Exit status is 0 when every case passes and 1 otherwise.
-"""
 import torch
 
 from precise_transformer import check_nonlinear_boundary, check_nonlinear_boundary_tensor
 
 
 def make_case(n, seed, lx, ux, ly, uy, A, B, C):
-    """Package the inputs in the two coefficient formats the functions expect.
-
-    Returns a list of (A, B, C) tuples for the original function and an [n, 3]
-    tensor for the vectorized one, followed by the box bounds unchanged. The
-    seed argument is unused and kept only so call sites read uniformly.
-    """
+    """Pack the inputs in the two formats the functions expect."""
     ABCs = [(A[i], B[i], C[i]) for i in range(n)]
     ABCs_tensor = torch.stack((A, B, C), dim=1)
     return ABCs, ABCs_tensor, lx, ux, ly, uy
 
 
 def make_random_case(n, seed, ly_lo=0.5, ly_width=4.0):
-    """Build random boxes with ly in [ly_lo, ly_lo + ly_width) and random A, B, C.
-
-    ly is kept away from zero by default so that A / ly is well defined; the
-    division-by-zero case is tested separately below.
-    """
+    """Random boxes. ly is kept away from zero so that A / ly is defined."""
     g = torch.Generator().manual_seed(seed)
 
     lx = torch.rand(n, generator=g) * 4 - 2
@@ -52,24 +29,16 @@ def make_random_case(n, seed, ly_lo=0.5, ly_width=4.0):
 
 
 def safe_abs_diff(a, b):
-    """Absolute difference that treats matching infinities as zero difference.
-
-    Both implementations return -inf for a neuron when every candidate root is
-    outside the allowed domain. Plain subtraction would give NaN there (-inf
-    minus -inf), even though the two results agree, so infinities with the same
-    sign are mapped to a difference of 0. This only affects the printed
-    diagnostic; the pass/fail decision uses allclose with equal_nan=True.
-    """
+    """Absolute difference, counting equal infinities as 0 (inf - inf would be NaN)."""
     both_inf = torch.isinf(a) & torch.isinf(b) & (torch.sign(a) == torch.sign(b))
     diff = (a - b).abs()
     return torch.where(both_inf, torch.zeros_like(diff), diff)
 
 
 def compare(name, ABCs, ABCs_tensor, lx, ux, ly, uy, atol=1e-4, rtol=1e-3):
-    """Run both implementations on one case, print the result, return pass/fail.
+    """Run both versions, print the result and return pass/fail.
 
-    The tolerances are looser than for the corner check because the root
-    computation goes through single-precision complex arithmetic.
+    The tolerances are loose because the roots are computed in complex64.
     """
     old_maxs, old_maxs_uy = check_nonlinear_boundary(lx, ux, ly, uy, ABCs)
     new_maxs, new_maxs_uy = check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor)
@@ -97,7 +66,6 @@ def compare(name, ABCs, ABCs_tensor, lx, ux, ly, uy, atol=1e-4, rtol=1e-3):
 
 
 def main():
-    """Run all test cases and return the process exit status."""
     torch.manual_seed(0)
     all_ok = True
 
