@@ -27,6 +27,11 @@ from SimpleZono import IntervalsToZonotope
 
 
 def check_grid_equivalence():
+    """Compare the batched sampling grid against the per-neuron loop.
+
+    Returns True when every strict case is bit-exact and every informational
+    case stays within its ULP bound.
+    """
     print("=== get_linspace_batched vs get_linspace ===")
     g = torch.Generator().manual_seed(4242)
     all_ok = True
@@ -91,8 +96,8 @@ def run_variant(x_lb, x_ub, y_lb, y_ub, *, vec, boundary, lstsq, grid, seed=99):
 
     The selectors are read at call time, and the np.random stream is reseeded
     per run because the transformer perturbs coefficient A with an unseeded
-    draw -- without pinning it, two runs of the *same* variant would differ and
-    nothing could be compared.
+    random draw. Without pinning the seed, two runs of the same variant would
+    differ and nothing could be compared.
     """
     pt.USE_VECTORIZED_PRECISE = vec
     pt.USE_VECTORIZED_BOUNDARY = boundary
@@ -106,6 +111,14 @@ def run_variant(x_lb, x_ub, y_lb, y_ub, *, vec, boundary, lstsq, grid, seed=99):
 
 
 def check_selector_equivalence():
+    """Check that every valid selector combination gives the same zonotope.
+
+    The reference is the run with all selectors off (the original code path).
+    Combinations that use the vectorized error checks may differ in the last
+    bits because floating-point reductions are reordered; combinations that
+    only batch the grid or the regression must match the reference exactly.
+    Returns True when every combination is within its tolerance.
+    """
     print("=== sigmoid_prime_product_tensor across selector combinations ===")
     g = torch.Generator().manual_seed(7)
     n = 60
