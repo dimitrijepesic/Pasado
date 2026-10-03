@@ -1,9 +1,14 @@
 """
-Standalone correctness check for the experimental check_corners_tensor
-against the original check_corners. Does not touch get_lipschitz.py /
-lipschitz.sh or any of the existing benchmark code.
+Unit test for check_corners_tensor (vectorized) against check_corners
+(the original per-neuron loop).
 
-Run with:  python test_check_corners_tensor.py
+Both functions evaluate the error of the planar approximation at the four
+corners of each neuron's input box. The test calls them directly on random
+inputs of several sizes plus one degenerate (zero-width) box, and checks that
+the results agree within a small tolerance. It does not run the full analysis.
+
+Run with:  python test_check_corners_tensor.py   (from forward_mode_tensorized_src/)
+Exit status is 0 when every case passes and 1 otherwise.
 """
 import torch
 
@@ -11,6 +16,12 @@ from precise_transformer import check_corners, check_corners_tensor
 
 
 def make_random_case(n, seed):
+    """Build random boxes [lx, ux] x [ly, uy] and plane coefficients A, B, C.
+
+    Returns the coefficients in both formats the two functions expect: a list
+    of (A, B, C) tuples for the original, and an [n, 3] tensor for the
+    vectorized version.
+    """
     g = torch.Generator().manual_seed(seed)
 
     lx = torch.rand(n, generator=g) * 4 - 2      # in [-2, 2)
@@ -34,6 +45,11 @@ def make_random_case(n, seed):
 
 
 def run_case(n, seed, atol=1e-6, rtol=1e-5):
+    """Compare both implementations on one random case and print the result.
+
+    The tolerances are loose on purpose: the two versions may differ in the
+    last floating-point bits because the vectorized one reorders operations.
+    """
     ABCs, ABCs_tensor, lx, ux, ly, uy = make_random_case(n, seed)
 
     old_result = torch.stack(check_corners(ABCs, lx, ux, ly, uy))
@@ -53,14 +69,17 @@ def run_case(n, seed, atol=1e-6, rtol=1e-5):
 
 
 def main():
+    """Run the random cases and the degenerate case; return the exit status."""
     torch.manual_seed(0)
 
+    # Sizes cover the smallest batch, odd sizes, and a larger layer.
     sizes = [1, 2, 5, 17, 100, 1000]
     all_ok = True
     for i, n in enumerate(sizes):
         all_ok &= run_case(n, seed=i)
 
-    # degenerate box: lx == ux, ly == uy (zero-width interval)
+    # Degenerate box: lx == ux and ly == uy (zero-width intervals), so all four
+    # corners coincide.
     n = 8
     ABCs, ABCs_tensor, lx, ux, ly, uy = make_random_case(n, seed=123)
     ux = lx.clone()
