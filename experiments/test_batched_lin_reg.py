@@ -1,32 +1,3 @@
-"""Correctness tests: lin_reg_tensor (per-neuron loop) vs lin_reg_tensor_batched.
-
-lin_reg_tensor_batched solves all per-neuron planar regressions of a layer in a
-single batched least-squares call. This test checks that it gives the same
-coefficients as calling the original lin_reg_tensor once per neuron.
-
-Coverage:
-  - Batch sizes n = 1, 10, 100 and 1024.
-  - float64 and float32. The original lin_reg_tensor builds its column of ones
-    in the default dtype, so each dtype section runs under the matching
-    torch.set_default_dtype. This is how the benchmark (float64) and the older
-    unit tests (float32) run it.
-  - Realistic grids (torch.linspace combined with torch.cartesian_prod, with
-    targets from sigmoid_prime_times_y) and purely random points.
-  - Degenerate boxes: lx == ux gives a rank-2 system and a point box gives a
-    rank-1 system. Also near-degenerate boxes (width 1e-12), saturated sigmoid
-    inputs (|x| around 30, so targets are close to 0), badly scaled systems,
-    and a mixed batch of healthy and degenerate neurons.
-  - dtype, device and shape of the result are preserved.
-  - The downstream planar-approximation error is equal, since that is what
-    compute_max_error actually consumes.
-
-Pass criterion: bit-identical results (torch.equal) are expected and reported,
-but the hard requirement is torch.testing.assert_close with rtol=1e-12 and
-atol=1e-14 for float64, and rtol=1e-5 and atol=1e-6 for float32.
-
-Run:  python experiments/test_batched_lin_reg.py   (from the repository root)
-Exit status is non-zero if any assertion fails.
-"""
 import os
 import sys
 
@@ -46,19 +17,16 @@ TOL = {torch.float64: dict(rtol=1e-12, atol=1e-14),
 
 
 def old_loop(x_batch, zs_batch):
-    """Reference result: call the original lin_reg_tensor once per neuron."""
+    """Reference: lin_reg_tensor called once per neuron."""
     return torch.stack([pt.lin_reg_tensor(x_batch[i], zs_batch[i])
                         for i in range(x_batch.shape[0])])
 
 
 def realistic_grids(n, seed, dtype, box="normal"):
-    """Stacked sampling grids exactly as get_linspace builds them, one per neuron.
+    """Sampling grids as get_linspace builds them, one per neuron.
 
-    box selects the kind of input box: "normal", "degenerate_x" (lx == ux),
-    "point" (lx == ux and ly == uy), "near_degenerate" (width 1e-12),
-    "saturated" (large x, sigmoid close to 1) or "mixed_scale" (very different
-    magnitudes in x and y, which makes the system badly conditioned).
-    Returns the grid points [n, 25, 2] and the regression targets [n, 25].
+    box picks the kind of input: normal, degenerate_x, point, near_degenerate,
+    saturated or mixed_scale. Returns points [n, 25, 2] and targets [n, 25].
     """
     g = torch.Generator().manual_seed(seed)
 
@@ -94,7 +62,7 @@ def realistic_grids(n, seed, dtype, box="normal"):
 
 
 def random_points(n, m, seed, dtype):
-    """n independent regression problems with m random points each."""
+    """n random regression problems with m points each."""
     g = torch.Generator().manual_seed(seed)
     x = torch.randn(n, m, 2, generator=g, dtype=dtype)
     zs = torch.randn(n, m, generator=g, dtype=dtype)
@@ -102,23 +70,14 @@ def random_points(n, m, seed, dtype):
 
 
 def planar_error(coeffs, x_batch, zs_batch):
-    """Max |z - (A x + B y + C)| per neuron.
-
-    This is the quantity the planar approximation feeds into compute_max_error.
-    The coefficients are intercept-first: column 0 is C, then A, then B.
-    """
+    """Largest |z - (A x + B y + C)| per neuron. Coefficients are intercept first (C, A, B)."""
     C, A, B = coeffs[:, 0:1], coeffs[:, 1:2], coeffs[:, 2:3]
     pred = A * x_batch[:, :, 0] + B * x_batch[:, :, 1] + C
     return (zs_batch - pred).abs().max(dim=1).values
 
 
 def run_case(name, x_batch, zs_batch, dtype):
-    """Compare batched and per-neuron results on one problem set.
-
-    Asserts shape, dtype, device, closeness (assert_close) and that passing the
-    targets as [n, m, 1] gives exactly the same result as [n, m]. Returns True
-    when the two results are also bit-identical.
-    """
+    """Compare batched and loop results. Returns True if they are bit-identical."""
     old = old_loop(x_batch, zs_batch)
     new = lin_reg_tensor_batched(x_batch, zs_batch)
 
@@ -147,7 +106,6 @@ def run_case(name, x_batch, zs_batch, dtype):
 
 
 def main():
-    """Run every case for float64 and float32 and print a summary."""
     all_bitwise = True
     for dtype in (torch.float64, torch.float32):
         torch.set_default_dtype(dtype)  # lin_reg_tensor builds ones() in default dtype

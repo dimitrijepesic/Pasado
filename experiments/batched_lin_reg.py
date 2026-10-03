@@ -1,10 +1,4 @@
-"""Re-export of the batched per-neuron planar regression.
-
-The implementation lives in forward_mode_tensorized_src/precise_transformer.py
-as lin_reg_tensor_batched, and is enabled with the PASADO_BATCHED_LSTSQ
-selector (off by default). This module only imports it so the experiment
-scripts and test_batched_lin_reg.py exercise the production code.
-"""
+"""Re-exports lin_reg_tensor_batched from precise_transformer for the experiment scripts."""
 import os
 import sys
 
