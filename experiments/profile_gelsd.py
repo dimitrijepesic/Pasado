@@ -1,17 +1,8 @@
-"""Profile: how much of the `big` precise pass is torch.linalg.lstsq(driver='gelsd')?
+"""Measures how much of the big network's precise pass goes to torch.linalg.lstsq
+(gelsd) compared to the big matmul. Uses wall-clock timers around the two calls,
+not cProfile.
 
-Answers Sasa's question (Slack, 22.8.2026): before building the CPU/GPU hybrid
-lstsq dispatch, measure whether gelsd is actually a meaningful slice of
-wall-clock time on `big`, or whether the big AffineZonotope matmul dominates
-and gelsd optimization is secondary.
-
-Method: wall-clock timers wrapped directly around the two calls we're
-comparing (torch.linalg.lstsq and the big matmul), not cProfile -- we want a
-clean side-by-side percentage of the SAME wall-clock run, not cProfile's
-inflated per-call attribution.
-
-Run:  .venv\\Scripts\\python.exe experiments\\profile_gelsd.py
-"""
+Run: python experiments/profile_gelsd.py"""
 import os
 import sys
 import time

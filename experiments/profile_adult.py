@@ -1,15 +1,8 @@
-"""Profile the Section 5.5 workload under cProfile.
+"""Profiles the Section 5.5 workload in a single process. adult_script.py uses a
+multiprocessing pool, which cProfile cannot see into.
 
-adult_script.py farms the same tasks out to a multiprocessing.Pool, which
-cProfile cannot see into (it would only measure the parent waiting on the
-pool). This script therefore runs a small subset of the same tasks
-in-process: for each (input, eps) pair it evaluates all three abstract
-domains (Interval, Zonotope/Affine, Pasado), exactly like wrapper() in
-adult_script.py.
-
-Run from Section_5_5:  python ../experiments/profile_adult.py
-Raw stats are dumped to results/profile_adult.prof (open with snakeviz/pstats).
-"""
+Run from Section_5_5: python ../experiments/profile_adult.py
+Raw stats go to results/profile_adult.prof."""
 
 import cProfile
 import os

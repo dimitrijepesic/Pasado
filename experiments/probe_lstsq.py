@@ -1,20 +1,6 @@
-"""Phase 5 probe: facts needed for the LSTSQ_ANALYSIS writeup. NO source changes.
-
-Sections:
-  [shapes]   instrument lin_reg_tensor on a real reduced 3layer run (1 image,
-             2 epsilon values) - shape histogram, dtype, exact-duplicate count
-             of the xplusone design matrices (via byte hashing).
-  [batched]  does torch.linalg.lstsq accept batched A/B on this Windows-CPU
-             install, with and without driver='gelsd'; batched-vs-loop diffs.
-  [drivers]  gelsd vs default driver on well-conditioned AND rank-deficient
-             (degenerate box) systems - does omitting the driver change results?
-  [grid]     is torch.linspace(l,u,5) bit-identical to the affine forms
-             l+(u-l)/4*arange(5) and l+(u-l)*[0,.25,.5,.75,1], and does
-             cartesian_prod match the repeat/interleave construction? (informs
-             whether a batched get_linspace can be bit-exact)
-
-Prints a compact summary only; no per-call flooding.
-"""
+"""Probes behind the lstsq analysis: shapes and duplicate design matrices on a real
+run, batched vs loop lstsq, gelsd vs the default driver on rank-deficient boxes,
+and whether torch.linspace matches simple affine formulas. Changes no source."""
 import hashlib
 import os
 import sys

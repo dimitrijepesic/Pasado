@@ -1,26 +1,7 @@
-"""Repeatable wall-clock benchmark harness for Section_5_4/get_lipschitz.py.
+"""Times get_lipschitz.py end to end for different PASADO_* variants and appends
+the results to logs/benchmark_results.csv.
 
-Runs the *unmodified* get_lipschitz.py as a subprocess (so the benchmark's own
-behavior is preserved exactly) and times it end-to-end with time.perf_counter.
-The implementation variant is selected purely through the PASADO_* environment
-variables read by precise_transformer.py, so no production code is edited to
-switch variants.
-
-Results are appended to logs/benchmark_results.csv with full environment
-metadata. For short networks several repetitions are run and median / min / max
-reported; for `big`, a single run is the default (expensive) and is clearly
-labelled as such.
-
-Usage (from the Pasado repo root, PowerShell):
-    .venv/Scripts/python.exe experiments/benchmark_lipschitz.py \
-        --network 3layer --variant original vec_both --runs 3
-
-Variants (env mapping):
-    original         PASADO_VECTORIZED_PRECISE=0                       (baseline A)
-    vec_corners      PASADO_VECTORIZED_PRECISE=1, PASADO_VEC_BOUNDARY=0 (B)
-    vec_both         PASADO_VECTORIZED_PRECISE=1                        (C, default)
-    vec_both_batched vec_both + PASADO_BATCHED_LSTSQ=1                  (D)
-"""
+Example: python experiments/benchmark_lipschitz.py --network 3layer --variant original vec_both --runs 3"""
 import argparse
 import csv
 import os
@@ -40,16 +21,11 @@ VARIANT_ENV = {
     "vec_corners":      {"PASADO_VECTORIZED_PRECISE": "1", "PASADO_VEC_BOUNDARY": "0"},
     "vec_both":         {"PASADO_VECTORIZED_PRECISE": "1"},
     "vec_both_batched": {"PASADO_VECTORIZED_PRECISE": "1", "PASADO_BATCHED_LSTSQ": "1"},
-    # Adds the batched sampling grid on top of the batched regression: removes
-    # the last per-neuron Python loop (and its 4n .item() device syncs) from the
-    # precise path. Bit-identical grid (test_batched_grid.py).
+    # Also batches the sampling grid: no per-neuron loop or .item() left.
     "vec_batched_grid": {"PASADO_VECTORIZED_PRECISE": "1", "PASADO_BATCHED_LSTSQ": "1",
                          "PASADO_BATCHED_GRID": "1"},
-    # Adds the real (Viete) cubic root solve. NOT bit-identical to the others:
-    # it replaces a complex64 solve with real float64 arithmetic, so the reported
-    # bounds move slightly (measured <= 5.7e-05 relative). Timed as its own
-    # variant because a single uninterleaved run first suggested it cost 8 %,
-    # which the kernel microbenchmark contradicted.
+    # Real cubic solver. It changes the bounds slightly (up to 5.7e-05 relative),
+    # so it is timed as its own variant.
     "vec_grid_realcubic": {"PASADO_VECTORIZED_PRECISE": "1", "PASADO_BATCHED_LSTSQ": "1",
                            "PASADO_BATCHED_GRID": "1", "PASADO_REAL_CUBIC": "1"},
 }
@@ -233,9 +209,7 @@ def main():
                 "seconds": f"{dt:.3f}", "health_gflops": f"{health:.1f}",
             })
             all_rows.append(row)
-            # appended per run, not at the end: a long matrix killed midway
-            # (machine sleep, Ctrl-C) otherwise loses every measurement taken
-            # so far - which happened twice during this sprint.
+            # written after every run, so a killed matrix keeps the runs that finished
             append_csv([row])
             print(f"[{network:7s} {variant:16s} run {run}/{args.runs}] {dt:8.2f}s "
                   f"(machine {health:.0f} GFLOP/s)")

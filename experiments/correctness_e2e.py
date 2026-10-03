@@ -1,19 +1,8 @@
-"""End-to-end old-vs-new correctness harness for the precise Lipschitz path.
+"""Compares the original per-neuron checks with the vectorized ones on real 3layer
+inputs (a few images and epsilons) with fixed seeds. Writes
+logs/correctness_results.csv and exits with 1 if any case differs.
 
-Reproduces exactly the precise forward pass of Section_5_4/get_lipschitz.py for
-the 3layer network on a handful of (image, epsilon) pairs, and compares the
-ORIGINAL per-neuron check path (PASADO_VECTORIZED_PRECISE off) against the
-vectorized path (on).
-
-Determinism: the only randomness in the precise path is np.random.normal inside
-sigmoid_prime_product_tensor (a per-neuron perturbation of A applied *before* the
-corner/boundary branch). Re-seeding np.random (and torch) identically before each
-forward makes the ABCs identical between the two paths, so the two runs differ
-only by floating-point reordering inside the corner/boundary checks (and its
-propagation through later layers). Everything is float64, as in the benchmark.
-
-Writes logs/correctness_results.csv.
-"""
+Pass --batched to also switch on the batched regression."""
 import csv
 import os
 import sys

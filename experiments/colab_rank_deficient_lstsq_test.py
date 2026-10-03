@@ -1,21 +1,5 @@
-"""Rank-deficient lstsq driver comparison: gelsd (CPU) vs gels (GPU).
-
-GPU_READINESS.md (Phase 11) measured gelsd-vs-gels agreement to 2.665e-15 on
-colab_gpu_profile.py's random test batch -- but that batch is full-rank. It
-says nothing about the degenerate (lx==ux and/or ly==uy) rank-deficient boxes
-that actually occur in the real analysis (finding #5's open question: gels
-has no minimum-norm guarantee for rank-deficient systems). This script builds
-exactly that case, at the same [n, 25, 3] \\ [n, 25] shape the real per-layer
-regression uses, and reports where the two drivers actually diverge.
-
-Run on Colab (GPU runtime):
-    !git clone -b colab-gpu-wip https://github.com/dimitrijepesic/Pasado.git
-    %cd Pasado
-    !pip install torch
-    !python experiments/colab_rank_deficient_lstsq_test.py
-
-If no GPU is present it says so and exits -- no CPU-only fabricated numbers.
-"""
+"""Compares lstsq with gelsd (CPU) and gels (GPU) on rank-deficient systems, which
+is what zero-width boxes produce in the real analysis. Needs a GPU runtime."""
 import torch
 
 torch.set_default_dtype(torch.float64)

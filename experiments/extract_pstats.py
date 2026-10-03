@@ -1,13 +1,7 @@
-"""Extract a detailed pstats report from a cProfile .prof file.
+"""Writes a pstats report from a cProfile file: the top 150 functions by cumulative
+and by self time, plus callers and callees of selected functions.
 
-Usage:
-    python extract_pstats.py <in.prof> <out.txt>
-
-Writes:
-  - top 150 by cumulative time
-  - top 150 by self (internal) time
-  - callers/callees for a set of functions of interest
-"""
+Usage: python extract_pstats.py <in.prof> <out.txt>"""
 import sys
 import pstats
 

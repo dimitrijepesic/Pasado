@@ -1,21 +1,7 @@
-"""torch.compile experiment on the pure-tensor kernels (Phase 8).
-
-Candidates (chosen because they are pure tensor functions after the Phase 3/6
-refactors):
-  - check_corners_tensor
-  - check_nonlinear_boundary_tensor   (includes the complex64 root solve)
-  - _max_objective_over_x_candidates
-  - lin_reg_tensor_batched
-
-For each: eager vs torch.compile(default) vs torch.compile(mode=
-"reduce-overhead"), measuring FIRST-CALL latency (compile cost) separately
-from STEADY-STATE median, verifying numerical equivalence against eager, and
-capturing graph breaks via torch._dynamo.explain.
-
-Run on an idle machine:
-    .venv/Scripts/python.exe experiments/compile_experiment.py
-Appends rows to logs/microbenchmark_results.csv.
-"""
+"""Tries torch.compile on the pure tensor kernels (corner check, nonlinear boundary
+check, the max-objective helper and the batched regression): first-call time,
+steady-state time, match with eager mode and graph breaks. Appends rows to
+logs/microbenchmark_results.csv."""
 import csv
 import os
 import statistics

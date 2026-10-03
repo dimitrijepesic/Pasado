@@ -1,19 +1,6 @@
-"""Pinpoint the source of the old-vs-new difference in the real layer-1 inputs.
-
-HISTORICAL / RESOLVED. This script was written to chase a ~1e-6 old-vs-new
-difference that turned out to be a dtype bug in the first version of
-check_nonlinear_boundary_tensor: inverse_poly_tensor computes cube roots
-through complex64, so the roots come back float32; the original code promoted
-them to float64 by stacking them with ly/uy, while the vectorized version kept
-them in float32. Fixed by promoting the stacked roots to ly.dtype (see
-RESULTS.md section 8). Differences are now <= 5.7e-14, so this script should
-report ~0. Kept as a record of the investigation and as a regression probe on
-the real layer-1 inputs.
-
-Captures the exact (lx,ux,ly,uy,ABCs) that sigmoid_prime_product_tensor sees on
-layer 1 of the 3layer net, then compares the original vs vectorized corner and
-nonlinear-boundary checks element-wise to find which check / which neuron differs.
-"""
+"""Debugging script from an earlier investigation. It tracked down a 1e-6 difference
+caused by float32 roots in the first vectorized boundary check (fixed by
+promoting the roots to the input dtype). It should now report differences near 0."""
 import os, sys, numpy as np, torch
 torch.set_default_dtype(torch.float64)
 HERE = os.path.dirname(os.path.abspath(__file__))

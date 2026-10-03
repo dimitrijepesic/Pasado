@@ -1,43 +1,9 @@
-"""Colab/GPU port of the Pasado-vs-auto_LiRPA local-Lipschitz comparison.
+"""Compares Pasado's bound on dF/dt with auto_LiRPA's Jacobian bound for the haze
+family x(t) = img + t*(1-img), on 30 correctly classified test images.
+Needs a GPU for the big network (auto_LiRPA uses about 10 GB there). Only the
+tightness is compared, not the runtime.
 
-Why this exists as a separate script. The comparison runs fine locally for the
-100-wide networks (3/4/5layer), but not for FFNNBig (1024-wide): auto_LiRPA's
-Jacobian path calls _expand_jacobian, which explicitly turns OFF every sparse
-option --
-
-    # auto_LiRPA/jacobian.py, _expand_jacobian
-    if self.jacobian_start_nodes:
-        # Disable unstable options
-        self.bound_opts.update({
-            'sparse_intermediate_bounds': False,
-            'sparse_conv_intermediate_bounds': False,
-            'sparse_intermediate_bounds_with_ibp': False,
-            'sparse_features_alpha': False,
-            'sparse_spec_alpha': False,
-        })
-
--- so intermediate bounds are computed against dense 1024x1024 identity specs
-(the library itself warns: "Creating an identity matrix with size 1024x1024 ...
-This may indicate poor performance"). One solve peaks near 10.7 GB, and the
-memory is never returned to the OS, so a 15.7 GB laptop cannot do two solves in
-one process and barely does one. An A100 (80 GB) has room.
-
-What is compared. Pasado Section 5.4 bounds dF/dt for the haze family
-x(t) = img + t*(1-img), t in [0, eps], reporting
-max_j max(|lb_j|, |ub_j|) averaged over 30 correctly-classified test images.
-We express the same haze map inside the model and ask auto_LiRPA for the
-Jacobian w.r.t. the scalar t, which is exactly dF/dt -- same quantity, no
-conversion factor.
-
-Fairness notes: auto_LiRPA runs its default optimize=True (CROWN-Optimized),
-its strongest standard mode; float64 throughout, matching Pasado. Runtime is
-NOT comparable here (their GPU vs Pasado's CPU) -- tightness is the metric.
-
-Colab usage:
-    !git clone https://github.com/uiuc-arc/Pasado.git
-    !pip install git+https://github.com/Verified-Intelligence/auto_LiRPA.git
-    !python Pasado/experiments/colab_compare_pasado_lirpa.py --network big
-"""
+Colab: python Pasado/experiments/colab_compare_pasado_lirpa.py --network big"""
 import argparse
 import csv
 import gc
@@ -146,13 +112,9 @@ def main():
         map_location="cpu"))
     selected = [i for i in range(len(ds)) if i in correct][:args.num_images]
 
-    # The saved Pasado numbers are averages over exactly 30 images
-    # (get_lipschitz.py: num_images_to_test = 30, break at correct_images == 30).
-    # Averaging auto_LiRPA over a different number of images compares a
-    # k-image mean against a 30-image mean -- not the same quantity, and the
-    # difference is large: image 0 alone has an exact |dF/dt| of 245.2 on
-    # `big`, well above the 30-image precise average of 168.1. Only --num-images
-    # 30 yields a valid ratio.
+    # The saved Pasado numbers are averages over exactly 30 images, so only
+    # --num-images 30 gives a comparable ratio (image 0 alone is 245.2 on big,
+    # well above the 30-image average of 168.1).
     if args.num_images != 30:
         print(f"\n*** WARNING: --num-images {args.num_images} != 30. The saved "
               f"Pasado values are 30-image averages, so the printed ratios are "
@@ -173,16 +135,9 @@ def main():
     for img_no, idx in enumerate(selected, start=1):
         img = ds[idx][0].flatten().unsqueeze(0).to(torch.float64).to(dev)
         for ei, eps in enumerate(EPSILONS):
-            # Fresh module per (image, epsilon). BoundedModule accumulates
-            # cached intermediate bounds and alpha parameters on every
-            # compute_jacobian_bounds call and never releases them; with the
-            # sparse options force-disabled on the Jacobian path (see the
-            # module docstring) that is ~10 GB per call on `big`. Reusing one
-            # module across epsilons is what OOM-killed the 16 GB local runs,
-            # and 16 accumulated calls would threaten even an 80 GB A100.
-            # A fresh network too, not just a fresh BoundedModule: tracing
-            # attaches bound state to the traced modules, so reusing one `net`
-            # across pairs keeps every previous solve's graph reachable.
+            # Fresh network and BoundedModule for every (image, epsilon). auto_LiRPA keeps
+            # the bound graph of each call alive (about 10 GB per call on big), so reusing
+            # one module ran out of memory.
             model = BoundedModule(HazeJacobian(build_network(args.network).to(dev)),
                                   (torch.zeros(1, 1, device=dev), img),
                                   device=dev)
@@ -198,11 +153,8 @@ def main():
             t_sums[ei] += time.perf_counter() - begin
             lc_sums[ei] += torch.maximum(lb.abs(), ub.abs()).max().item()
             counts[ei] += 1
-            # gc.collect() before empty_cache(), and both are needed: the bound
-            # graph is a cycle of nodes referencing each other, so plain
-            # refcounting never frees it and empty_cache() only returns blocks
-            # already freed. Without the collect, an 80 GB A100 filled up after
-            # six solves (76 GiB still live).
+            # gc.collect() first, then empty_cache(): the bound graph is a reference cycle,
+            # so only the garbage collector frees it.
             del model, lb, ub
             gc.collect()
             if dev == "cuda":

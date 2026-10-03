@@ -1,29 +1,8 @@
-"""Colab / GPU readiness experiment for the Pasado Section_5_4 precise path.
+"""Checks what already runs on a GPU: fp64 vs fp32 matmul speed, then the
+device-ready kernels (vectorized checks and batched regression) on CPU and GPU,
+with timings and a numeric comparison. Without a GPU it runs only the CPU part.
 
-Run on Colab (or any CUDA machine):
-
-    !git clone <repo-url> Pasado          # or upload the repo
-    %cd Pasado
-    !pip install torch torchvision scikit-learn
-    !python experiments/colab_gpu_profile.py
-
-What it does (honestly - no hidden benchmark shortcuts):
-  1. prints CUDA availability, GPU model, and measured fp64 vs fp32 matmul
-     throughput (consumer GPUs run fp64 at 1/32-1/64 rate - decisive for the
-     AffineZonotope matmul that dominates the `big` network);
-  2. runs a REDUCED 3layer precise test on CPU (1 image-like input, 2 epsilons)
-     - the full pipeline, just fewer inputs;
-  3. attempts the same on GPU for the pieces that are device-ready today
-     (vectorized corner/boundary checks + batched regression); the full
-     pipeline is NOT GPU-ready yet (see GPU_READINESS.md: gelsd is CPU-only,
-     several factory calls lack device=...), so this script measures the ready
-     kernels rather than pretending the whole benchmark runs on GPU;
-  4. compares CPU vs GPU numerics for those kernels;
-  5. times with proper torch.cuda.synchronize() around every GPU measurement.
-
-If no GPU is present it says so and runs the CPU part only - it never
-fabricates GPU numbers.
-"""
+Run: python experiments/colab_gpu_profile.py"""
 import os
 import statistics
 import sys

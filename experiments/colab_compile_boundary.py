@@ -1,41 +1,6 @@
-"""Does fusing check_nonlinear_boundary_tensor pay for the real cubic's 8 %?
-
-Context. After the grid was batched, `check_nonlinear_boundary_tensor` is the
-largest addressable block in the precise path (38 % of
-sigmoid_prime_product_tensor on 5layer). It was previously uncompilable: its
-root solve went through complex64, which TorchInductor cannot codegen. The
-PASADO_REAL_CUBIC path removes that, at a measured cost of +8 % on the precise
-transformer (acos + 3 cos are dearer than complex sqrt + pow).
-
-So the question is a threshold, not a direction: **fusion must recover more than
-the 8 % the real solver gives up**, otherwise the combination is a net loss.
-
-This measures four variants of the same kernel:
-
-    eager   + complex64   (production today)
-    eager   + real cubic  (the 8 % penalty, alone)
-    compile + complex64   (expected to FAIL -- documents the blocker)
-    compile + real cubic  (the point of the exercise)
-
-Reported per variant: median steady-state time, and for compiled variants the
-first-call compile latency separately -- a fused kernel that needs 30 s to
-compile is useless inside an analysis that runs it 1920 times for 20 s of work.
-
-Why a microbenchmark and not the full benchmark. torch.compile pays its cost
-once and amortizes; running get_lipschitz.py end to end mixes that with the
-interval/zonotope passes and data loading, which this change cannot affect. The
-kernel is timed in isolation at the shapes the real analysis uses (n = layer
-width), then the end-to-end effect is inferred from the profile share.
-
-Colab:
-    !git clone https://github.com/uiuc-arc/Pasado.git
-    !wget -q -O Pasado/forward_mode_tensorized_src/precise_transformer.py \\
-      https://raw.githubusercontent.com/dimitrijepesic/Pasado/colab-gpu-wip/forward_mode_tensorized_src/precise_transformer.py
-    !wget -q -O Pasado/experiments/compile_boundary.py \\
-      https://raw.githubusercontent.com/dimitrijepesic/Pasado/colab-gpu-wip/experiments/colab_compile_boundary.py
-    !pip install -q scikit-learn
-    !python Pasado/experiments/compile_boundary.py
-"""
+"""Times check_nonlinear_boundary_tensor in eager mode and with torch.compile, with
+the complex64 root solver and with the real cubic solver. The first-call compile
+time is reported separately from the steady-state time."""
 import argparse
 import os
 import statistics

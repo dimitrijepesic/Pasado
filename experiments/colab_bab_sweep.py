@@ -1,41 +1,9 @@
-"""auto_LiRPA + Branch-and-Bound swept over networks x epsilons x budgets, on GPU.
+"""Runs auto_LiRPA with branch and bound over networks, epsilons and budgets on a GPU.
+Each (network, epsilon) result is appended to a CSV as soon as it is done, so a
+rerun after a Colab disconnect skips the pairs that are already there. The Pasado
+side runs separately on CPU (get_lipschitz.py --n-splits k).
 
-Establishes where the equal-budget crossover with Pasado sits across the whole
-benchmark, not just at the one point measured so far (5layer, eps=0.2, crossover
-at ~7 subproblems). That point was the most favourable one for Pasado -- it is
-where the single-pass gap peaked -- so the crossover elsewhere is expected to be
-at a smaller budget, and this sweep is what shows it.
-
-Only the auto_LiRPA side runs here. The Pasado side is a CPU job
-(`get_lipschitz.py --n-splits k`, cheap) and is merged afterwards; keeping them
-apart avoids running Pasado's float64 CPU code inside a CUDA-default process.
-
-Design notes that matter:
-
-* **Best-first bisection.** t in [0, eps] is the whole perturbed domain (a
-  scalar), so bisecting it is complete branching; there are no ReLU neurons to
-  split in a sigmoid network. At each step the sub-interval with the largest
-  current bound is split, since only that one can hold the global max. The
-  running max over live sub-intervals is sound at every budget, so one pass
-  yields the whole curve.
-
-* **Fresh module per solve.** auto_LiRPA caches intermediate bounds and alpha
-  parameters per call and never frees them; the bound graph is a reference
-  cycle, so `gc.collect()` is required and `empty_cache()` alone is a no-op.
-  Without this an 80 GB A100 fills after six solves.
-
-* **Resumable.** Colab sessions die. Every (network, epsilon) result is appended
-  to the CSV as soon as it completes, and a rerun skips pairs already present,
-  so progress survives a disconnect.
-
-Colab:
-    !git clone https://github.com/uiuc-arc/Pasado.git
-    !mkdir -p Pasado/experiments
-    !pip install -q --ignore-requires-python git+https://github.com/Verified-Intelligence/auto_LiRPA.git
-    !wget -q -O Pasado/experiments/sweep.py \\
-      https://raw.githubusercontent.com/dimitrijepesic/Pasado/colab-gpu-wip/experiments/colab_bab_sweep.py
-    !python Pasado/experiments/sweep.py --networks 3layer 4layer 5layer --eps-indices 0 1 2 3 4 5 6
-"""
+Colab: clone the repo, pip install auto_LiRPA, then run this file."""
 import argparse
 import csv
 import gc

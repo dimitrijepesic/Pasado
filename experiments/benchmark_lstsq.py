@@ -1,15 +1,7 @@
-"""Microbenchmark: per-neuron lin_reg_tensor loop vs lin_reg_tensor_batched.
+"""Compares the per-neuron lin_reg_tensor loop with lin_reg_tensor_batched.
+Results go to logs/microbenchmark_results.csv. Run on an idle machine.
 
-Times the exact work sigmoid_prime_product_tensor does per layer call:
-  loop:    n x ( ones + cat + lstsq )           (current production path)
-  batched: 1 x ( ones + cat + batched lstsq )   (Phase 6 candidate)
-
-Method: warm-up runs, then R repetitions, median/min/max reported. CPU-only,
-no cProfile. Run on an otherwise idle machine; results are appended to
-logs/microbenchmark_results.csv.
-
-Run:  .venv/Scripts/python.exe experiments/benchmark_lstsq.py
-"""
+Run: python experiments/benchmark_lstsq.py"""
 import csv
 import os
 import statistics

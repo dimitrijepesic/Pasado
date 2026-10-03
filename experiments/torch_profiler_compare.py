@@ -1,21 +1,8 @@
-"""Reduced torch.profiler comparison of the three precise-path variants (Phase 9).
+"""Compares the old, vectorized and batched precise-path variants with torch.profiler
+on one image and one epsilon. Writes operator tables to
+logs/torch_profiler_<variant>.txt and small traces to profiles/.
 
-Workload: ONE image, ONE epsilon, full 3layer precise forward (both sigmoid
-layers) - not the whole benchmark. Profiled per variant:
-
-    old      PASADO_VECTORIZED_PRECISE-off per-neuron checks + per-neuron lstsq
-    vec      vectorized corner/boundary checks + per-neuron lstsq
-    batched  vectorized checks + batched lstsq (only if wired into pt)
-
-Outputs, per variant:
-  - logs/torch_profiler_<variant>.txt : operator table (name, calls, self CPU,
-    total CPU) sorted by self CPU, top 25, plus total op-call count
-  - profiles/torch_profiler_<variant>.json : small Chrome trace
-  - a compact stdout summary comparing tiny-op counts across variants.
-
-Run on an idle machine:
-    .venv/Scripts/python.exe experiments/torch_profiler_compare.py
-"""
+Run: python experiments/torch_profiler_compare.py"""
 import os
 import sys
 

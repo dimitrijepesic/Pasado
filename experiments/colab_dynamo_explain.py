@@ -1,26 +1,6 @@
-"""Enumerate the graph breaks in sigmoid_prime_product_tensor.
-
-Compiling `check_nonlinear_boundary_tensor` alone already gave 5-30x
-(colab_compile_boundary.py) with `linalg_lstsq` simply outside the compiled
-region. The open question is what compiling the WHOLE transformer would cost and
-gain, and that hinges on where Dynamo breaks the graph. Two breaks are expected:
-
-  * `torch.linalg.lstsq` -- dynamic output shape, documented in
-    TORCH_COMPILE_ANALYSIS.md as the reason the whole function was not
-    compilable.
-  * `np.random.normal(...)` in the A-coefficient perturbation -- a numpy call in
-    the hot path. This one matters beyond fusion: if Dynamo constant-folds it
-    instead of breaking, the compiled function would reuse FIXED perturbations
-    on every call, which is a correctness bug rather than a missed
-    optimization. The script checks that explicitly by calling the compiled
-    function twice and comparing.
-
-Reports, per compiled callable: number of graphs, number of breaks, and the
-reason + source location of each break.
-
-Colab (after the setup cells used for compile_boundary.py):
-    !python Pasado/experiments/colab_dynamo_explain.py
-"""
+"""Lists where Dynamo breaks the graph in sigmoid_prime_product_tensor. It also
+checks that compilation does not freeze the np.random perturbation: two calls
+must give different results."""
 import os
 import sys
 
@@ -134,9 +114,7 @@ def main():
         pt.USE_BATCHED_LSTSQ = True
         pt.USE_BATCHED_GRID = True
 
-        # The kernel already proven to compile cleanly, as a control: it should
-        # report zero breaks, which validates that a nonzero count elsewhere is
-        # a real finding and not a harness artifact.
+        # Control: a kernel known to compile cleanly should report zero breaks.
         g = torch.Generator().manual_seed(3)
         lx = torch.rand(n, generator=g) * 6 - 3
         ux = lx + torch.rand(n, generator=g) * 2 + 1e-3

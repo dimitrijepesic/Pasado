@@ -1,33 +1,9 @@
-"""Profile the precise path under several selector variants and diff them.
+"""Profiles get_lipschitz.py under cProfile for several selector variants and prints
+the time of the precise-path functions side by side. cProfile overstates code
+with many cheap calls, so use this to see which function moved, not as wall-clock
+time.
 
-Purpose. After batching the sampling grid, the previously dominant
-`get_linspace` (~44 % of sigmoid_prime_product_tensor on 3layer, plus 4 .item()
-syncs per neuron) is gone, and nothing tells us what the new bottleneck is. The
-question this answers is binary and decides whether CPU work continues:
-
-  * still Python overhead on top  -> more vectorization is worth doing;
-  * pure BLAS on top (AffineZonotope matmul, abs/sum reductions)
-    -> CPU side is finished and everything further belongs on the GPU.
-
-Method. Runs get_lipschitz.py under cProfile once per variant (variants are
-selected purely through the PASADO_* environment variables, so no source is
-edited), then prints one side-by-side table of cumulative and self time for the
-functions on the precise path. A side-by-side diff is the point: an absolute
-profile alone cannot show what *moved*.
-
-Reading the numbers -- important caveat. cProfile charges a fixed cost per
-Python call, so it systematically overstates code that makes many cheap calls
-and understates a few large tensor operations. That bias is exactly backwards
-for judging our optimizations: it flatters the un-optimized variant's
-bottlenecks and can make the optimized one look BLAS-bound sooner than it is.
-Use these numbers for *attribution* (which function, and did it move), never as
-wall-clock -- the interleaved benchmark harness is the authority on time.
-
-Usage (from the Pasado repo root):
-    .venv\\Scripts\\python.exe experiments\\profile_variants.py
-    .venv\\Scripts\\python.exe experiments\\profile_variants.py \\
-        --network 3layer --variants vec_both_batched vec_batched_grid
-"""
+Usage: python experiments/profile_variants.py --network 3layer --variants vec_both_batched vec_batched_grid"""
 import argparse
 import os
 import pstats
@@ -97,9 +73,7 @@ def run_profile(network, variant, force):
     os.makedirs(PROFILES, exist_ok=True)
     env = dict(os.environ)
     env.update(VARIANT_ENV[variant])
-    # --no-save keeps torch.save out of the profile; an early attempt in this
-    # project was dominated by ~93s of serialization and was useless for
-    # compute attribution.
+    # --no-save keeps torch.save out of the profile (it once dominated it).
     cmd = [PY, "-m", "cProfile", "-o", out, "get_lipschitz.py",
            "--network", network, "--no-save"]
     print(f"  [{variant}] profiling ...", end="", flush=True)
