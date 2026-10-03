@@ -1,19 +1,3 @@
-"""Verifies the batched-grid and tensor-max-error optimizations.
-
-Two checks, both against the original per-neuron path:
-
-1. `get_linspace_batched` equals `torch.stack(get_linspace(...))` bit for bit
-   for STEPS=3 and 5 (5 is the production value), including the degenerate
-   boxes the analysis actually produces. STEPS=7/9 are reported and bounded to
-   a few ULP only (known 1-ULP difference on arm64).
-2. `sigmoid_prime_product_tensor` produces the identical zonotope under every
-   combination of the four selectors. This matters because the selectors are
-   independent flags: the grid can be batched while the regression is not, the
-   error checks can be half-vectorized ("corners only"), and each combination
-   takes a different route through the code.
-
-Run:  python test_batched_grid.py   (from forward_mode_tensorized_src/)
-"""
 import itertools
 import sys
 
@@ -27,20 +11,13 @@ from SimpleZono import IntervalsToZonotope
 
 
 def check_grid_equivalence():
-    """Compare the batched sampling grid against the per-neuron loop.
-
-    Returns True when every strict case is bit-exact and every informational
-    case stays within its ULP bound.
-    """
+    """Batched grid vs the per-neuron loop. STEPS 3 and 5 and the zero-width boxes must match bit for bit."""
     print("=== get_linspace_batched vs get_linspace ===")
     g = torch.Generator().manual_seed(4242)
     all_ok = True
 
     def one(name, lx, ux, ly, uy, steps=5, strict=True, ulp_tol=4):
-        """strict: must be bit-exact, otherwise the test fails.
-        not strict: informational; fails only if the difference exceeds
-        `ulp_tol` ULPs of the largest grid value, and is labelled when it is
-        not bit-exact (see the STEPS note below)."""
+        """strict=True: grids must be identical. Otherwise a few ULP of difference is allowed."""
         nonlocal all_ok
         ref = torch.stack(pt.get_linspace(lx, ux, ly, uy, steps))
         got = pt.get_linspace_batched(lx, ux, ly, uy, steps)
@@ -61,15 +38,11 @@ def check_grid_equivalence():
                    f"({'within' if ok else 'EXCEEDS'} {ulp_tol} ULP)")
         print(f"  {name:42s} STEPS={steps}  {'strict' if strict else 'info  '}  {tag}")
 
-    # STEPS=5 is the only value production uses (get_linspace_batched default),
-    # so it decides the exit code together with the degenerate boxes below.
-    # STEPS=3 is also bit-exact (the multipliers t*step are only 0, 1, 2, which
-    # multiply exactly), so it stays strict as extra coverage.
-    # STEPS=7/9 first need a multiplier of 3; torch.linspace's kernel may fuse
-    # start + step*idx into one FMA on arm64, while the batched version does
-    # mul then add (two roundings) -> 1 ULP apart. This is a working hypothesis,
-    # not verified on x86, so these two are reported but only bounded, and the
-    # formula in _linspace_rows is intentionally left unchanged.
+    # STEPS=5 is what production uses, so it decides the exit code together with the
+    # zero-width boxes below. STEPS=3 is also exact, so it stays strict.
+    # STEPS=7/9 differ by 1 ULP on arm64, probably because torch.linspace fuses
+    # start + step*i into one FMA while the batched version rounds twice (not checked
+    # on x86). They are reported and bounded; _linspace_rows is left as it is.
     for steps in (3, 5, 7, 9):
         n = 400
         lx = torch.rand(n, generator=g) * 10 - 5
@@ -92,12 +65,9 @@ def check_grid_equivalence():
 
 
 def run_variant(x_lb, x_ub, y_lb, y_ub, *, vec, boundary, lstsq, grid, seed=99):
-    """One sigmoid_prime_product_tensor call under a fixed selector combination.
+    """Run sigmoid_prime_product_tensor once with the given selectors.
 
-    The selectors are read at call time, and the np.random stream is reseeded
-    per run because the transformer perturbs coefficient A with an unseeded
-    random draw. Without pinning the seed, two runs of the same variant would
-    differ and nothing could be compared.
+    np.random is reseeded because the transformer adds a random perturbation to A.
     """
     pt.USE_VECTORIZED_PRECISE = vec
     pt.USE_VECTORIZED_BOUNDARY = boundary
@@ -111,13 +81,10 @@ def run_variant(x_lb, x_ub, y_lb, y_ub, *, vec, boundary, lstsq, grid, seed=99):
 
 
 def check_selector_equivalence():
-    """Check that every valid selector combination gives the same zonotope.
+    """Every selector combination must give the same zonotope as the original code.
 
-    The reference is the run with all selectors off (the original code path).
-    Combinations that use the vectorized error checks may differ in the last
-    bits because floating-point reductions are reordered; combinations that
-    only batch the grid or the regression must match the reference exactly.
-    Returns True when every combination is within its tolerance.
+    The vectorized checks may differ in the last bits (reordered sums). The grid and
+    the regression must match exactly.
     """
     print("=== sigmoid_prime_product_tensor across selector combinations ===")
     g = torch.Generator().manual_seed(7)
@@ -152,9 +119,8 @@ def check_selector_equivalence():
             dc = (c - ref_c).abs().max().item()
             dg = (gen - ref_gen).abs().max().item()
             worst = max(worst, dc, dg)
-            # The vectorized error checks reorder floating-point reductions, so
-            # they are allowed to differ in the last bits; the grid and the
-            # regression must not differ at all.
+            # The vectorized checks reorder sums, so they may differ in the last bits.
+            # The grid and the regression must match exactly.
             tol = 1e-12 if vec else 0.0
             ok = dc <= tol and dg <= tol
             all_ok &= ok
