@@ -1,28 +1,3 @@
-"""
-Routing and equivalence test for the PASADO_VECTORIZED_PRECISE and
-PASADO_VEC_BOUNDARY selectors.
-
-Runs the full sigmoid_prime_product_tensor entry point and confirms that:
-
-  1. With the selector off, the original check_corners and
-     check_nonlinear_boundary run (verified by call counters) and the
-     vectorized versions are never called.
-  2. With the selector on, check_corners_tensor and
-     check_nonlinear_boundary_tensor run and the originals are never called.
-  3. In the intermediate "corners only" setting (USE_VECTORIZED_BOUNDARY off),
-     the corner check uses the tensor path and the boundary check uses the
-     original path.
-  4. With identical np.random seeds, all three settings produce numerically
-     equivalent output zonotopes. The regressions are identical by
-     construction, so only floating-point reordering inside the two checks
-     may cause small differences.
-
-The benchmark runs in float64 (get_lipschitz.py sets the default dtype), so
-this test does too.
-
-Run with:  python test_selector_paths.py   (from forward_mode_tensorized_src/)
-Exit status is non-zero if any assertion fails.
-"""
 import numpy as np
 import torch
 
@@ -39,7 +14,7 @@ SEED = 12345
 
 
 class CallCounter:
-    """Wraps a function and counts how many times it is called."""
+    """Counts how often a function is called."""
 
     def __init__(self, fn):
         self.fn = fn
@@ -51,11 +26,7 @@ class CallCounter:
 
 
 def make_inputs(n, seed, degenerate=False):
-    """Build two random input zonotopes (x and y) with n neurons each.
-
-    With degenerate=True the boxes have zero width (lx == ux and ly == uy),
-    which is the case that makes the regression rank-deficient.
-    """
+    """Two random zonotopes with n neurons. degenerate=True makes the boxes zero-width."""
     g = torch.Generator().manual_seed(seed)
     lx = torch.rand(n, generator=g, dtype=torch.float64) * 4 - 2
     ux = lx if degenerate else lx + torch.rand(n, generator=g, dtype=torch.float64) * 4 + 1e-3
@@ -78,9 +49,7 @@ def run_with_flags(x, y, vectorized, vec_boundary=True):
         pt.USE_VECTORIZED_BOUNDARY = vec_boundary
         for name, c in counters.items():
             setattr(pt, name, c)
-        # Only np.random affects this code path (the perturbation of A). The
-        # torch seed is set as well so the test stays deterministic if torch
-        # randomness is ever introduced.
+        # Only np.random matters here (the perturbation of A); torch is seeded just in case.
         np.random.seed(SEED)
         torch.manual_seed(SEED)
         out = pt.sigmoid_prime_product_tensor(x.clone(), y.clone())
@@ -92,7 +61,7 @@ def run_with_flags(x, y, vectorized, vec_boundary=True):
 
 
 def check_routing(counts, expect_active, expect_inactive, label):
-    """Assert that the listed functions were called and the others were not."""
+    """Assert which functions were called."""
     for name in expect_active:
         assert counts[name] > 0, f"{label}: {name} was not called ({counts})"
     for name in expect_inactive:
@@ -100,7 +69,7 @@ def check_routing(counts, expect_active, expect_inactive, label):
 
 
 def compare_outputs(z_old, z_new, label):
-    """Assert that two zonotopes have the same shape, dtype and values."""
+    """Assert that two zonotopes match in shape, dtype and values."""
     dc = (z_old.centers - z_new.centers).abs().max().item()
     dg = (z_old.generators - z_new.generators).abs().max().item()
     assert z_old.centers.shape == z_new.centers.shape, label
@@ -112,8 +81,6 @@ def compare_outputs(z_old, z_new, label):
 
 
 def main():
-    """Run all three selector settings for several sizes, with and without
-    degenerate boxes, checking routing and output equivalence each time."""
     print(f"default USE_VECTORIZED_PRECISE={pt.USE_VECTORIZED_PRECISE} "
           f"(env PASADO_VECTORIZED_PRECISE, '1' if unset)")
 
