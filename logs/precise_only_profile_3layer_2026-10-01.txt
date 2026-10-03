@@ -1,0 +1,54 @@
+precise-only profile | net=3layer | flags=best {'vec': True, 'bnd': True, 'lstsq': True, 'grid': True, 'cubic': False} | images=5 eps_idx=[0, 4, 8, 12] -> 400 forwards | torch=2.12.1 threads=5 dtype=torch.float64
+WALL-CLOCK: 0.590 s
+
+cProfile total (inflated by per-call overhead): 0.610 s
+
+=== TOP 15 BY SELF TIME (tottime) ===
+         308402 function calls in 0.610 seconds
+
+   Ordered by: internal time
+   List reduced from 100 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      800    0.110    0.000    0.110    0.000 {built-in method torch._C._linalg.linalg_lstsq}
+      800    0.051    0.000    0.484    0.001 precise_transformer.py:716(sigmoid_prime_product_tensor)
+     3200    0.039    0.000    0.039    0.000 {built-in method torch.max}
+     1600    0.032    0.000    0.054    0.000 precise_transformer.py:215(inverse_poly_tensor)
+     2400    0.031    0.000    0.032    0.000 SimpleZono.py:169(AffineZonotope)
+     5600    0.020    0.000    0.020    0.000 {built-in method torch.cat}
+     6400    0.019    0.000    0.026    0.000 precise_transformer.py:304(filter_range)
+     1600    0.014    0.000    0.014    0.000 {built-in method torch.min}
+     4800    0.014    0.000    0.014    0.000 {built-in method torch.abs}
+    10400    0.013    0.000    0.013    0.000 {built-in method torch.sigmoid}
+     4800    0.012    0.000    0.012    0.000 {built-in method torch.stack}
+     1600    0.012    0.000    0.019    0.000 precise_transformer.py:71(_linspace_rows)
+    11200    0.012    0.000    0.012    0.000 {built-in method torch.rsub}
+     4800    0.011    0.000    0.023    0.000 precise_transformer.py:290(bool_to_nan)
+      800    0.011    0.000    0.038    0.000 SimpleZono.py:294(SigmoidZonotope)
+
+
+
+=== TOP 15 BY CUMULATIVE TIME ===
+         308402 function calls in 0.610 seconds
+
+   Ordered by: cumulative time
+   List reduced from 100 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.610    0.610 profile_precise_only.py:91(run_all)
+      400    0.002    0.000    0.610    0.002 profile_precise_only.py:81(one_forward)
+      400    0.004    0.000    0.577    0.001 correctness_e2e.py:60(forward_zono_precise)
+      800    0.003    0.000    0.537    0.001 precise_transformer.py:841(PreciseSigmoidDualZonotope)
+      800    0.051    0.000    0.484    0.001 precise_transformer.py:716(sigmoid_prime_product_tensor)
+      800    0.004    0.000    0.233    0.000 precise_transformer.py:664(compute_max_error)
+      800    0.009    0.000    0.186    0.000 precise_transformer.py:532(check_nonlinear_boundary_tensor)
+      800    0.001    0.000    0.118    0.000 precise_transformer.py:199(lin_reg_tensor_batched)
+      800    0.110    0.000    0.110    0.000 {built-in method torch._C._linalg.linalg_lstsq}
+     1600    0.010    0.000    0.101    0.000 precise_transformer.py:311(inverse_sigmoid_2nd_deriv)
+     1600    0.032    0.000    0.054    0.000 precise_transformer.py:215(inverse_poly_tensor)
+      800    0.008    0.000    0.041    0.000 precise_transformer.py:403(check_corners_tensor)
+     1600    0.010    0.000    0.041    0.000 precise_transformer.py:511(_max_objective_over_x_candidates)
+     3200    0.039    0.000    0.039    0.000 {built-in method torch.max}
+      800    0.011    0.000    0.038    0.000 SimpleZono.py:294(SigmoidZonotope)
+
+

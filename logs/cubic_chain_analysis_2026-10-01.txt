@@ -1,0 +1,60 @@
+torch=2.12.1 threads=5 captured=16 calls
+
+=== 2. STATS on captured real inputs ===
+captured calls: 16  (neurons per call: 100)
+layer/y    neurons   y==0  A/y in range   roots in (0,1)   survive [lx,ux]  >=1 candidate
+L0/ly          800      0        100.0%            65.9%             34.0%          92.8%
+L0/uy          800      0        100.0%            65.9%             34.0%          92.8%
+L1/ly          800      0         85.9%            57.0%             18.8%          55.4%
+L1/uy          800      0         86.2%            57.2%             18.3%          53.5%
+(percent of neurons, resp. of the 3n root slots; the whole chain is run on all n regardless)
+
+=== 3. STAGE TIMING (median us, one ly branch, real inputs) ===
+  a  A/ly + inf_to_nan + filter_range(l,u)                                     4.8 us
+  b  inverse_poly_tensor (complex64 Cardano)                                  21.9 us
+  c  inverse_sigmoid_2nd_deriv (b + bool_to_nan x3 + inv_sigmoid x3)          45.2 us
+  d  filter_range(lx,ux) x3 on roots                                           8.6 us
+  e  stack + to(dtype) + max objective                                        27.8 us
+     whole check_nonlinear_boundary_tensor (both branches)                   205.3 us
+  a+c+d+e (one branch)=86.4 us, x2 branches=172.8 us vs whole=205.3 us   [n=100]
+
+=== 4. OP COUNT / TOP OPS for one check_nonlinear_boundary_tensor call ===
+  distinct aten ops: 45   total aten calls (incl. nested): 690   sum self CPU: 214 us
+  op                                calls   self us
+  aten::max                             2        33
+  aten::_to_copy                       60        18
+  aten::mul                            28        14
+  aten::copy_                          60        12
+  aten::add                            22        10
+  aten::pow                             8        10
+  aten::empty                          24         9
+  aten::select                         15         8
+  aten::sub                            18         7
+  aten::empty_strided                  62         6
+  aten::to                             76         6
+  aten::logical_and                    16         6
+  aten::div                            10         5
+  aten::eq                              8         5
+  mask-assignment related (index_put_/nonzero/masked*): aten::masked_fill_ x16, aten::_index_put_impl_ x16, aten::index_put_ x16
+
+=== 5. VARIANTS (prototypes) ===
+-- bit-identity vs original (torch.equal on both outputs)
+  orig+where(helpers)    real inputs: 16/16 identical   edge cases differing: none
+  stack                  real inputs: 16/16 identical   edge cases differing: none
+  stack+where            real inputs: 16/16 identical   edge cases differing: none
+  stack+merge            real inputs: 16/16 identical   edge cases differing: none
+  stack+merge+where      real inputs: 16/16 identical   edge cases differing: none
+-- micro timing, median us per call (n=100)
+  orig                       205.2 us   x 1.00 vs orig
+  orig+where(helpers)        208.3 us   x 0.99 vs orig
+  stack                      167.7 us   x 1.22 vs orig
+  stack+where                167.9 us   x 1.22 vs orig
+  stack+merge                100.4 us   x 2.04 vs orig
+  stack+merge+where          100.8 us   x 2.04 vs orig
+-- e2e: 3layer precise forward wall-clock (interleaved, min of 5 rounds)
+  orig                     1.395 ms/forward   x1.000 vs orig
+  stack+where              1.305 ms/forward   x1.069 vs orig
+  stack+merge+where        1.161 ms/forward   x1.202 vs orig
+-- e2e bit-identity of the final dual zonotope (same seed)
+  stack+where            dual centers+generators identical: True
+  stack+merge+where      dual centers+generators identical: True
