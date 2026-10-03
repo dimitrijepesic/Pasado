@@ -1,0 +1,9 @@
+Part 1: 3 unseeded get_lipschitz.py runs, flags {'PASADO_VECTORIZED_PRECISE': '1', 'PASADO_VEC_BOUNDARY': '1', 'PASADO_BATCHED_LSTSQ': '1', 'PASADO_BATCHED_GRID': '1', 'PASADO_REAL_CUBIC': '0'}
+  run 0 vs run 1: max relative difference 1.55e-05, median 4.76e-06
+  run 0 vs run 2: max relative difference 1.15e-05, median 6.34e-06
+  worst case over all epsilons and run pairs: 1.55e-05
+  first epsilon, lc_precise per run: [526.172492, 526.173978, 526.174782]
+
+Part 2: single forward passes, seeded
+  same seed twice gives exactly the same lc: True
+  different seed, worst relative difference over 6 cases: 7.76e-05
