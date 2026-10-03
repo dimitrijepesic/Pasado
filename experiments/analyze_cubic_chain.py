@@ -1,27 +1,8 @@
-"""Analysis of the "cubic chain" in the precise path.
+"""Measures where the time goes in the cubic root solve of
+check_nonlinear_boundary_tensor and tests possible rewrites. The rewrites live
+only in this file; precise_transformer.py is not modified.
 
-The cubic chain is the part of check_nonlinear_boundary_tensor that solves a
-cubic equation per neuron (inverse_sigmoid_2nd_deriv and its helpers) and then
-filters and evaluates the roots. This script measures where its time goes and
-tests possible rewrites.
-
-It does not modify precise_transformer.py. The rewrites are prototypes that
-live only in this file, so they can be checked for bit-identity and timed
-before anyone changes the real code.
-
-Sections:
-  1. capture   Record the real inputs of check_nonlinear_boundary_tensor during
-               actual forward passes.
-  2. stats     Measure how much of the work is done on values that end up NaN.
-  3. stages    Time each stage of the chain on those real inputs.
-  4. ops       Count the PyTorch operations in one call (torch.profiler).
-  5. variants  Compare the prototypes with the original: bit-identity on real
-               and synthetic inputs, plus speed per call and end to end.
-
-Usage (from the Pasado repo root, venv active):
-    python experiments/analyze_cubic_chain.py
-    python experiments/analyze_cubic_chain.py --section stats stages
-"""
+Run: python experiments/analyze_cubic_chain.py [--section stats stages ops variants]"""
 import argparse
 import os
 import statistics
@@ -43,17 +24,9 @@ L = -1.0 / (6.0 * np.sqrt(3.0))
 U = -L
 
 
-# --------------------------------------------------------------------------
 # 1. capture
-# --------------------------------------------------------------------------
 def capture(n_images=2, eps_indices=(0, 4, 8, 12)):
-    """Run real precise forwards and record every call's inputs.
-
-    check_nonlinear_boundary_tensor is temporarily wrapped with a function that
-    stores clones of its arguments (so later in-place edits cannot change them)
-    and then calls the original. Returns the recorded calls, the network, the
-    images and the epsilons used.
-    """
+    """Run real forwards and record the inputs of every check_nonlinear_boundary_tensor call."""
     pp.set_flags("best")
     net = pp.ce.build_net()
     imgs = pp.load_images(n_images)
@@ -81,18 +54,9 @@ def capture(n_images=2, eps_indices=(0, 4, 8, 12)):
     return rec, net, imgs, epsilons
 
 
-# --------------------------------------------------------------------------
 # 2. stats: where does the chain compute values that are discarded?
-# --------------------------------------------------------------------------
 def stats(rec):
-    """Print how many neurons and root slots survive each filtering step.
-
-    For each layer and each of the two branches (ly and uy) it reports the
-    share of neurons whose A / y is inside the valid range, the share of the
-    three root slots that are valid (inside (0, 1) before inverting the
-    sigmoid), the share that also fall inside [lx, ux], and the share of
-    neurons that keep at least one candidate.
-    """
+    """Print how many neurons and root slots survive each filtering step."""
     print("\n=== 2. STATS on captured real inputs ===")
     print(f"captured calls: {len(rec)}  (neurons per call: {rec[0]['lx'].numel()})")
     agg = {}
@@ -131,11 +95,9 @@ def stats(rec):
           "all n regardless)")
 
 
-# --------------------------------------------------------------------------
 # 3. stage timing
-# --------------------------------------------------------------------------
 def med_us(fn, reps=400, warm=30):
-    """Median wall-clock time of fn() in microseconds, after warm-up calls."""
+    """Median time of fn() in microseconds."""
     for _ in range(warm):
         fn()
     ts = []
@@ -147,12 +109,7 @@ def med_us(fn, reps=400, warm=30):
 
 
 def stages(rec):
-    """Time each stage of one branch of the chain on a real captured call.
-
-    The helper functions used here are idempotent (applying them twice gives the
-    same result), so they can be timed repeatedly on the same input without
-    copying it each time.
-    """
+    """Time each stage of one branch of the chain on a real captured call."""
     print("\n=== 3. STAGE TIMING (median us, one ly branch, real inputs) ===")
     c = rec[len(rec) // 2]
     lx, ux, ly = c["lx"], c["ux"], c["ly"]
@@ -190,16 +147,9 @@ def stages(rec):
           f"vs whole={res[rows[5][0]]:.1f} us   [n={n}]")
 
 
-# --------------------------------------------------------------------------
 # 4. torch.profiler op counts
-# --------------------------------------------------------------------------
 def ops(rec):
-    """Profile one call with torch.profiler and print operation counts.
-
-    Counts include nested operations, so the total is larger than the number of
-    top-level calls. Also lists the operations behind boolean-mask assignment,
-    to show whether it uses nonzero (which would force a device sync on GPU).
-    """
+    """Count the PyTorch operations in one call with torch.profiler."""
     print("\n=== 4. OP COUNT / TOP OPS for one check_nonlinear_boundary_tensor call ===")
     from torch.profiler import profile, ProfilerActivity
     c = rec[len(rec) // 2]
@@ -222,28 +172,26 @@ def ops(rec):
           + ", ".join(f"{e.key} x{e.count}" for e in idx))
 
 
-# --------------------------------------------------------------------------
 # 5. variants (prototypes, live only here)
-# --------------------------------------------------------------------------
 def inf_to_nan_w(b):
-    """inf_to_nan written with torch.where instead of in-place mask assignment."""
+    """inf_to_nan with torch.where."""
     return torch.where(torch.isinf(b), NAN, b)
 
 
 def filter_range_w(l, u, x):
-    """filter_range written with torch.where; also works for broadcast bounds."""
+    """filter_range with torch.where."""
     guard = torch.logical_not(torch.logical_and(x <= u, x >= l))
     return torch.where(guard, NAN, x)
 
 
 def bool_to_nan_w(x):
-    """bool_to_nan with torch.where: 1.0 where x is real, NaN otherwise (float32)."""
+    """bool_to_nan with torch.where."""
     b1 = torch.isreal(x).float()
     return torch.where(b1 < 0.5, NAN, b1)
 
 
 def roots_stacked(y, use_where):
-    """[3, m] float32, equal to stack(inverse_sigmoid_2nd_deriv(y)) element-wise."""
+    """The three roots as one [3, m] float32 tensor."""
     x1, x2, x3 = pt.inverse_poly_tensor(y)
     x = torch.stack((x1, x2, x3))                 # complex64 [3, m]
     b = bool_to_nan_w(x) if use_where else _bool_to_nan_orig(x)
@@ -251,14 +199,13 @@ def roots_stacked(y, use_where):
 
 
 def _bool_to_nan_orig(x):
-    """The original bool_to_nan, wrapped so roots_stacked can switch between versions."""
     return pt.bool_to_nan(x)
 
 
 def cnb_variant(lx, ux, ly, uy, ABCs_tensor, merge, use_where):
-    """check_nonlinear_boundary_tensor with: roots handled as one stacked tensor
-    (always), ly/uy branches merged into one pass (merge), and mask assignment
-    replaced by torch.where (use_where)."""
+    """check_nonlinear_boundary_tensor with the three roots stacked, optionally with the
+    ly and uy branches merged into one pass, and with torch.where.
+    """
     A = ABCs_tensor[:, 0]; B = ABCs_tensor[:, 1]; C = ABCs_tensor[:, 2]
     i2n = inf_to_nan_w if use_where else pt.inf_to_nan
     flt = filter_range_w if use_where else pt.filter_range
@@ -288,23 +235,19 @@ def cnb_variant(lx, ux, ly, uy, ABCs_tensor, merge, use_where):
 
 
 def patched_helpers_where():
-    """Swap the mask-assignment helpers in precise_transformer for the where versions.
-
-    The structure of the original function is unchanged; only the three helpers
-    are replaced. Returns the originals so restore_helpers can undo the swap.
-    """
+    """Swap the mask-assignment helpers for the torch.where versions; returns the originals."""
     saved = (pt.inf_to_nan, pt.filter_range, pt.bool_to_nan)
     pt.inf_to_nan, pt.filter_range, pt.bool_to_nan = inf_to_nan_w, filter_range_w, bool_to_nan_w
     return saved
 
 
 def restore_helpers(saved):
-    """Undo patched_helpers_where using the tuple it returned."""
+    """Undo patched_helpers_where."""
     pt.inf_to_nan, pt.filter_range, pt.bool_to_nan = saved
 
 
 def edge_cases(dtype=torch.float64):
-    """Synthetic inputs aimed at the places where a rewrite could diverge."""
+    """Synthetic inputs where a rewrite could differ from the original."""
     g = torch.Generator().manual_seed(1)
     n = 64
     lx = torch.rand(n, generator=g) * 6 - 3
@@ -339,13 +282,7 @@ def edge_cases(dtype=torch.float64):
 
 
 def variants(rec, net, imgs, epsilons):
-    """Compare the prototypes with the original function.
-
-    Three checks per variant: bit-identity on the captured real inputs and on
-    the synthetic edge cases, speed of the function alone (n = 100), and speed
-    of the whole 3layer precise forward pass (interleaved runs, best of 5),
-    followed by bit-identity of the final output zonotope.
-    """
+    """Compare the prototypes with the original: bit-identity, speed per call and end to end."""
     print("\n=== 5. VARIANTS (prototypes) ===")
     orig = pt.check_nonlinear_boundary_tensor
 
@@ -437,7 +374,6 @@ def variants(rec, net, imgs, epsilons):
 
 
 def main():
-    """Capture real inputs once, then run the requested sections."""
     ap = argparse.ArgumentParser()
     ap.add_argument("--section", nargs="+",
                     choices=["stats", "stages", "ops", "variants"],
