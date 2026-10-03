@@ -5,57 +5,25 @@ from sklearn import linear_model
 from SimpleZono import *
 
 
-# ---------------------------------------------------------------------------
-# Experimental implementation selectors (Phase 3 / Phase 6 of the 5.4 sprint).
-#
-# PASADO_VECTORIZED_PRECISE=1 (default)  -> compute_max_error uses the vectorized
-#     check_corners_tensor / check_nonlinear_boundary_tensor path.
-# PASADO_VECTORIZED_PRECISE=0            -> falls back to the original per-neuron
-#     check_corners / check_nonlinear_boundary Python-loop path.
-#
-# The selector affects ONLY the corner and nonlinear-boundary error checks. The
-# linear regression, the ABCs, the np.random perturbation of A, and every bound
-# computation are byte-for-byte identical on both paths, so a seeded run differs
-# only by floating-point reordering inside the two checks.
-#
-# The module-level flags are read at *call* time, so an in-process harness can
-# flip e.g. `precise_transformer.USE_VECTORIZED_PRECISE = False` between runs.
-# ---------------------------------------------------------------------------
+# Switches for the optimized code paths. They are read when the code runs, so a
+# script can flip them between runs. The original code stays as the fallback.
+# Set the environment variable to 0 or 1 to change a default.
+
+# Vectorized corner and nonlinear boundary checks in compute_max_error.
 USE_VECTORIZED_PRECISE = os.environ.get("PASADO_VECTORIZED_PRECISE", "1") != "0"
 
-# PASADO_VEC_BOUNDARY lets the nonlinear-boundary check be toggled independently
-# of the corner check, so the benchmark matrix can express the "corners only"
-# intermediate variant. Default follows PASADO_VECTORIZED_PRECISE. It only has an
-# effect when ABCs_tensor is supplied (i.e. USE_VECTORIZED_PRECISE is on).
+# Only the boundary check, so "vectorized corners only" can be run on its own.
+# Needs USE_VECTORIZED_PRECISE.
 USE_VECTORIZED_BOUNDARY = os.environ.get("PASADO_VEC_BOUNDARY", "1") != "0"
 
-# PASADO_BATCHED_LSTSQ=1 -> sigmoid_prime_product_tensor solves all per-neuron
-#     regressions with a single batched lin_reg_tensor_batched call per layer.
-# PASADO_BATCHED_LSTSQ=0 (default) -> original per-neuron lin_reg_tensor loop.
-# The batched solve is bit-identical to the loop (same design matrices, same
-# gelsd driver, batch iterated at C++ level) and consumes the np.random stream
-# in the same per-neuron order, so seeded runs match exactly. Default stays off
-# so production behavior is unchanged unless the variant is selected explicitly.
+# One batched lstsq per layer instead of one per neuron. Same results as the loop.
 USE_BATCHED_LSTSQ = os.environ.get("PASADO_BATCHED_LSTSQ", "0") != "0"
 
-# PASADO_BATCHED_GRID=1 -> the per-neuron sampling grids are built by
-#     get_linspace_batched in one shot instead of the per-neuron torch.linspace /
-#     cartesian_prod loop. Verified bit-identical (see get_linspace_batched).
-# PASADO_BATCHED_GRID=0 (default) -> original loop. Default off so production
-#     behavior is unchanged unless the variant is selected explicitly.
+# Build all sampling grids at once. Same results as the loop.
 USE_BATCHED_GRID = os.environ.get("PASADO_BATCHED_GRID", "0") != "0"
 
-# PASADO_REAL_CUBIC=1 -> inverse_sigmoid_2nd_deriv solves the cubic with Viete's
-#     real trigonometric form instead of Cardano's formula in complex64.
-# PASADO_REAL_CUBIC=0 (default) -> original complex64 path.
-#
-# Unlike the other selectors this one is NOT bit-identical: it deliberately
-# changes numerics, because the complex64 path computes the roots in single
-# precision inside an otherwise float64 analysis (measured residuals 3.8e-06 vs
-# 1.2e-16 -- see inverse_poly_real_tensor). It also removes the only complex
-# arithmetic in the precise path, which is one of the three reasons TorchInductor
-# could not compile it. Default stays off until the end-to-end effect on the
-# reported bounds has been measured.
+# Solve the cubic with Viete's real formula instead of complex64 Cardano. This
+# changes the numbers slightly (see inverse_poly_real_tensor), so it stays off.
 USE_REAL_CUBIC = os.environ.get("PASADO_REAL_CUBIC", "0") != "0"
 
 
@@ -69,44 +37,28 @@ def get_linspace(lx, ux, ly, uy, STEPS=5):
 
 
 def _linspace_rows(lo, hi, STEPS):
-    """Row-wise torch.linspace: [n] x [n] -> [n, STEPS], bit-identical.
+    """torch.linspace for each row, bit for bit.
 
-    torch.linspace does NOT compute start + i*step throughout; it fills the
-    first half forward from `start` and the second half backward from `end`
-    (the same trick numpy uses, so the endpoints are exact and the result is
-    symmetric). Reproducing only the forward half of that formula differs by
-    1 ULP on roughly a quarter of random inputs -- which is what an earlier
-    note in NEXT_RESEARCH_DIRECTIONS.md recorded as "batched linspace is not
-    bit-identical". Mirroring both halves makes it exact, so batching the grid
-    needs no precision concession at all.
+    torch.linspace fills the first half forward from the start and the second half
+    backward from the end. Copying only the forward half is off by 1 ULP in about
+    a quarter of cases, so both halves are reproduced.
     """
     t = torch.arange(STEPS, dtype=lo.dtype, device=lo.device)
     step = (hi - lo) / (STEPS - 1)
     out = lo.unsqueeze(1) + t * step.unsqueeze(1)
-    # A plain slice, not a boolean mask. Which half is which depends only on
-    # STEPS, never on the data, but writing it as `out[:, mask] = ...` still
-    # lowers to aten.nonzero, whose output shape is data-dependent -- and that
-    # was breaking the Dynamo graph twice per call (once for xs, once for ys),
-    # as torch._dynamo.explain showed. The slice is bit-identical and captures.
+    # A slice, not a boolean mask: a mask goes through nonzero, whose shape depends
+    # on the data and breaks the Dynamo graph.
     half = STEPS // 2
     out[:, half:] = hi.unsqueeze(1) - (STEPS - 1 - t[half:]) * step.unsqueeze(1)
     return out
 
 
 def get_linspace_batched(lx, ux, ly, uy, STEPS=5):
-    """[n, STEPS*STEPS, 2], equal to torch.stack(get_linspace(...)) bit for bit.
+    """[n, STEPS*STEPS, 2], identical to torch.stack(get_linspace(...)).
 
-    Replaces 2n torch.linspace calls, n torch.cartesian_prod calls, 4n .item()
-    calls and the Python loop with a handful of whole-tensor operations. The
-    .item() calls matter beyond their cost: each is a device-host sync, so the
-    loop version cannot run on a GPU without stalling on every neuron
-    (7.87M syncs on the `big` benchmark).
-
-    The cartesian product is assembled by repeat_interleave / repeat, which is
-    pure data movement and therefore exact by construction. Verified bit-exact
-    against the loop for float32 and float64, STEPS in {3,5,7,9}, point boxes
-    (lx==ux, ly==uy), widths down to 1e-12, magnitudes up to 1e6, and negative
-    ranges.
+    One batch of tensor operations instead of 2n linspace calls, n cartesian_prod
+    calls and 4n .item() calls. Each .item() also forces a device sync, which
+    would stall a GPU run.
     """
     xs = _linspace_rows(lx, ux, STEPS)
     ys = _linspace_rows(ly, uy, STEPS)
@@ -183,20 +135,13 @@ def lin_reg_tensor(x, zs):
     return R
 
 
-# EXPERIMENTAL batched version of lin_reg_tensor (PASADO_BATCHED_LSTSQ=1).
-# Solves the n independent per-neuron planar regressions in ONE batched
-# least-squares call instead of a Python loop.
-#
-#   x_batch:  [n, m, 2] stacked per-neuron (x, y) grid points
-#   zs_batch: [n, m] or [n, m, 1] stacked per-neuron target values
-#   returns:  [n, 3] coefficients, intercept-first (column 0 = C, 1 = A, 2 = B),
-#             exactly the layout lin_reg_tensor returns per neuron.
-#
-# Matches lin_reg_tensor bit-for-bit: the design matrix is the same [ones | x]
-# concatenation and the same LAPACK gelsd routine solves each matrix in the
-# batch (ATen iterates the batch at C++ level). Preserves dtype and device of
-# x_batch. Validated in experiments/test_batched_lin_reg.py.
 def lin_reg_tensor_batched(x_batch, zs_batch):
+    """All per-neuron planar regressions of a layer in one lstsq call.
+
+    x_batch is [n, m, 2] grid points, zs_batch is [n, m] (or [n, m, 1]) targets.
+    Returns [n, 3] with the intercept first (C, A, B), like lin_reg_tensor. The
+    result is bit-identical to calling lin_reg_tensor once per neuron.
+    """
     if zs_batch.dim() == 2:
         zs_batch = zs_batch.unsqueeze(-1)  # [n, m, 1]
     ones = torch.ones(x_batch.shape[0], x_batch.shape[1], 1,
@@ -236,45 +181,27 @@ def inverse_poly_tensor(y):
     return (x1, x2, x3)
 
 
-# Smallest tolerance that never discards a root the complex64 path accepts (see
-# the module docstring note on PASADO_REAL_CUBIC). It equals float32 epsilon
-# because the production path decides the same discriminant question in
-# complex64, i.e. at float32 precision.
+# Tolerance for the real cubic solver. It equals float32 epsilon because the
+# complex64 path decides the same question in float32.
 _CUBIC_BOUNDARY_TOL = 1e-7
 
 
 def inverse_poly_real_tensor(y, tol=_CUBIC_BOUNDARY_TOL):
-    """The same three roots as inverse_poly_tensor, in real arithmetic.
+    """The roots of inverse_poly_tensor (s = u + 1/2), in real arithmetic (Viete).
 
-    inverse_poly_tensor solves the depressed cubic  u^3 - u/4 - y/2 = 0  (which
-    is sigma''(x) = y after substituting s = sigma(x) = u + 1/2) by Cardano's
-    formula evaluated in complex64. For this cubic p = -1/4 and q = -y/2, so
-    4p^3 + 27q^2 < 0 -- all three roots real -- exactly when
-    |y| < 1/(6*sqrt(3)), and that bound IS the maximum of |sigma''|. Over the
-    whole reachable range the complex path therefore computes three real numbers
-    through complex arithmetic. Viete's trigonometric form gives them directly:
+    The cubic u^3 - u/4 - y/2 = 0 has three real roots exactly when
+    |y| < 1/(6*sqrt(3)), the maximum of |sigma''|. Viete's form gives them directly:
 
-        u_k = (1/sqrt(3)) * cos( acos(6*sqrt(3)*y)/3 - 2*pi*k/3 ),  k = 0,1,2
+        u_k = cos(acos(6*sqrt(3)*y)/3 - 2*pi*k/3) / sqrt(3),  k = 0, 1, 2
 
-    and the acos argument lies in [-1, 1] precisely when the roots are real, so
-    the range test comes for free.
+    The acos argument is in [-1, 1] exactly when the roots are real.
 
-    Two measured consequences (experiments in lipschitz-comparison/probe_*.py):
-
-    * Accuracy. Residuals |2s^3 - 3s^2 + s - y| for the returned roots:
-      complex64 path median 3.8e-06, this path median 1.2e-16. The old roots are
-      single-precision because complex64 is, inside an analysis that is float64
-      everywhere else -- and inv_sigmoid amplifies a 1e-6 error in s to ~1 in the
-      returned x when s approaches 0 or 1.
-
-    * Root count. Compared as sets (the two formulas order roots differently),
-      the two paths agree on how many roots are real for every in-range,
-      out-of-range and realistic input tested. They disagree only within ~1e-6
-      of the boundary, where the complex path's float32 discriminant is itself
-      unreliable. `tol` handles that: inside the band the argument is clamped,
-      which returns the near-double root rather than discarding it. Keeping a
-      candidate can only enlarge the error term (more conservative); dropping one
-      is what would risk unsoundness. At tol=1e-7 no candidate is ever dropped.
+    The complex64 path is only accurate to single precision (median residual 3.8e-06
+    against 1.2e-16 here), and inv_sigmoid can amplify that near 0 and 1. Both paths
+    agree on how many roots are real, except within about 1e-6 of the boundary.
+    There `tol` clamps the argument, so a near-double root is kept instead of
+    dropped: an extra candidate only makes the error bound larger, while a dropped
+    one could make it unsound.
     """
     arg = 6.0 * math.sqrt(3.0) * y
     phi = torch.acos(arg.clamp(-1.0, 1.0)) / 3.0
@@ -393,25 +320,19 @@ def check_corners(ABCs, lx, ux, ly, uy):
     return maxs
 
 
-# EXPERIMENTAL / vectorized version of check_corners.
-# Same semantics as check_corners, but ABCs is passed as a single [n,3] tensor
-# (columns A,B,C) instead of a Python list of (A,B,C) tuples, and all n neurons
-# are evaluated in one batch instead of a Python for-loop.
-#
-# Used by compute_max_error when ABCs_tensor is provided; check_corners is kept
-# as the default (ABCs_tensor=None) path for rollback.
+# Vectorized check_corners: ABCs is an [n, 3] tensor (columns A, B, C) instead of a
+# list of tuples, and all neurons are evaluated at once.
 def check_corners_tensor(ABCs_tensor, lx, ux, ly, uy):
     A = ABCs_tensor[:, 0]
     B = ABCs_tensor[:, 1]
     C = ABCs_tensor[:, 2]
 
-    # all_corners per neuron, in the same order as check_corners:
-    # (lx,ly), (lx,uy), (ux,ly), (ux,uy)  -> shape [n, 4]
+    # corners in the same order as check_corners: (lx,ly), (lx,uy), (ux,ly), (ux,uy)
     xs = torch.stack((lx, lx, ux, ux), dim=1)
     ys = torch.stack((ly, uy, ly, uy), dim=1)
 
     sig = torch.sigmoid(xs)
-    # same association as sigmoid_prime_times_y: (1-s) * (s*y), for bit-identical results
+    # same operation order as sigmoid_prime_times_y, to stay bit-identical
     sigmoid_prime_y = (1.0 - sig) * (sig * ys)
     planar = A.unsqueeze(1) * xs + B.unsqueeze(1) * ys + C.unsqueeze(1)
 
@@ -509,12 +430,10 @@ def check_nonlinear_boundary(lx, ux, ly, uy, ABCs):
 
 
 def _max_objective_over_x_candidates(A, B, C, xs, ys):
-    # xs: [n, k] candidate x-roots per neuron, ys: [n, 1] the fixed y (ly or uy)
-    # for that neuron, broadcast against xs. Same math as objective_fn, batched,
-    # with NaN candidates (filtered-out roots) mapped to -inf before the max so
-    # they can never win - mirrors the per-neuron loop in check_nonlinear_boundary.
+    # xs is [n, k] candidate roots, ys is [n, 1]. NaN candidates (filtered-out roots)
+    # become -inf so they never win the max, as in the per-neuron loop.
     sig = torch.sigmoid(xs)
-    # same association as sigmoid_prime_times_y: (1-s) * (s*y), for bit-identical results
+    # same operation order as sigmoid_prime_times_y, to stay bit-identical
     sigmoid_prime_y = (1.0 - sig) * (sig * ys)
     planar = A.unsqueeze(1) * xs + B.unsqueeze(1) * ys + C.unsqueeze(1)
     evaluation = sigmoid_prime_y - planar
@@ -522,13 +441,8 @@ def _max_objective_over_x_candidates(A, B, C, xs, ys):
     return torch.max(evaluation, dim=1).values
 
 
-# EXPERIMENTAL / vectorized version of check_nonlinear_boundary.
-# Same semantics, but ABCs is passed as a single [n,3] tensor (columns A,B,C)
-# instead of a Python list of (A,B,C) tuples, and the two per-neuron
-# objective-max loops are replaced with batched tensor ops.
-#
-# Used by compute_max_error when ABCs_tensor is provided; check_nonlinear_boundary
-# is kept as the default (ABCs_tensor=None) path for rollback.
+# Vectorized check_nonlinear_boundary: ABCs is an [n, 3] tensor, and the per-neuron
+# loops are replaced by batched operations.
 def check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor):
     A = ABCs_tensor[:, 0]
     B = ABCs_tensor[:, 1]
@@ -553,17 +467,15 @@ def check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor):
     root2 = filter_range(lx, ux, root2)
     root3 = filter_range(lx, ux, root3)
 
-    # inverse_sigmoid_2nd_deriv computes through complex64, so the roots come
-    # back float32. The original check_nonlinear_boundary stacks each root with
-    # ly/uy, which promotes to the common dtype before objective_fn evaluates
-    # sigmoid; promote explicitly here so the objective is evaluated at the same
-    # precision as the original path (bit-identical results).
+    # The roots are float32 (complex64 solve). The original stacks them with ly/uy,
+    # which promotes them to the common dtype before sigmoid, so promote explicitly
+    # to get the same result.
     roots_x = torch.stack((root1, root2, root3), dim=1).to(ly.dtype)  # [n, 3]
     roots_y = ly.unsqueeze(1)  # [n, 1], broadcasts against roots_x
 
     maxs = _max_objective_over_x_candidates(A, B, C, roots_x, roots_y)  # [n]
 
-    # NEED TO DO ALL THIS AGAIN FOR A_by_uy
+    # same for the uy branch
     root1_uy, root2_uy, root3_uy = inverse_sigmoid_2nd_deriv(A_by_uy)
 
     root1_uy = filter_range(lx, ux, root1_uy)
@@ -662,24 +574,18 @@ def check_corners_negated(ABCs,lx,ux,ly,uy):
 
 
 def compute_max_error(lx, ux, ly, uy, ABCs, ABCs_tensor=None):
-    """Returns a [n] tensor when both checks are vectorized, else a list of n
-    0-dim tensors (the original shape). The caller normalizes with
-    lst_as_tensor, which now passes an already-stacked tensor through."""
+    """[n] tensor when both checks are vectorized, otherwise a list of 0-dim tensors."""
     fully_vectorized = ABCs_tensor is not None and USE_VECTORIZED_BOUNDARY
     if fully_vectorized:
-        # Both checks already produce [n] tensors. The previous version unbound
-        # them into Python lists, recombined element-by-element in a loop, and
-        # let lst_as_tensor stack the result straight back into a [n] tensor --
-        # ~20s of pure round-trip on the `big` profile. Elementwise maximum is
-        # exact, so keeping tensors throughout is bit-identical, not merely close.
+        # Keep everything as tensors. An elementwise maximum is exact, so this is
+        # bit-identical to unbinding into lists and stacking again.
         errors = check_corners_tensor(ABCs_tensor, lx, ux, ly, uy)
         errors2_ly, errors2_uy = check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor)
         return torch.maximum(torch.maximum(errors, errors2_ly), errors2_uy)
 
     # checks along the linear function boundaries (by just checking the corners)
     if ABCs_tensor is not None:
-        # Vectorized corners but original boundary check ("corners only"
-        # variant): the boundary path returns lists, so match its shape.
+        # "Corners only" variant: the original boundary check returns lists.
         errors = list(check_corners_tensor(ABCs_tensor, lx, ux, ly, uy).unbind(0))
     else:
         errors = check_corners(ABCs, lx, ux, ly, uy)  # This seems to be correct
@@ -719,10 +625,8 @@ def sigmoid_prime_product_tensor(x, y):
     ly = y.get_lb()
     uy = y.get_ub()
 
-    # EXPERIMENTAL batched grid (PASADO_BATCHED_GRID=1): build [n,25,2] directly
-    # instead of a Python list of n [25,2] tensors. Bit-identical either way, so
-    # the two selectors compose freely; whichever consumer needs the other shape
-    # converts once here rather than inside the hot loop.
+    # Batched grid: build [n, 25, 2] directly. Whichever path needs the other shape
+    # converts once here.
     if USE_BATCHED_GRID:
         xys_batch = get_linspace_batched(lx, ux, ly, uy)
         xys = None if USE_BATCHED_LSTSQ else list(xys_batch.unbind(0))
@@ -731,11 +635,8 @@ def sigmoid_prime_product_tensor(x, y):
         xys_batch = torch.stack(xys) if USE_BATCHED_LSTSQ else None
 
     if USE_BATCHED_LSTSQ:
-        # EXPERIMENTAL batched regression path (PASADO_BATCHED_LSTSQ=1): solve
-        # all planar regressions in one batched gelsd call - proven bit-identical
-        # to the per-neuron loop (experiments/test_batched_lin_reg.py). The
-        # np.random stream is consumed one scalar draw per neuron in the same
-        # order as the loop path, so seeded runs match it exactly.
+        # Batched regression: one lstsq call for all neurons. np.random is drawn
+        # once per neuron in the same order as the loop path, so seeded runs match.
         x_batch = xys_batch             # [n, 25, 2], exact same grid values
         xs_grid = x_batch[..., 0]
         ys_grid = x_batch[..., 1]
@@ -749,13 +650,8 @@ def sigmoid_prime_product_tensor(x, y):
         Bs = lineqs_b[:, 2]
         Cs = lineqs_b[:, 0]
         assert bool(((As > 0) | (As < 0)).all())
-        # The tuple list is consumed by whichever check still runs the original
-        # per-neuron path. Testing "not USE_VECTORIZED_PRECISE" was not enough:
-        # with vectorized corners but the original boundary check
-        # (PASADO_VEC_BOUNDARY=0) the boundary fallback still needs the list, and
-        # passing None crashed it. That combination was never in the benchmark
-        # matrix, so the latent bug went unnoticed until test_batched_grid.py
-        # enumerated all selector combinations.
+        # The tuple list is needed by whichever check still runs the original
+        # per-neuron path (for example PASADO_VEC_BOUNDARY=0 with vectorized corners).
         ABCs = None if (USE_VECTORIZED_PRECISE and USE_VECTORIZED_BOUNDARY) else \
             [(As[i], Bs[i], Cs[i]) for i in range(As.shape[0])]
     else:
@@ -772,9 +668,8 @@ def sigmoid_prime_product_tensor(x, y):
         Bs = torch.tensor([x[1] for x in ABCs])
         Cs = torch.tensor([x[2] for x in ABCs])
 
-    # EXPERIMENTAL: tensor form of ABCs for the vectorized corner check. When the
-    # selector is off we pass ABCs_tensor=None so compute_max_error falls back to
-    # the original per-neuron check_corners / check_nonlinear_boundary path.
+    # [n, 3] tensor form of ABCs for the vectorized checks; None selects the
+    # original per-neuron path.
     ABCs_tensor = torch.stack((As, Bs, Cs), dim=1) if USE_VECTORIZED_PRECISE else None
 
     # Everything up to this point works (the linear regression and the lower and upper bounds of the input Zonotopes)
