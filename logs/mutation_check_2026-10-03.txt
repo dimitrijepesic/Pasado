@@ -1,0 +1,211 @@
+=== baseline: all tests on the unmodified copy ===
+  grid       exit=0  PASS
+  selector   exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    exit=0  ALL PASS
+  boundary   exit=0  ALL PASS
+  max_error  exit=0  ALL PASS
+  lin_reg    exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        exit=0  ALL PASS
+
+=== M1  _linspace_rows: wrong step size in the batched sampling grid ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -82,5 +82,5 @@
+     """
+     t = torch.arange(STEPS, dtype=lo.dtype, device=lo.device)
+-    step = (hi - lo) / (STEPS - 1)
++    step = (hi - lo) / STEPS
+     out = lo.unsqueeze(1) + t * step.unsqueeze(1)
+     # A plain slice, not a boolean mask. Which half is which depends only on
+
+  grid       KILLED   exit=1  FAIL
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        survived exit=0  ALL PASS
+
+=== M2  check_corners_tensor: forget the negated side of the error (only F, not -F) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -421,5 +421,5 @@
+     row_min = torch.min(evaluation, dim=1).values
+ 
+-    return torch.max(row_max, -row_min)  # [n]
++    return row_max  # [n]
+ 
+ 
+
+  grid       KILLED   exit=1  FAIL
+  selector   KILLED   exit=1  Greatest relative difference: 0.24069688112641147 at index (7, 2) (up to 1e-09 allowed)
+  corners    KILLED   exit=1  SOME FAILED
+  boundary   survived exit=0  ALL PASS
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        KILLED   exit=1  SOME FAILED
+
+=== M3  check_corners_tensor: use a wrong corner (lower-x corner twice, upper-x corner dropped) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -408,5 +408,5 @@
+     # all_corners per neuron, in the same order as check_corners:
+     # (lx,ly), (lx,uy), (ux,ly), (ux,uy)  -> shape [n, 4]
+-    xs = torch.stack((lx, lx, ux, ux), dim=1)
++    xs = torch.stack((lx, lx, lx, ux), dim=1)
+     ys = torch.stack((ly, uy, ly, uy), dim=1)
+ 
+
+  grid       KILLED   exit=1  FAIL
+  selector   KILLED   exit=1  Greatest relative difference: 0.5445892682675137 at index (144, 44) (up to 1e-09 allowed)
+  corners    KILLED   exit=1  SOME FAILED
+  boundary   survived exit=0  ALL PASS
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        KILLED   exit=1  SOME FAILED
+
+=== M4  check_nonlinear_boundary_tensor: the uy branch divides by ly instead of uy ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -536,5 +536,5 @@
+ 
+     A_by_ly = A / ly
+-    A_by_uy = A / uy
++    A_by_uy = A / ly
+     A_by_ly = inf_to_nan(A_by_ly)  # Checks the case ly=0 (meaning A/ly is undefined)
+     A_by_uy = inf_to_nan(A_by_uy)
+
+  grid       survived exit=0  PASS
+  selector   KILLED   exit=1  Greatest relative difference: 0.21266400396305665 at index (139, 39) (up to 1e-09 allowed)
+  corners    survived exit=0  ALL PASS
+  boundary   KILLED   exit=1  SOME FAILED
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        KILLED   exit=1  SOME FAILED
+
+=== M5  _max_objective_over_x_candidates: filtered-out roots count as 0 instead of -inf, so they can win the max ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -519,5 +519,5 @@
+     planar = A.unsqueeze(1) * xs + B.unsqueeze(1) * ys + C.unsqueeze(1)
+     evaluation = sigmoid_prime_y - planar
+-    evaluation = torch.nan_to_num(evaluation, -float("Inf"))
++    evaluation = torch.nan_to_num(evaluation, 0.0)
+     return torch.max(evaluation, dim=1).values
+ 
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   KILLED   exit=1  SOME FAILED
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        survived exit=0  ALL PASS
+
+=== M6  check_nonlinear_boundary_tensor: roots are left in float32 instead of promoted to the input dtype (a mistake that was actually made once during development) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -559,5 +559,5 @@
+     # sigmoid; promote explicitly here so the objective is evaluated at the same
+     # precision as the original path (bit-identical results).
+-    roots_x = torch.stack((root1, root2, root3), dim=1).to(ly.dtype)  # [n, 3]
++    roots_x = torch.stack((root1, root2, root3), dim=1)  # [n, 3]
+     roots_y = ly.unsqueeze(1)  # [n, 1], broadcasts against roots_x
+ 
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        KILLED   exit=1  SOME FAILED
+
+=== M7  compute_max_error: drop the uy boundary term from the combined maximum ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -675,5 +675,5 @@
+         errors = check_corners_tensor(ABCs_tensor, lx, ux, ly, uy)
+         errors2_ly, errors2_uy = check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor)
+-        return torch.maximum(torch.maximum(errors, errors2_ly), errors2_uy)
++        return torch.maximum(errors, errors2_ly)
+ 
+     # checks along the linear function boundaries (by just checking the corners)
+
+  grid       survived exit=0  PASS
+  selector   KILLED   exit=1  Greatest relative difference: 0.21266400396305665 at index (139, 39) (up to 1e-09 allowed)
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        KILLED   exit=1  SOME FAILED
+
+=== M8  sigmoid_prime_product_tensor: selector inverted: vectorized path used exactly when it is switched off ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -776,5 +776,5 @@
+     # selector is off we pass ABCs_tensor=None so compute_max_error falls back to
+     # the original per-neuron check_corners / check_nonlinear_boundary path.
+-    ABCs_tensor = torch.stack((As, Bs, Cs), dim=1) if USE_VECTORIZED_PRECISE else None
++    ABCs_tensor = torch.stack((As, Bs, Cs), dim=1) if not USE_VECTORIZED_PRECISE else None
+ 
+     # Everything up to this point works (the linear regression and the lower and upper bounds of the input Zonotopes)
+
+  grid       KILLED   exit=1  TypeError: 'NoneType' object is not subscriptable
+  selector   KILLED   exit=1  AssertionError: n=1 [old]: check_corners was not called ({'check_corners': 0, 'check_corne
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  e2e        survived exit=0  ALL PASS
+
+=== M9  lin_reg_tensor_batched: design matrix columns in the wrong order (intercept last) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -202,5 +202,5 @@
+     ones = torch.ones(x_batch.shape[0], x_batch.shape[1], 1,
+                       dtype=x_batch.dtype, device=x_batch.device)
+-    xplusone = torch.cat((ones, x_batch), dim=2)  # [n, m, 3], intercept-first
++    xplusone = torch.cat((x_batch, ones), dim=2)  # [n, m, 3], intercept-last
+     R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsd').solution  # [n, 3, 1]
+     return R.squeeze(-1)  # [n, 3]
+
+  grid       KILLED   exit=1  FAIL
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    KILLED   exit=1  Greatest relative difference: 2.3816602656046677 at index (0, 1) (up to 1e-12 allowed)
+  e2e        survived exit=0  ALL PASS
+
+=== M10  lin_reg_tensor_batched: different LAPACK driver (gelsy instead of gelsd): same answer up to rounding, not bit-identical ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -203,5 +203,5 @@
+                       dtype=x_batch.dtype, device=x_batch.device)
+     xplusone = torch.cat((ones, x_batch), dim=2)  # [n, m, 3], intercept-first
+-    R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsd').solution  # [n, 3, 1]
++    R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsy').solution  # [n, 3, 1]
+     return R.squeeze(-1)  # [n, 3]
+ 
+
+  grid       KILLED   exit=1  FAIL
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    KILLED   exit=1  Greatest relative difference: 4.374090903533728e-12 at index (787, 0) (up to 1e-12 allowed
+  e2e        survived exit=0  ALL PASS
+
+=== summary (K = killed, . = survived, K* = survived with bitwise loss) ===
+            grid   selector    corners   boundary  max_error    lin_reg        e2e   caught by any test?
+M1             K          .          .          .          .          .          .   yes
+M2             K          K          K          .          K          .          K   yes
+M3             K          K          K          .          K          .          K   yes
+M4             .          K          .          K          K          .          K   yes
+M5             .          .          .          K          .          .          .   yes
+M6             .          .          .          .          .          .          K   yes
+M7             .          K          .          .          K          .          K   yes
+M8             K          K          .          .          .          .          .   yes
+M9             K          .          .          .          .          K          .   yes
+M10            K          .          .          .          .          K          .   yes
