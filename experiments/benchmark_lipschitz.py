@@ -16,18 +16,25 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEC = os.path.join(REPO_ROOT, "Section_5_4")
 CSV_PATH = os.path.join(REPO_ROOT, "logs", "benchmark_results.csv")
 
+def _flags(vec, bnd, lstsq, grid, cubic):
+    """All five selectors, always given. A PASADO_* variable exported in the shell
+    can then never change what a variant measures."""
+    return {"PASADO_VECTORIZED_PRECISE": vec, "PASADO_VEC_BOUNDARY": bnd,
+            "PASADO_BATCHED_LSTSQ": lstsq, "PASADO_BATCHED_GRID": grid,
+            "PASADO_REAL_CUBIC": cubic}
+
+
+#                        vec  bnd  lstsq grid cubic
 VARIANT_ENV = {
-    "original":         {"PASADO_VECTORIZED_PRECISE": "0"},
-    "vec_corners":      {"PASADO_VECTORIZED_PRECISE": "1", "PASADO_VEC_BOUNDARY": "0"},
-    "vec_both":         {"PASADO_VECTORIZED_PRECISE": "1"},
-    "vec_both_batched": {"PASADO_VECTORIZED_PRECISE": "1", "PASADO_BATCHED_LSTSQ": "1"},
+    "original":         _flags("0", "0", "0", "0", "0"),
+    "vec_corners":      _flags("1", "0", "0", "0", "0"),
+    "vec_both":         _flags("1", "1", "0", "0", "0"),
+    "vec_both_batched": _flags("1", "1", "1", "0", "0"),
     # Also batches the sampling grid: no per-neuron loop or .item() left.
-    "vec_batched_grid": {"PASADO_VECTORIZED_PRECISE": "1", "PASADO_BATCHED_LSTSQ": "1",
-                         "PASADO_BATCHED_GRID": "1"},
+    "vec_batched_grid": _flags("1", "1", "1", "1", "0"),
     # Real cubic solver. It changes the bounds slightly (up to 5.7e-05 relative),
     # so it is timed as its own variant.
-    "vec_grid_realcubic": {"PASADO_VECTORIZED_PRECISE": "1", "PASADO_BATCHED_LSTSQ": "1",
-                           "PASADO_BATCHED_GRID": "1", "PASADO_REAL_CUBIC": "1"},
+    "vec_grid_realcubic": _flags("1", "1", "1", "1", "1"),
 }
 
 CSV_FIELDS = [
