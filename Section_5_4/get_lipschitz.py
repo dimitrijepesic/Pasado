@@ -22,14 +22,9 @@ parser = argparse.ArgumentParser(description='Get haze Lipschitz constant of MNI
 parser.add_argument('--network', choices=['3layer', '4layer', '5layer', 'big'], help='neural network architecture',
                     default='3layer')
 parser.add_argument("--no-save", action="store_true")
-# Splitting the haze interval [0, eps] into k pieces and taking the max over
-# them is already the mechanism this benchmark implements; it just ships with
-# k = 1. Exposing it is needed to compare against a Branch-and-Bound baseline
-# at an equal split budget, instead of letting only the baseline split.
+# Split [0, eps] into k pieces and take the max over them (default 1).
 parser.add_argument("--n-splits", type=int, default=1)
-# Each epsilon is an independent pass over the images; restricting the set only
-# skips iterations of the outer loop. Needed so large --n-splits sweeps can
-# target the epsilons that have an auto_LiRPA counterpart instead of all 16.
+# Run only some of the 16 epsilons, given by index.
 parser.add_argument("--eps-indices", type=int, nargs="+", default=None,
                     help="indices into the default 16-epsilon range; default all")
 args = parser.parse_args()
@@ -241,8 +236,7 @@ print('time_precise', time_precise)
 
 if not args.no_save:
     os.system('mkdir -p results')
-    # Split runs write to their own files so a k>1 experiment can never
-    # overwrite the reference k=1 results the comparison is measured against.
+    # k > 1 runs get their own file names so they never overwrite the k = 1 results.
     sfx = '' if n_splits == 1 else f'_split{n_splits}'
     torch.save(lc_zonos, f'results/lc_zonos_{network}{sfx}.pth')
     torch.save(lc_intervals, f'results/lc_intervals_{network}{sfx}.pth')
