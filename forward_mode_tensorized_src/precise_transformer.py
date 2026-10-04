@@ -141,14 +141,21 @@ def lin_reg_tensor_batched(x_batch, zs_batch):
     x_batch is [n, m, 2] grid points, zs_batch is [n, m] (or [n, m, 1]) targets.
     Returns [n, 3] with the intercept first (C, A, B), like lin_reg_tensor. The
     result is bit-identical to calling lin_reg_tensor once per neuron.
+
+    gelsd exists only on CPU. CUDA has only gels, which is wrong on rank-deficient
+    boxes (lx == ux), so inputs on a GPU are solved on CPU and the result is moved back.
+    On CPU nothing changes.
     """
+    device = x_batch.device
+    if device.type != "cpu":
+        x_batch, zs_batch = x_batch.cpu(), zs_batch.cpu()
     if zs_batch.dim() == 2:
         zs_batch = zs_batch.unsqueeze(-1)  # [n, m, 1]
     ones = torch.ones(x_batch.shape[0], x_batch.shape[1], 1,
                       dtype=x_batch.dtype, device=x_batch.device)
     xplusone = torch.cat((ones, x_batch), dim=2)  # [n, m, 3], intercept-first
     R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsd').solution  # [n, 3, 1]
-    return R.squeeze(-1)  # [n, 3]
+    return R.squeeze(-1).to(device)  # [n, 3]
 
 
 # tensorized/vectorized version (torch is overloaded for the ** operator)
