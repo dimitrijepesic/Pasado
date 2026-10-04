@@ -75,7 +75,7 @@ def run(device):
     rec = {"lstsq": [], "corners": [], "boundary": []}
 
     def lstsq(x, z):
-        out = REAL_LSTSQ(x.cpu(), z.cpu()).to(x.device)
+        out = REAL_LSTSQ(x, z)
         rec["lstsq"].append(((cpu(x), cpu(z)), cpu(out)))
         return out
 

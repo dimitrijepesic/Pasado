@@ -4,8 +4,8 @@ Any tensor that is created on the wrong device makes PyTorch raise "Expected all
 tensors to be on the same device", so a clean run means the device plumbing is complete.
 It works with mps (float32 only) and with cuda (float64).
 
-lstsq has no GPU version for gelsd, so for now it is run on CPU inside this script.
-Remove lin_reg_on_cpu once the real CPU bridge is in precise_transformer.py.
+The regression (lstsq with gelsd) has no GPU version, so lin_reg_tensor_batched solves it on
+CPU and moves the result back.
 
 On mps, a torch.cat of a CPU and a GPU tensor can crash the interpreter (exit code 139)
 instead of raising an error. On cuda it raises a normal RuntimeError.
@@ -53,14 +53,6 @@ pt.USE_VECTORIZED_PRECISE = pt.USE_VECTORIZED_BOUNDARY = True
 pt.USE_BATCHED_LSTSQ = pt.USE_BATCHED_GRID = True
 pt.USE_REAL_CUBIC = args.real_cubic
 
-_real_lin_reg = pt.lin_reg_tensor_batched
-
-
-def lin_reg_on_cpu(x_batch, zs_batch):
-    """Stand-in for the CPU bridge: solve on CPU, return on the input's device."""
-    return _real_lin_reg(x_batch.cpu(), zs_batch.cpu()).to(x_batch.device)
-
-
 def build_net(device):
     net = FCN(3)
     net.load_state_dict(torch.load(os.path.join(ROOT, "Section_5_4", "trained", "model_3layer.pth"),
@@ -98,7 +90,6 @@ def main():
     cpu_out = precise_forward(build_net("cpu"), img, "cpu")
     print(f"dtype {dtype}, real cubic {args.real_cubic}; CPU reference lc = {bound(cpu_out):.6f}")
 
-    pt.lin_reg_tensor_batched = lin_reg_on_cpu
     try:
         dev_out = precise_forward(build_net(device), img.to(device), device)
     except RuntimeError as e:
