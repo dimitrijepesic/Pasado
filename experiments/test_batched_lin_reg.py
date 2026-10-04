@@ -105,27 +105,65 @@ def run_case(name, x_batch, zs_batch, dtype):
     return bitwise
 
 
+def accelerators():
+    """Devices other than the CPU that this machine has."""
+    found = []
+    if torch.cuda.is_available():
+        found.append("cuda")
+    if torch.backends.mps.is_available():
+        found.append("mps")
+    return found
+
+
+def cases(dtype):
+    """Every input set used here, as (name, points, targets)."""
+    out = []
+    for n in (1, 10, 100, 1024):
+        x, zs = realistic_grids(n, SEED + n, dtype)
+        out.append((f"realistic grid n={n}", x, zs))
+    for n in (1, 10, 100):
+        x, zs = random_points(n, 25, SEED + n, dtype)
+        out.append((f"random points n={n}", x, zs))
+    for box in ("degenerate_x", "point", "near_degenerate", "saturated", "mixed_scale"):
+        x, zs = realistic_grids(16, SEED, dtype, box=box)
+        out.append((f"{box} n=16", x, zs))
+    # mixed batch: healthy and rank-deficient neurons side by side
+    xh, zh = realistic_grids(8, SEED + 1, dtype)
+    xd, zd = realistic_grids(8, SEED + 2, dtype, box="degenerate_x")
+    out.append(("mixed healthy+degenerate n=16", torch.cat((xh, xd)), torch.cat((zh, zd))))
+    return out
+
+
+def device_case(name, x, zs, dtype, device):
+    """With the inputs on `device`, the result must be on `device` and equal the CPU solve exactly."""
+    ref = lin_reg_tensor_batched(x, zs)
+    got = lin_reg_tensor_batched(x.to(device), zs.to(device))
+    assert got.device.type == torch.device(device).type, f"{name}: result is on {got.device}"
+    assert got.dtype == dtype, f"{name}: dtype {got.dtype}"
+    assert torch.equal(got.cpu(), ref), f"{name} on {device}: differs from the CPU solve"
+    print(f"  [{name:34s}] on {device}: identical to the CPU solve  PASS")
+
+
 def main():
+    """Run every case for float64 and float32, on CPU and on each available GPU."""
+    devices = accelerators()
     all_bitwise = True
     for dtype in (torch.float64, torch.float32):
         torch.set_default_dtype(dtype)  # lin_reg_tensor builds ones() in default dtype
         print(f"--- dtype={dtype} ---")
-        for n in (1, 10, 100, 1024):
-            x, zs = realistic_grids(n, SEED + n, dtype)
-            all_bitwise &= run_case(f"realistic grid n={n}", x, zs, dtype)
-        for n in (1, 10, 100):
-            x, zs = random_points(n, 25, SEED + n, dtype)
-            all_bitwise &= run_case(f"random points n={n}", x, zs, dtype)
-        for box in ("degenerate_x", "point", "near_degenerate",
-                    "saturated", "mixed_scale"):
-            x, zs = realistic_grids(16, SEED, dtype, box=box)
-            all_bitwise &= run_case(f"{box} n=16", x, zs, dtype)
-        # mixed batch: healthy and rank-deficient neurons side by side
-        xh, zh = realistic_grids(8, SEED + 1, dtype)
-        xd, zd = realistic_grids(8, SEED + 2, dtype, box="degenerate_x")
-        all_bitwise &= run_case("mixed healthy+degenerate n=16",
-                                torch.cat((xh, xd)), torch.cat((zh, zd)), dtype)
+        sets = cases(dtype)
+        for name, x, zs in sets:
+            all_bitwise &= run_case(name, x, zs, dtype)
+        for device in devices:
+            if device == "mps" and dtype == torch.float64:
+                print("  SKIP mps with float64: the device has no float64")
+                continue
+            print(f"  --- inputs on {device} ---")
+            for name, x, zs in sets:
+                device_case(name, x, zs, dtype, device)
 
+    if not devices:
+        print("\nSKIP device cases: no cuda or mps device on this machine")
     print(f"\nALL PASS (assert_close, rtol/atol per dtype); "
           f"bitwise-identical everywhere: {'YES' if all_bitwise else 'NO'}")
 
