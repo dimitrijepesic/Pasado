@@ -1,0 +1,13 @@
+3layer: complex vs real cubic, relative difference of lc_precise over 16 epsilons: max 1.5e-06, median 9.8e-08
+   complex  lowest lc / true maximum over the epsilons: 1.000  (valid everywhere)
+   real     lowest lc / true maximum over the epsilons: 1.000  (valid everywhere)
+4layer: complex vs real cubic, relative difference of lc_precise over 16 epsilons: max 3.6e-06, median 1.2e-07
+   complex  lowest lc / true maximum over the epsilons: 1.000  (valid everywhere)
+   real     lowest lc / true maximum over the epsilons: 1.000  (valid everywhere)
+5layer: complex vs real cubic, relative difference of lc_precise over 16 epsilons: max 8.3e-06, median 2.3e-07
+   complex  lowest lc / true maximum over the epsilons: 1.001  (valid everywhere)
+   real     lowest lc / true maximum over the epsilons: 1.001  (valid everywhere)
+big: complex vs real cubic, relative difference of lc_precise over 16 epsilons: max 9.8e-08, median 1.8e-08
+   complex  lowest lc / true maximum over the epsilons: 1.000  (valid everywhere)
+   real     lowest lc / true maximum over the epsilons: 1.000  (valid everywhere)
+python experiments/measure_real_cubic_shift.py  343.05s user 12.72s system 162% cpu 3:39.31 total
