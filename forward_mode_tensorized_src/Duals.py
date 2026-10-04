@@ -12,9 +12,9 @@ class DualIntervalTensor:
     def __init__(self, real_l: torch.Tensor, real_u: torch.Tensor, e1_l: torch.Tensor = None,
                  e1_u: torch.Tensor = None):
         if e1_l is None:
-            e1_l = torch.zeros(real_l.shape)
+            e1_l = torch.zeros_like(real_l)
         if e1_u is None:
-            e1_u = torch.zeros(real_l.shape)
+            e1_u = torch.zeros_like(real_l)
 
         assert (real_l.shape == e1_l.shape) and (real_l.device == e1_l.device)
         assert torch.all(torch.le(real_l, real_u)) and torch.all(torch.le(e1_l, e1_u))

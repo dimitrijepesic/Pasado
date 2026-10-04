@@ -16,7 +16,7 @@ def copy_centers(centers, num):
 def traceify(rowvec):
     leng = torch.numel(rowvec)
     copied = copy_centers(rowvec, leng)
-    identity = torch.eye(leng)
+    identity = torch.eye(leng, device=rowvec.device, dtype=rowvec.dtype)
     return (identity * copied)
 
 
@@ -72,7 +72,7 @@ class Zonotope:
             return
         if n > 0:
             cols = self.generators.shape[1]
-            self.generators = torch.cat([self.generators, torch.zeros((n, cols))], dim=0)
+            self.generators = torch.cat([self.generators, self.generators.new_zeros((n, cols))], dim=0)
         else:
             raise Exception
 
@@ -325,7 +325,7 @@ def SigmoidZonotope(Zono):
 def HyperDualIntervalToDualZonotope(hdi):
     real = IntervalsToZonotope(hdi.real_l.flatten(), hdi.real_u.flatten())
     dual = IntervalsToZonotope(hdi.e1_l.flatten(), hdi.e1_u.flatten())
-    dual.generators = torch.cat([torch.zeros((real.generators.shape[0], real.generators.shape[1])), dual.generators])
+    dual.generators = torch.cat([torch.zeros_like(real.generators), dual.generators])
 
     dual_num_noise_terms = dual.get_num_noise_symbs()
     real_num_noise_terms = real.get_num_noise_symbs()

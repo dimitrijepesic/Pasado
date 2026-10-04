@@ -158,6 +158,8 @@ def cuberoot(x):
 
 # tensorized/vectorized version
 def inverse_poly_tensor(y):
+    # Q, J and sqrt_3_by_2 are 0-dim CPU tensors. PyTorch allows those next to CUDA
+    # tensors, so they need no device, and their dtypes must stay as they are.
     Q = torch.tensor(-1 / 12.)
     R = 0.25 * y
 
