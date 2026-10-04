@@ -25,6 +25,8 @@ ap.add_argument("--dtype", choices=["float32", "float64"], default=None)
 ap.add_argument("--epsilon", type=float, default=0.2)
 ap.add_argument("--seed", type=int, default=7)
 ap.add_argument("--tol", type=float, default=1e-9, help="relative difference that counts as different")
+ap.add_argument("--real-cubic", action="store_true",
+                help="use the real (Viete) cubic root solver on both devices")
 args = ap.parse_args()
 dtype = args.dtype or ("float32" if args.device.startswith("mps") else "float64")
 
@@ -39,7 +41,7 @@ from model import FCN                                # noqa: E402
 torch.set_default_dtype(getattr(torch, dtype))
 pt.USE_VECTORIZED_PRECISE = pt.USE_VECTORIZED_BOUNDARY = True
 pt.USE_BATCHED_LSTSQ = pt.USE_BATCHED_GRID = True
-pt.USE_REAL_CUBIC = False
+pt.USE_REAL_CUBIC = args.real_cubic
 
 REAL_LSTSQ = pt.lin_reg_tensor_batched
 ORIG_CORNERS = pt.check_corners_tensor
@@ -123,7 +125,8 @@ def stage_report(cpu_args, device):
             to = lambda t: t.to(dev)
             A = to(abc)[:, 0]
             r = pt.filter_range(L, U, pt.inf_to_nan((A / to(y)).clone()))
-            roots_c = pt.inverse_poly_tensor(r.clone())
+            solver = pt.inverse_poly_real_tensor if args.real_cubic else pt.inverse_poly_tensor
+            roots_c = solver(r.clone())
             roots = pt.inverse_sigmoid_2nd_deriv(r.clone())
             filt = [pt.filter_range(to(lx), to(ux), t.clone()) for t in roots]
             ok = ~torch.isnan(r)
@@ -131,23 +134,24 @@ def stage_report(cpu_args, device):
                 r=r.cpu(), roots_c=[t.cpu() for t in roots_c], roots=[t.cpu() for t in roots],
                 in_range=int(ok.sum()),
                 nonreal=[int((~torch.isreal(t) & ok).sum()) for t in roots_c],
+                max_imag=max((t.imag.abs()[ok].max().item() if t.is_complex() and ok.any() else 0.0) for t in roots_c),
                 valid=[int((~torch.isnan(t)).sum()) for t in roots],
                 kept=[int((~torch.isnan(t)).sum()) for t in filt])
         c, d = per["cpu"], per[device]
         print(f"  [{tag}] neurons with A/y in range: cpu {c['in_range']}, {device} {d['in_range']}")
         print(f"       roots with nonzero imaginary part (cpu | {device}): {c['nonreal']} | {d['nonreal']}")
+        print(f"       largest imaginary part of an in-range root (cpu | {device}): {c['max_imag']:.1e} | {d['max_imag']:.1e}")
         print(f"       roots in (0,1) after inverse sigmoid (cpu | {device}): {c['valid']} | {d['valid']}")
         print(f"       roots kept inside [lx,ux] (cpu | {device}): {c['kept']} | {d['kept']}")
         for k in range(3):
             re = compare(c["roots_c"][k].real, d["roots_c"][k].real)
-            im = compare(c["roots_c"][k].imag, d["roots_c"][k].imag)
-            print(f"       root {k}: complex64 value rel diff re {re[0]:.1e} im {im[0]:.1e}")
+            print(f"       root {k}: value rel diff {re[0]:.1e}")
 
 
 def main():
     cpu_rec, cpu_lc = run("cpu")
     dev_rec, dev_lc = run(args.device)
-    print(f"dtype {dtype}: lc cpu {cpu_lc:.6f}, {args.device} {dev_lc:.6f}, "
+    print(f"dtype {dtype}, real cubic {args.real_cubic}: lc cpu {cpu_lc:.6f}, {args.device} {dev_lc:.6f}, "
           f"relative difference {abs(cpu_lc - dev_lc) / cpu_lc:.2e}\n")
 
     print("call by call (relative difference of inputs / outputs; NaN-inf pattern mismatches in brackets)")

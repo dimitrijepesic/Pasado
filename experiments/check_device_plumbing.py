@@ -32,6 +32,8 @@ ap.add_argument("--dtype", choices=["float32", "float64"], default=None,
 ap.add_argument("--network", choices=["3layer"], default="3layer")
 ap.add_argument("--epsilon", type=float, default=0.2)
 ap.add_argument("--seed", type=int, default=7)
+ap.add_argument("--real-cubic", action="store_true",
+                help="use the real (Viete) cubic root solver on both devices")
 args = ap.parse_args()
 
 dtype = args.dtype or ("float32" if args.device.startswith("mps") else "float64")
@@ -49,7 +51,7 @@ torch.set_default_dtype(getattr(torch, dtype))
 
 pt.USE_VECTORIZED_PRECISE = pt.USE_VECTORIZED_BOUNDARY = True
 pt.USE_BATCHED_LSTSQ = pt.USE_BATCHED_GRID = True
-pt.USE_REAL_CUBIC = False
+pt.USE_REAL_CUBIC = args.real_cubic
 
 _real_lin_reg = pt.lin_reg_tensor_batched
 
@@ -94,7 +96,7 @@ def main():
     device = torch.device(args.device)
 
     cpu_out = precise_forward(build_net("cpu"), img, "cpu")
-    print(f"dtype {dtype}; CPU reference lc = {bound(cpu_out):.6f}")
+    print(f"dtype {dtype}, real cubic {args.real_cubic}; CPU reference lc = {bound(cpu_out):.6f}")
 
     pt.lin_reg_tensor_batched = lin_reg_on_cpu
     try:
