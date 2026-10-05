@@ -1,4 +1,4 @@
-# NEXT_RESEARCH_DIRECTIONS — Section 5.4 precise transformer
+# NEXT_RESEARCH_DIRECTIONS - Section 5.4 precise transformer
 
 Ranked by how directly the sprint's measurements support them. A deliberate
 distinction is kept throughout between **implementation optimization** (same
@@ -7,7 +7,7 @@ capability, better bounds, or a transferable technique).
 
 ---
 
-## Tier 1 — directly justified by the profile
+## Tier 1 - directly justified by the profile
 
 ### 1.1 Batch `get_linspace` (the current top precise-path bottleneck)
 
@@ -18,13 +18,13 @@ operators, with call counts **identical across all three variants** (we never
 touched them): 192 000 `linspace`, 96 000 `cartesian_prod`, 385 456 `.item()`
 per 3layer benchmark; ~2x/4x those on `big`.
 
-Design: build all n grids in one shot from the bound vectors — no `.item()`,
-no Python loop — via `lx.unsqueeze(1) + (ux-lx).unsqueeze(1) * t` and a
+Design: build all n grids in one shot from the bound vectors - no `.item()`,
+no Python loop - via `lx.unsqueeze(1) + (ux-lx).unsqueeze(1) * t` and a
 `repeat_interleave`/`repeat` cartesian assembly.
 
 **Caveat that makes this research-flavored, not mechanical:** the cartesian
 assembly is bit-identical (verified, 0/2000 mismatches), but batched linspace
-is **not** — it differs from `torch.linspace` by ~1 ULP in ~14 % of cases
+is **not** - it differs from `torch.linspace` by ~1 ULP in ~14 % of cases
 (280/2000). So this optimization requires an explicit, documented precision
 decision. Recommended framing: implement behind a selector, quantify the
 end-to-end bound difference on the reduced harness, and report it as
@@ -42,8 +42,8 @@ recombined in a Python loop. Keeping tensors throughout and combining with two
 ### 1.3 Re-measure `big` under controlled conditions
 
 Evidence: two runs in this sprint were corrupted by background system activity
-(a `big vec_both` run at 2514 s that cannot be explained by code — the entire
-footprint of the changed functions is < 60 s in the profile — and a 3layer
+(a `big vec_both` run at 2514 s that cannot be explained by code - the entire
+footprint of the changed functions is < 60 s in the profile - and a 3layer
 cProfile run at 2998 s vs the expected ~22 s). The `big` speedup claim is
 currently the weakest link in the results. Needs: idle machine, several runs
 if affordable, or at minimum a machine-health probe (a fixed matmul benchmark)
@@ -51,37 +51,37 @@ recorded alongside each run.
 
 ---
 
-## Tier 2 — plausible, needs an experiment first
+## Tier 2 - plausible, needs an experiment first
 
 ### 2.1 Reduce the number of noise symbols (algorithmic, changes semantics)
 
-Evidence: `AffineZonotope` is **416 s self on big — 33 % of everything**, and
-it is genuine BLAS, not Python overhead. It scales as width² x #generators,
+Evidence: `AffineZonotope` is **416 s self on big - 33 % of everything**, and
+it is genuine BLAS, not Python overhead. It scales as width^2 x #generators,
 and the precise transformer *adds fresh error symbols at every sigmoid*, so
 generator count grows layer by layer. No amount of vectorization touches this.
 The only real levers are algorithmic: symbol merging / order reduction, with a
 precision-vs-cost tradeoff. This is the one direction that could plausibly
-change the asymptotics of the whole analysis — and it is a genuine research
+change the asymptotics of the whole analysis - and it is a genuine research
 question (how much tightness is lost per symbol removed?), not an
 implementation detail. Out of scope for this sprint by rule ("do not change
 the mathematical algorithm"), but it is where the time actually is.
 
-### 2.2 GPU execution — both open questions now measured (Phases 11-13)
+### 2.2 GPU execution - both open questions now measured (Phases 11-13)
 
 Evidence in `GPU_READINESS.md`. Both hard facts from the original write-up
 have since been measured, not just anticipated:
 
-(a) **Driver**: `driver='gelsd'` does not exist on CUDA — the only CUDA
+(a) **Driver**: `driver='gelsd'` does not exist on CUDA - the only CUDA
 driver is `gels`. Phase 12 measured this directly on rank-deficient boxes
 (the actual `lx==ux` case, not a hypothetical): `gels` diverges from `gelsd`
-by 15-34 *orders of magnitude* — confirmed unsafe, not just unproven. Any GPU
+by 15-34 *orders of magnitude* - confirmed unsafe, not just unproven. Any GPU
 regression path needs a rank check routing degenerate rows to a CPU/SVD
 fallback.
 
 (b) **fp64 throughput is hardware-dependent, now measured on both ends**:
-T4 (Phase 11) runs fp64 at ~1/17 of fp32 — on par with a laptop CPU, so the
+T4 (Phase 11) runs fp64 at ~1/17 of fp32 - on par with a laptop CPU, so the
 dominant `AffineZonotope` matmul would not meaningfully speed up there. A100
-(Phase 13) runs fp64 at ~parity with fp32 via dedicated FP64 Tensor Cores —
+(Phase 13) runs fp64 at ~parity with fp32 via dedicated FP64 Tensor Cores  -
 ~65x the CPU rate. The matmul *would* plausibly win big on A100/H100-class
 hardware; it would not on T4/L4.
 
@@ -104,16 +104,16 @@ kernel worth fusing.
 
 Not attempted (would change precision). Worth noting that the root solve
 *already* passes through `complex64`, i.e. the cube roots are effectively
-computed in single precision today — a latent precision property of the
+computed in single precision today - a latent precision property of the
 original algorithm that the dtype bug found in this sprint brought to light.
 A study of "what precision does each stage actually need?" would be defensible
 and could unlock both GPU throughput and fp32 BLAS on CPU.
 
 ---
 
-## Tier 3 — longer-term research directions
+## Tier 3 - longer-term research directions
 
-### 3.1 Triton kernels — only after a stable pure-tensor kernel exists
+### 3.1 Triton kernels - only after a stable pure-tensor kernel exists
 
 Premature today: the natural Triton target would be the grid-generation +
 objective-evaluation kernel, which does not exist as a single fused kernel
@@ -138,7 +138,7 @@ instances", which is what this sprint hand-vectorized. A JAX frontend would
 get that structure for free, plus XLA fusion and straightforward GPU/TPU
 execution. The interesting research question is whether the whole
 zonotope/dual-number machinery can be expressed so that `vmap` + `jit` recover
-the hand-written batching automatically — i.e. whether the manual work in this
+the hand-written batching automatically - i.e. whether the manual work in this
 sprint was avoidable in principle.
 
 ### 3.4 Comparison with fusion/locality ideas from Neptune
@@ -146,8 +146,8 @@ sprint was avoidable in principle.
 The bottleneck structure found here (many small per-neuron kernels whose cost
 is dispatch, sitting between two large dense BLAS operations) is precisely the
 setting where Neptune-style fusion and locality arguments apply. A principled
-comparison — hand vectorization vs compiler fusion vs a `vmap`-style frontend,
-on the same abstract-interpretation workload — would be a stronger
+comparison - hand vectorization vs compiler fusion vs a `vmap`-style frontend,
+on the same abstract-interpretation workload - would be a stronger
 contribution than any single speedup number.
 
 ### 3.5 Cross-hardware study
@@ -162,10 +162,10 @@ it also changes with hardware would make the point sharper.
 
 ## Explicitly rejected (documented negative results)
 
-* **Caching** grids / design matrices — measured 0 % exact-repeat rate
+* **Caching** grids / design matrices - measured 0 % exact-repeat rate
   (400/400 distinct); a value-keyed cache can never hit. `CACHING_ANALYSIS.md`.
-* **Closed-form / normal-equations / pinv** replacement for `lstsq` —
+* **Closed-form / normal-equations / pinv** replacement for `lstsq`  -
   unnecessary (batched `gelsd` is already native and bit-exact) and worse
   conditioned. `LSTSQ_ANALYSIS.md`.
-* **torch.compile in the production path** — backend unavailable, graph breaks
+* **torch.compile in the production path** - backend unavailable, graph breaks
   where it matters, target kernels too cheap. `TORCH_COMPILE_ANALYSIS.md`.

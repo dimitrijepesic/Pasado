@@ -1,4 +1,4 @@
-# TORCH_COMPILE_ANALYSIS (Phase 8) — negative result on this platform
+# TORCH_COMPILE_ANALYSIS (Phase 8) - negative result on this platform
 
 Experiment: `experiments/compile_experiment.py`, torch 2.12.1+cpu, Windows 11,
 float64, candidates at n=100 and n=1024.
@@ -19,7 +19,7 @@ Dynamo capture was measured with `torch._dynamo.explain` and *does* work
 | `check_corners_tensor` | **0** | fully capturable |
 | `check_nonlinear_boundary_tensor` | **0** | capturable, but see the complex-op caveat below |
 | `_max_objective_over_x_candidates` | **0** | fully capturable |
-| `lin_reg_tensor_batched` | **1** | `aten.linalg_lstsq.default` is a dynamic-shape operator (data-dependent output shape) — cannot be traced into the graph |
+| `lin_reg_tensor_batched` | **1** | `aten.linalg_lstsq.default` is a dynamic-shape operator (data-dependent output shape) - cannot be traced into the graph |
 
 ## 2. Backend failure (the blocker)
 
@@ -32,7 +32,7 @@ InductorError: RuntimeError: Compiler: cl is not found.
 TorchInductor's CPU backend generates C++ and needs MSVC `cl.exe`. Visual
 Studio 2019/2022 directories exist on the machine but `cl.exe` is not on PATH
 (no Build Tools workload / no developer shell). So **first-call latency and
-steady-state compiled runtime could not be measured** — those columns are
+steady-state compiled runtime could not be measured** - those columns are
 genuinely unknown, not zero.
 
 Fixing this would mean installing the MSVC C++ build tools and re-running from
@@ -62,7 +62,7 @@ Note the shape of these numbers: the two cheap kernels cost < 1 ms even at
 n=1024, i.e. they are already a negligible slice of the ~19 s 3layer run (they
 are called 960x -> under 1 s total). Compiling them could not move the
 end-to-end number much even in the best case. The two expensive candidates are
-dominated by `linalg_lstsq` and the complex root solve — exactly the parts
+dominated by `linalg_lstsq` and the complex root solve - exactly the parts
 Inductor cannot generate code for.
 
 ## 5. Is torch.compile relevant for this workload?
@@ -70,7 +70,7 @@ Inductor cannot generate code for.
 **Not currently, and not obviously worth pursuing.** Reasons, in order of
 weight:
 
-1. The backend is unavailable (MSVC missing) — hard blocker today.
+1. The backend is unavailable (MSVC missing) - hard blocker today.
 2. The regression kernel graph-breaks on `linalg_lstsq` anyway.
 3. The complex-arithmetic kernel is unsupported by Inductor codegen.
 4. The kernels that *do* capture cleanly are already too cheap to matter after
@@ -85,7 +85,7 @@ informative negative result**, consistent with the sprint brief.
 
 Prerequisites, in order: (a) install MSVC Build Tools and verify `cl.exe`;
 (b) target `get_linspace`-replacement kernels (pure elementwise, no complex, no
-lstsq) — the current top bottleneck and the best-shaped compile candidate;
+lstsq) - the current top bottleneck and the best-shaped compile candidate;
 (c) measure first-call vs steady-state separately, as this script already does;
 (d) on GPU, revisit with Inductor's Triton backend, where the calculus differs
 (no MSVC dependency, and fusion matters more).

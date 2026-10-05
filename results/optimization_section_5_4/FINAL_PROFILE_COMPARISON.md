@@ -6,7 +6,7 @@ attribution) and **torch.profiler** (ATen operator level).
 
 > Times from different runs/machines are not directly comparable (see the
 > contamination note at the end). **Call counts are machine-independent and
-> exact** — they carry most of the argument here.
+> exact** - they carry most of the argument here.
 
 ## A. cProfile, whole 3layer benchmark (480 precise forwards)
 
@@ -21,7 +21,7 @@ attribution) and **torch.profiler** (ATen operator level).
 | `lin_reg_tensor(_batched)` cum | 5.00 s | ~4.7 s | **0.99 s** |
 | `linalg_lstsq` self | 3.79 s | 3.57 s | **0.92 s** |
 | `get_linspace` cum | ~3.1 s | 3.13 s | 3.87 s |
-| total function calls | — | 9 603 903 | **8 297 488** |
+| total function calls | - | 9 603 903 | **8 297 488** |
 
 ## B. torch.profiler, one image x one epsilon, 3layer precise forward
 
@@ -52,14 +52,14 @@ attribution) and **torch.profiler** (ATen operator level).
   dominant part of what remains: the Python combine loop plus the `unbind(0)`
   that converts our `[n]` tensors back into lists. On `big` that residue is
   ~20 s. It moved from "the checks are slow" to "the glue around the checks is
-  slow" — cheap to finish (Tier 1.2 in NEXT_RESEARCH_DIRECTIONS).
+  slow" - cheap to finish (Tier 1.2 in NEXT_RESEARCH_DIRECTIONS).
 * Grid generation did not move at all: `linspace` / `cartesian_prod` /`.item()`
   call counts are **identical in all three variants**. It became the top
   precise-path cost purely because everything around it shrank.
 
 ## 3. What is now dominant?
 
-**`get_linspace`** — per-neuron grid construction. In the batched cProfile it
+**`get_linspace`** - per-neuron grid construction. In the batched cProfile it
 is 3.87 s of `sigmoid_prime_product_tensor`'s 8.16 s (~47 %); in the operator
 profile the top entries are `aten::select` (1 848 calls), `aten::linspace`
 (800), `aten::meshgrid` (200) and `aten::item` (844), all inside it.
@@ -67,7 +67,7 @@ profile the top entries are `aten::select` (1 848 calls), `aten::linspace`
 Beyond the precise path, on the **`big`** network the true dominant cost is
 different and untouched: `AffineZonotope`'s dense `generators @ layer` matmul
 at **416 s self (33 % of the whole profile)**. That is genuine BLAS scaling as
-width² x #generators, not dispatch overhead — no vectorization addresses it.
+width^2 x #generators, not dispatch overhead - no vectorization addresses it.
 
 ## 4. How did function call count change?
 
@@ -85,9 +85,9 @@ central empirical claim, and it is confirmed by both instruments.
 
 ## 6. Which costs are unavoidable numerical work?
 
-* `AffineZonotope` dense matmul (416 s on `big`) — one BLAS call already.
-* `get_coeff_abs` (`abs` + `sum`, 133 s on `big`) — one reduction already.
-* The batched `lstsq` itself — 4 calls x 8.4 ms in the reduced run, each
+* `AffineZonotope` dense matmul (416 s on `big`) - one BLAS call already.
+* `get_coeff_abs` (`abs` + `sum`, 133 s on `big`) - one reduction already.
+* The batched `lstsq` itself - 4 calls x 8.4 ms in the reduced run, each
   solving 100 systems. This is now real arithmetic, not overhead.
 
 Everything above is *inherent* to the analysis as currently formulated; making
@@ -98,12 +98,12 @@ hardware/precision, not the Python.
 
 | target | kind |
 |---|---|
-| Batch `get_linspace` (1-ULP caveat) | batching candidate — **top priority** |
-| `compute_max_error` unbind/loop residue | batching candidate — trivial, bit-exact |
+| Batch `get_linspace` (1-ULP caveat) | batching candidate - **top priority** |
+| `compute_max_error` unbind/loop residue | batching candidate - trivial, bit-exact |
 | `AffineZonotope` matmul (416 s on big) | GPU candidate (fp64 throughput caveat) / algorithmic |
 | `get_coeff_abs` abs+sum (133 s on big) | GPU candidate |
 | Noise-symbol growth per sigmoid layer | **algorithmic research question** |
-| Fused grid+objective kernel | compiler/Triton candidate — only after grid batching |
+| Fused grid+objective kernel | compiler/Triton candidate - only after grid batching |
 
 ## Contamination note (why some times above are not compared directly)
 

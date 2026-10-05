@@ -1,4 +1,4 @@
-# LSTSQ_ANALYSIS — per-neuron regression in the precise transformer (Phase 5)
+# LSTSQ_ANALYSIS - per-neuron regression in the precise transformer (Phase 5)
 
 Evidence sources: big pstats (`logs/lipschitz_big_nosave_both_vectorized_pstats.txt`),
 optimized 3layer cProfile (`logs/cprofile_3layer_both_vectorized.txt`),
@@ -42,7 +42,7 @@ Instrumented reduced run (1 image, 2 epsilons, both layers, 400 calls):
 **every call is `x=[25,2]`, `zs=[25]`, float64** (grid = 5x5 cartesian product,
 STEPS=5 hardcoded). The solved system is `[25,3] \ [25]` -> 3 coefficients.
 
-**3. Do all calls share the same shape?** Yes — 400/400 in the instrumented
+**3. Do all calls share the same shape?** Yes - 400/400 in the instrumented
 run, and structurally always: STEPS is a constant default, never overridden.
 This makes the calls perfectly stackable.
 
@@ -58,12 +58,12 @@ matrix is an affine image of.
 Yes. Per layer, the n per-neuron systems stack to `A:[n,25,3]`, `B:[n,25,1]`
 (n=100 or 1024; float64; identical m). Memory is trivial (1024*25*3*8 = 600 KB).
 Probe result: batched `gelsd` solution vs per-item loop over the same
-matrices — **max abs difference 0.000e+00, bit-identical**. Stacking the
+matrices - **max abs difference 0.000e+00, bit-identical**. Stacking the
 *existing* per-neuron grids preserves their exact values, so a batched solve of
 stacked inputs is provably the same computation.
 
 **6. Does torch.linalg.lstsq support batched A and B here (Windows CPU,
-torch 2.12.1+cpu)?** Yes — `A:[64,25,3], B:[64,25,1]` solved fine both with
+torch 2.12.1+cpu)?** Yes - `A:[64,25,3], B:[64,25,1]` solved fine both with
 `driver='gelsd'` and with the default driver.
 
 **7. Does driver='gelsd' work for batched input?** Yes, and bit-identically to
@@ -76,20 +76,20 @@ Yes, subtly. On CPU the default driver is `gelsy` (QR with pivoting), not
 `gelsd` (SVD). Probe: well-conditioned system differs by 3.3e-16 (ULP-level but
 nonzero); on rank-deficient systems `gelsy` does not guarantee the minimum-norm
 solution that `gelsd` returns (our degenerate-box probe happened to agree to
-1e-16, but that is not a guarantee). **Keep `driver='gelsd'`** — batching does
+1e-16, but that is not a guarantee). **Keep `driver='gelsd'`** - batching does
 not require changing it.
 
 **9. Is anything safely cacheable?**
 Only trivial constants: the `ones(25,1)` intercept column, the cartesian-product
 index pattern, the canonical `[0,.25,.5,.75,1]` grid. No full design matrix ever
 repeats (Q4), so exact-input caching has zero hit rate. The constants are
-subsumed by batching (one `ones(n*25,1)`-equivalent per layer instead of n) —
+subsumed by batching (one `ones(n*25,1)`-equivalent per layer instead of n)  -
 a standalone cache is not worth building. **Caching rejected.**
 
 **10. Python loop dispatch or the numerical solver?**
 Overwhelmingly dispatch/overhead. Measured per-call cost of the `lstsq` builtin:
-37 us (3layer cProfile) / 61 us (big cProfile). The actual math — SVD of a
-25x3 float64 matrix — is a few thousand FLOPs, well under 1 us. Even allowing
+37 us (3layer cProfile) / 61 us (big cProfile). The actual math - SVD of a
+25x3 float64 matrix - is a few thousand FLOPs, well under 1 us. Even allowing
 for cProfile inflation, >90% of the per-call time is Python frame + argument
 parsing + LAPACK workspace setup + tensor allocation, repeated 1.97M times on
 big. The same applies to the per-call `torch.cat` (45 us/call for a 25x3
@@ -122,7 +122,7 @@ many-tiny-ops pattern; the solver itself is nearly free.
 
 ## Recommendation
 
-1. **Batched lstsq: YES — implement in Phase 6.** Stack the existing per-neuron
+1. **Batched lstsq: YES - implement in Phase 6.** Stack the existing per-neuron
    grids -> batched zs evaluation -> batched xplusone -> one
    `torch.linalg.lstsq(A, B, driver='gelsd')` per layer. Every step of that
    chain is proven bit-identical on this platform. Keep `driver='gelsd'`.
@@ -133,7 +133,7 @@ many-tiny-ops pattern; the solver itself is nearly free.
 3. **Batched linspace: optional second step.** Not bit-exact (1 ULP). Only do
    it if the bit-exact variant leaves `linspace` as a measurable cost, and then
    document the ULP-level difference explicitly.
-4. **Caching: NO** — zero exact-repetition (Q4/Q9).
-5. **Closed-form / normal equations / pinv: NO** — unnecessary (batched gelsd
+4. **Caching: NO** - zero exact-repetition (Q4/Q9).
+5. **Closed-form / normal equations / pinv: NO** - unnecessary (batched gelsd
    already native and bit-exact) and numerically riskier (squares the condition
    number).

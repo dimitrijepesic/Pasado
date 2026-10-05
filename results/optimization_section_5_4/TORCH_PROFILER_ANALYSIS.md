@@ -1,8 +1,8 @@
-# TORCH_PROFILER_ANALYSIS (Phase 9) — reduced-workload operator comparison
+# TORCH_PROFILER_ANALYSIS (Phase 9) - reduced-workload operator comparison
 
 Script: `experiments/torch_profiler_compare.py`.
 Workload: **one image, one epsilon (2e-3), full 3layer precise forward** (both
-sigmoid layers) — deliberately not the whole benchmark. CPU activities,
+sigmoid layers) - deliberately not the whole benchmark. CPU activities,
 `record_shapes=True`. Warm-up outside the profiler; seeded identically per
 variant.
 
@@ -12,7 +12,7 @@ batched regression).
 
 Artifacts: `logs/torch_profiler_{old,vec,batched}.txt` (operator tables with
 name / call count / self CPU / total CPU) and Chrome traces
-`profiles/torch_profiler_{old,vec,batched}.json` (small — one forward each).
+`profiles/torch_profiler_{old,vec,batched}.json` (small - one forward each).
 
 ## Aggregate
 
@@ -36,7 +36,7 @@ removing tiny-op dispatch, not from changing the math.
 | `aten::item` | 4 238 | 2 238 | 844 | remaining ones are `get_linspace`'s per-neuron `.item()` |
 | `aten::cat` | 630 | 424 | 228 | |
 | `aten::max` | 1 200 | 408 | 408 | vectorized in Phase 3, unchanged by batching |
-| `aten::linspace` | 800 | 800 | **800** | **untouched** — the remaining per-neuron work |
+| `aten::linspace` | 800 | 800 | **800** | **untouched** - the remaining per-neuron work |
 | `aten::cartesian_prod` | 200 | 200 | **200** | **untouched** |
 | `aten::stack` | 418 | 212 | 214 | |
 
@@ -54,7 +54,7 @@ removing tiny-op dispatch, not from changing the math.
 | `aten::item` | 5.0 ms | 844 | host syncs in `get_linspace` |
 
 Compare with `old`, where `aten::linalg_lstsq` alone was 47.9 % of total CPU
-(289 ms across 400 calls) — that entire block is gone.
+(289 ms across 400 calls) - that entire block is gone.
 
 ## Conclusions
 
@@ -64,10 +64,10 @@ Compare with `old`, where `aten::linalg_lstsq` alone was 47.9 % of total CPU
 2. **What remains dominant is `get_linspace`**: `select` + `linspace` +
    `meshgrid`/`cartesian_prod` + `item` together are the largest remaining
    precise-path cost, and their call counts are *identical* across all three
-   variants — we never touched them. This is the same conclusion the cProfile
+   variants - we never touched them. This is the same conclusion the cProfile
    comparison reached, from an independent measurement.
 3. **`linalg_lstsq` is now real work, not overhead**: 4 calls, 8.4 ms each,
    solving 100 systems apiece.
 4. Batching the grid construction is the natural next step, but it is **not
-   bit-exact** (1-ULP `linspace` difference, LSTSQ_ANALYSIS §grid), so it
+   bit-exact** (1-ULP `linspace` difference, LSTSQ_ANALYSIS Section grid), so it
    needs an explicit precision decision rather than a silent swap.
