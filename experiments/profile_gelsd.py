@@ -19,7 +19,7 @@ SEC = os.path.join(REPO, "Section_5_4")
 #   changing what it returns.
 
 # TODO 3: wrap the big matmul too (SimpleZono.AffineZonotope's
-#   `generators @ layer`) -- same pattern, so both numbers come from ONE run.
+#   `generators @ layer`) - same pattern, so both numbers come from ONE run.
 
 # TODO 4: run get_lipschitz.py --network big --no-save in-process (its own
 #   sys.path.insert / relative paths assume cwd == Section_5_4).

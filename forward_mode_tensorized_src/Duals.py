@@ -67,7 +67,7 @@ class DualIntervalTensor:
             e1_l, e1_u = iadd(l1, u1, l2, u2)
             return DualIntervalTensor(rl, ru, e1_l, e1_u)
         elif isinstance(other, (int, float, torch.Tensor)):
-            zero = torch.tensor(0.0, device=self.device)
+            zero = torch.tensor(0.0, device=self.device, dtype=self.dtype)
 
             prl, pru, pe1_l, pe1_u = self.real_l * other, self.real_u * other, self.e1_l * other, self.e1_u * other
             prl = prl * (torch.le(zero, other))
@@ -93,7 +93,7 @@ class DualIntervalTensor:
 
     def __truediv__(self, other):
         if isinstance(other, self.__class__):
-            one = torch.tensor(1.0)
+            one = other.real_l.new_tensor(1.0)
             inv_other_rl, inv_other_ru = idiv(one, one, other.real_l, other.real_u)
             squared_real_l, squared_real_u = isquare(other.real_l, other.real_u)
             inv_other_e1_l, inv_other_e1_u = idiv(other.e1_l, other.e1_u, squared_real_l, squared_real_u)

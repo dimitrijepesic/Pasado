@@ -33,11 +33,11 @@ def filter_hyperdual_zono(hdz):
 def HyperDualIntervalToHyperDualZonotope(hdi):
     real = IntervalsToZonotope(hdi.real_l.flatten(), hdi.real_u.flatten())
     e1 = IntervalsToZonotope(hdi.e1_l.flatten(), hdi.e1_u.flatten())
-    e1.generators = torch.cat([torch.zeros((real.generators.shape[0], real.generators.shape[1])), e1.generators])
+    e1.generators = torch.cat([torch.zeros_like(real.generators), e1.generators])
     e2 = IntervalsToZonotope(hdi.e2_l.flatten(), hdi.e2_u.flatten())
-    e2.generators = torch.cat([torch.zeros((e1.generators.shape[0], e1.generators.shape[1])), e2.generators])
+    e2.generators = torch.cat([torch.zeros_like(e1.generators), e2.generators])
     e1e2 = IntervalsToZonotope(hdi.e1e2_l.flatten(), hdi.e1e2_u.flatten())
-    e1e2.generators = torch.cat([torch.zeros((e2.generators.shape[0], e2.generators.shape[1])), e1e2.generators])
+    e1e2.generators = torch.cat([torch.zeros_like(e2.generators), e1e2.generators])
 
     e1e2_num_noise_terms = e1e2.get_num_noise_symbs()
     real.expand(e1e2_num_noise_terms - real.get_num_noise_symbs())

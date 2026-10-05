@@ -89,15 +89,17 @@ class HazeJacobian(nn.Module):
 
 
 def main():
-    from auto_LiRPA import BoundedModule, BoundedTensor
-    from auto_LiRPA.perturbations import PerturbationLpNorm
-
     ap = argparse.ArgumentParser()
     ap.add_argument("--network", default="big",
                     choices=["3layer", "4layer", "5layer", "big"])
     ap.add_argument("--num-images", type=int, default=30)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    ap.add_argument("--out", default=None,
+                    help="output CSV path; default: results_<network>_colab.csv")
     args = ap.parse_args()
+
+    from auto_LiRPA import BoundedModule, BoundedTensor
+    from auto_LiRPA.perturbations import PerturbationLpNorm
 
     dev = args.device
     print(f"device={dev}"
@@ -127,7 +129,9 @@ def main():
     ref = {k: saved(k) for k in
            ("lc_intervals", "lc_zonos", "lc_precise", "time_precise")}
 
-    out_path = os.path.join(os.getcwd(), f"results_{args.network}_colab.csv")
+    out_path = os.path.abspath(
+        args.out or os.path.join(os.getcwd(), f"results_{args.network}_colab.csv")
+    )
     lc_sums = [0.0] * len(EPSILONS)
     t_sums = [0.0] * len(EPSILONS)
     counts = [0] * len(EPSILONS)

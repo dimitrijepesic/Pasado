@@ -457,7 +457,7 @@ def format_str(st):
 
 def add_leading_one(mat):
     rows = mat.shape[0]
-    new = torch.zeros((rows + 1, rows + 1))
+    new = mat.new_zeros((rows + 1, rows + 1))
     new[0, 0] = 1.
     new[1:, 1:] = mat
     return new
@@ -544,7 +544,7 @@ def ComputeZonotopeJacobian(real_l, real_u, f):
     JacobianCols = []
     for i in range(numInputs):
         real = IntervalsToZonotope(real_l, real_u)
-        d = torch.zeros(numInputs)
+        d = real_l.new_zeros(numInputs)
         d[i] = 1
         dual = IntervalsToZonotope(d, d)
         inputDZ = DualZonotope(real.centers, real.generators, dual.centers, dual.generators)

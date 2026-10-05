@@ -34,6 +34,8 @@ ap.add_argument("--epsilon", type=float, default=0.2)
 ap.add_argument("--seed", type=int, default=7)
 ap.add_argument("--real-cubic", action="store_true",
                 help="use the real (Viete) cubic root solver on both devices")
+ap.add_argument("--selector-matrix", action="store_true",
+                help="check all 16 vectorized/boundary/lstsq/grid selector combinations")
 args = ap.parse_args()
 
 dtype = args.dtype or ("float32" if args.device.startswith("mps") else "float64")
@@ -49,9 +51,20 @@ from model import FCN                                # noqa: E402
 # for this check has to be set after the imports.
 torch.set_default_dtype(getattr(torch, dtype))
 
-pt.USE_VECTORIZED_PRECISE = pt.USE_VECTORIZED_BOUNDARY = True
-pt.USE_BATCHED_LSTSQ = pt.USE_BATCHED_GRID = True
 pt.USE_REAL_CUBIC = args.real_cubic
+DEFAULT_SELECTORS = (
+    pt.USE_VECTORIZED_PRECISE,
+    pt.USE_VECTORIZED_BOUNDARY,
+    pt.USE_BATCHED_LSTSQ,
+    pt.USE_BATCHED_GRID,
+)
+
+
+def set_selectors(values):
+    (pt.USE_VECTORIZED_PRECISE,
+     pt.USE_VECTORIZED_BOUNDARY,
+     pt.USE_BATCHED_LSTSQ,
+     pt.USE_BATCHED_GRID) = values
 
 def build_net(device):
     net = FCN(3)
@@ -81,32 +94,69 @@ def bound(out):
     return torch.max(torch.maximum(lb.abs(), ub.abs())).item()
 
 
-def main():
-    testset = torchvision.datasets.MNIST(root=os.path.join(ROOT, "Section_5_4", "MNIST_Data"),
-                                         train=False, download=True, transform=transforms.ToTensor())
-    img = testset[0][0].flatten().to(getattr(torch, dtype))
-    device = torch.device(args.device)
+def same_device(actual, requested):
+    if actual.type != requested.type:
+        return False
+    requested_index = 0 if requested.index is None else requested.index
+    actual_index = 0 if actual.index is None else actual.index
+    return actual_index == requested_index
 
+
+def run_case(name, selectors, img, device):
+    set_selectors(selectors)
     cpu_out = precise_forward(build_net("cpu"), img, "cpu")
-    print(f"dtype {dtype}, real cubic {args.real_cubic}; CPU reference lc = {bound(cpu_out):.6f}")
+    print(f"{name} selectors={tuple(int(value) for value in selectors)} "
+          f"CPU reference lc={bound(cpu_out):.6f}")
 
     try:
         dev_out = precise_forward(build_net(device), img.to(device), device)
     except RuntimeError as e:
         print(f"FAIL on {device}: {str(e).splitlines()[0][:150]}")
-        return 1
+        return False
 
     tensors = {"real centers": dev_out.real.centers, "real generators": dev_out.real.generators,
                "dual centers": dev_out.dual.centers, "dual generators": dev_out.dual.generators}
     ok = True
-    for name, t in tensors.items():
-        on_device = t.device.type == device.type
+    for tensor_name, t in tensors.items():
+        on_device = same_device(t.device, device)
         ok &= on_device
-        print(f"  {name:16s} on {t.device}  {'ok' if on_device else 'WRONG DEVICE'}")
+        print(f"  {tensor_name:16s} on {t.device}  {'ok' if on_device else 'WRONG DEVICE'}")
     rel = abs(bound(dev_out) - bound(cpu_out)) / abs(bound(cpu_out))
     tol = 1e-3 if dtype == "float32" else 1e-9
     print(f"{device} lc = {bound(dev_out):.6f}, relative difference to CPU {rel:.2e} (limit {tol:.0e})")
     ok &= rel < tol
+    print(f"{name}: {'PASS' if ok else 'FAIL'}")
+    return ok
+
+
+def main():
+    testset = torchvision.datasets.MNIST(root=os.path.join(ROOT, "Section_5_4", "MNIST_Data"),
+                                         train=False, download=True, transform=transforms.ToTensor())
+    img = testset[0][0].flatten().to(getattr(torch, dtype))
+    device = torch.device(args.device)
+    if device.type == "cuda" and not torch.cuda.is_available():
+        print("FAIL: CUDA is not available")
+        return 1
+    if device.type == "mps" and not torch.backends.mps.is_available():
+        print("FAIL: MPS is not available")
+        return 1
+
+    if args.selector_matrix:
+        cases = [
+            (f"selector_{vec}{bnd}{lstsq}{grid}",
+             (bool(vec), bool(bnd), bool(lstsq), bool(grid)))
+            for vec in (0, 1)
+            for bnd in (0, 1)
+            for lstsq in (0, 1)
+            for grid in (0, 1)
+        ]
+    else:
+        cases = [("configured_defaults", DEFAULT_SELECTORS)]
+
+    print(f"dtype {dtype}, real cubic {args.real_cubic}, device {device}")
+    results = [run_case(name, selectors, img, device) for name, selectors in cases]
+    ok = all(results)
+    set_selectors(DEFAULT_SELECTORS)
     print("PASS" if ok else "FAIL")
     return 0 if ok else 1
 

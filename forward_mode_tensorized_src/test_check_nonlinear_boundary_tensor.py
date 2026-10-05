@@ -79,7 +79,8 @@ def main():
     g = torch.Generator().manual_seed(100)
     lx = torch.rand(n, generator=g) * 4 - 2
     ux = lx + torch.rand(n, generator=g) * 4 + 1e-3
-    ly = torch.linspace(-2.0, 2.0, n)  # includes exact 0
+    ly = torch.linspace(-2.0, 2.0, n)
+    ly[n // 2] = 0.0
     uy = ly + torch.rand(n, generator=g) * 3 + 1e-3
     A = torch.rand(n, generator=g) * 4 - 2
     B = torch.rand(n, generator=g) * 2 - 1

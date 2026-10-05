@@ -14,7 +14,7 @@ import time
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEC = os.path.join(REPO, "Section_5_4")
 PROFILES = os.path.join(REPO, "profiles")
-PY = os.path.join(REPO, ".venv", "Scripts", "python.exe")
+PY = sys.executable
 
 # Same mapping the benchmark harness uses, so a profile and a timing run of the
 # same variant name are guaranteed to exercise the same code.

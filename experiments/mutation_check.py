@@ -25,6 +25,8 @@ TESTS = [
     ("boundary",  f"{SRC}/test_check_nonlinear_boundary_tensor.py"),
     ("max_error", f"{SRC}/test_compute_max_error_tensor.py"),
     ("lin_reg",   "experiments/test_batched_lin_reg.py"),
+    ("variants",  "experiments/test_benchmark_variants.py"),
+    ("cli",       "experiments/test_get_lipschitz_cli.py"),
     # End-to-end comparison on real images. Slower than the unit tests, and it is
     # the check that originally caught the float32 root precision bug (M6).
     ("e2e",       "experiments/correctness_e2e.py"),
@@ -88,14 +90,25 @@ def clean_env():
 
 
 def make_workdir():
-    """Temporary repo root. The folders that mutants edit are copied; Section_5_4 is large and read-only, so it is linked."""
+    """Temporary repo root containing every file that the mutation tests can write."""
     root = tempfile.mkdtemp(prefix="pasado_mutation_")
-    ignore = shutil.ignore_patterns("__pycache__", "*.pyc")
-    for d in (SRC, "experiments"):
-        shutil.copytree(os.path.join(REPO, d), os.path.join(root, d), ignore=ignore)
-    os.symlink(os.path.join(REPO, "Section_5_4"), os.path.join(root, "Section_5_4"))
-    os.makedirs(os.path.join(root, "logs"), exist_ok=True)   # e2e writes a CSV here
-    return root
+    try:
+        ignore = shutil.ignore_patterns("__pycache__", "*.pyc")
+        for d in (SRC, "experiments"):
+            shutil.copytree(os.path.join(REPO, d), os.path.join(root, d), ignore=ignore)
+        section = os.path.join(root, "Section_5_4")
+        os.makedirs(section)
+        for filename in ("model.py", "get_lipschitz.py"):
+            shutil.copy2(os.path.join(REPO, "Section_5_4", filename), section)
+        shutil.copytree(os.path.join(REPO, "Section_5_4", "trained"),
+                        os.path.join(section, "trained"), ignore=ignore)
+        shutil.copytree(os.path.join(REPO, "Section_5_4", "MNIST_Data"),
+                        os.path.join(section, "MNIST_Data"), ignore=ignore)
+        os.makedirs(os.path.join(root, "logs"), exist_ok=True)   # e2e writes a CSV here
+        return root
+    except Exception:
+        shutil.rmtree(root, ignore_errors=True)
+        raise
 
 
 def run_one_test(root, rel_path):
@@ -135,13 +148,22 @@ def main():
     ap.add_argument("--only", nargs="+", help="run only these mutant ids, e.g. M3 M7")
     args = ap.parse_args()
 
-    mutants = [m for m in MUTANTS if not args.only or m["id"] in args.only]
-    root = make_workdir()
-    target_path = os.path.join(root, TARGET)
-    with open(target_path, encoding="utf-8") as f:
-        original = f.read()
+    known_ids = {m["id"] for m in MUTANTS}
+    unknown = sorted(set(args.only or ()) - known_ids)
+    if unknown:
+        ap.error(f"unknown mutant id(s): {', '.join(unknown)}")
 
+    mutants = [m for m in MUTANTS if not args.only or m["id"] in args.only]
+    if not mutants:
+        ap.error("no mutants selected")
+
+    root = None
     try:
+        root = make_workdir()
+        target_path = os.path.join(root, TARGET)
+        with open(target_path, encoding="utf-8") as f:
+            original = f.read()
+
         print("=== baseline: all tests on the unmodified copy ===")
         base = run_all_tests(root)
         for name, (code, tail) in base.items():
@@ -172,6 +194,7 @@ def main():
         names = [n for n, _ in TESTS]
         print("\n=== summary (K = killed, . = survived, K* = survived with bitwise loss) ===")
         print(f"{'':5s}" + "".join(f"{n:>11s}" for n in names) + "   caught by any test?")
+        all_caught = True
         for m in mutants:
             cells, caught = [], False
             for n in names:
@@ -185,9 +208,11 @@ def main():
             note = "yes" if caught else ("only as a printed warning" if "K*" in cells
                                         else "NO, none of the tests notices this")
             print(f"{m['id']:5s}" + "".join(f"{c:>11s}" for c in cells) + f"   {note}")
-        return 0
+            all_caught &= caught
+        return 0 if all_caught else 1
     finally:
-        shutil.rmtree(root, ignore_errors=True)
+        if root is not None:
+            shutil.rmtree(root, ignore_errors=True)
 
 
 if __name__ == "__main__":

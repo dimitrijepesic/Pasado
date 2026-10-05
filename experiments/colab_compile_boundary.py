@@ -42,8 +42,8 @@ def make_inputs(n, device, regime, seed=1234):
     FASTER, while the end-to-end run had measured it 8 % SLOWER. Both regimes are
     therefore measured, and the disagreement is the finding rather than a bug.
 
-      in_image  -- A scaled into the image: most candidates live
-      realistic -- A unscaled, as the regression produces it: most filtered away
+      in_image  - A scaled into the image: most candidates live
+      realistic - A unscaled, as the regression produces it: most filtered away
     """
     g = torch.Generator().manual_seed(seed)
     lx = (torch.rand(n, generator=g) * 6 - 3)

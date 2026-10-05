@@ -1,8 +1,9 @@
 """Compares the old, vectorized and batched precise-path variants with torch.profiler
-on one image and one epsilon. Writes operator tables to
-logs/torch_profiler_<variant>.txt and small traces to profiles/.
+on one image and one epsilon. Optional output directories can store operator
+tables and traces.
 
 Run: python experiments/torch_profiler_compare.py"""
+import argparse
 import os
 import sys
 
@@ -37,15 +38,19 @@ def load_case():
     net.eval()
     testset = torchvision.datasets.MNIST(
         root=os.path.join(REPO, "Section_5_4", "MNIST_Data"), train=False,
-        download=True, transform=transforms.ToTensor())
-    ci = torch.load(os.path.join(REPO, "Section_5_4", "trained",
-                                 "indices_3layer.pth"), map_location="cpu")
+        download=False, transform=transforms.ToTensor())
+    ci = {
+        int(index)
+        for index in torch.load(os.path.join(REPO, "Section_5_4", "trained",
+                                             "indices_3layer.pth"), map_location="cpu")
+    }
     idx = 0
     for (image, _) in torch.utils.data.DataLoader(testset, batch_size=1,
                                                   shuffle=False):
         if idx in ci:
             return net, image.flatten()
         idx += 1
+    raise RuntimeError("no correctly classified image found")
 
 
 def make_hazed(img_f, epsilon):
@@ -71,6 +76,17 @@ VARIANTS = {
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out-dir", default=None,
+                    help="optional directory for text operator tables")
+    ap.add_argument("--trace-dir", default=None,
+                    help="optional directory for Chrome trace JSON files")
+    args = ap.parse_args()
+    if args.out_dir:
+        os.makedirs(args.out_dir, exist_ok=True)
+    if args.trace_dir:
+        os.makedirs(args.trace_dir, exist_ok=True)
+
     net, img = load_case()
     have_batched = hasattr(pt, "USE_BATCHED_LSTSQ") and hasattr(pt, "lin_reg_tensor_batched")
     summary = []
@@ -103,15 +119,21 @@ def main():
         summary.append((name, total_calls, total_self_us / 1e3, tiny))
 
         table = ka.table(sort_by="self_cpu_time_total", row_limit=25)
-        out_txt = os.path.join(REPO, "logs", f"torch_profiler_{name}.txt")
-        with open(out_txt, "w") as f:
-            f.write(f"variant={name}  (1 image, eps={EPS}, 3layer precise forward)\n")
-            f.write(f"total operator calls: {total_calls}\n\n")
-            f.write(table)
-        prof.export_chrome_trace(
-            os.path.join(REPO, "profiles", f"torch_profiler_{name}.json"))
-        print(f"[{name}] ops={total_calls:7d}  self_cpu={total_self_us / 1e3:8.1f} ms  "
-              f"-> {out_txt}")
+        saved = []
+        if args.out_dir:
+            out_txt = os.path.join(args.out_dir, f"torch_profiler_{name}.txt")
+            with open(out_txt, "w") as f:
+                f.write(f"variant={name}  (1 image, eps={EPS}, 3layer precise forward)\n")
+                f.write(f"total operator calls: {total_calls}\n\n")
+                f.write(table)
+            saved.append(out_txt)
+        if args.trace_dir:
+            trace = os.path.join(args.trace_dir, f"torch_profiler_{name}.json")
+            prof.export_chrome_trace(trace)
+            saved.append(trace)
+        suffix = f" -> {', '.join(saved)}" if saved else " (no files written)"
+        print(f"[{name}] ops={total_calls:7d}  self_cpu={total_self_us / 1e3:8.1f} ms"
+              f"{suffix}")
 
     print("\nper-op call counts (tiny-op dispatch check):")
     keys = sorted({k for _, _, _, t in summary for k in t})

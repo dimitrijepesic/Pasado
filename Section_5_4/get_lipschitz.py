@@ -13,48 +13,84 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
-torch.set_default_dtype(torch.float64)
-
 from tqdm import tqdm
 
 import argparse
+
+
+def positive_int(value):
+    parsed = int(value)
+    if parsed < 1:
+        raise argparse.ArgumentTypeError("must be at least 1")
+    return parsed
+
+
+def numpy_seed(value):
+    parsed = int(value)
+    if not 0 <= parsed < 2 ** 32:
+        raise argparse.ArgumentTypeError("must be between 0 and 2**32 - 1")
+    return parsed
+
 
 parser = argparse.ArgumentParser(description='Get haze Lipschitz constant of MNIST Network')
 parser.add_argument('--network', choices=['3layer', '4layer', '5layer', 'big'], help='neural network architecture',
                     default='3layer')
 parser.add_argument("--no-save", action="store_true")
+parser.add_argument("--results-dir", default="results",
+                    help="directory for saved .pth files; default: results")
 # Split [0, eps] into k pieces and take the max over them (default 1).
-parser.add_argument("--n-splits", type=int, default=1)
+parser.add_argument("--n-splits", type=positive_int, default=1)
 # Run only some of the 16 epsilons, given by index.
 parser.add_argument("--eps-indices", type=int, nargs="+", default=None,
                     help="indices into the default 16-epsilon range; default all")
 # The precise transformer adds random noise to coefficient A, so two runs differ
 # slightly. With a seed, np.random is reset before every precise forward pass and
 # runs repeat exactly. Without one, the behaviour is unchanged.
-parser.add_argument("--seed", type=int, default=None,
+parser.add_argument("--seed", type=numpy_seed, default=None,
                     help="reseed np.random before every precise forward pass; default: no seeding")
 parser.add_argument("--device", default=os.environ.get("PASADO_DEVICE", "cpu"),
                     help="torch device for the analysis, for example cpu or cuda; default: cpu")
-parser.add_argument("--num-images", type=int, default=30,
+parser.add_argument("--dtype", choices=["float32", "float64"], default=None,
+                    help="default: float32 on MPS, float64 otherwise")
+parser.add_argument("--num-images", type=positive_int, default=30,
                     help="number of correctly classified test images; default: 30")
 parser.add_argument("--precise-only", action="store_true",
                     help="skip the plain zonotope and interval analyses")
 args = parser.parse_args()
+
+if args.eps_indices is not None:
+    if len(set(args.eps_indices)) != len(args.eps_indices):
+        parser.error("--eps-indices must not contain duplicates")
+    invalid_eps = [index for index in args.eps_indices if not 0 <= index < 16]
+    if invalid_eps:
+        parser.error(f"--eps-indices entries must be between 0 and 15: {invalid_eps}")
 
 num_images_to_test = args.num_images
 if num_images_to_test != 30:
     print(f'WARNING: --num-images {num_images_to_test}. The saved Pasado results are averages '
           f'over 30 images, so these values must not be compared with them.')
 
-device = torch.device(args.device)
+try:
+    device = torch.device(args.device)
+except (RuntimeError, ValueError) as error:
+    parser.error(f"invalid --device {args.device!r}: {error}")
 if device.type == 'cuda' and not torch.cuda.is_available():
     sys.exit('--device cuda was requested but CUDA is not available')
+if device.type == 'mps' and not torch.backends.mps.is_available():
+    sys.exit('--device mps was requested but MPS is not available')
+
+default_dtype_name = 'float32' if device.type == 'mps' else 'float64'
+dtype_name = args.dtype or default_dtype_name
+if device.type == 'mps' and dtype_name == 'float64':
+    parser.error('--dtype float64 is not supported on MPS')
+analysis_dtype = getattr(torch, dtype_name)
+torch.set_default_dtype(analysis_dtype)
 
 
 def now():
     """Timer reading. On CUDA, wait for queued kernels first so the time is real."""
     if device.type == 'cuda':
-        torch.cuda.synchronize()
+        torch.cuda.synchronize(device)
     return timer()
 
 
@@ -67,7 +103,7 @@ from model import FCN, FCNBig
 
 network = args.network
 print(f'===== {network} Network =====')
-print('config', dict(device=str(device), seed=args.seed, num_images=num_images_to_test,
+print('config', dict(device=str(device), dtype=dtype_name, seed=args.seed, num_images=num_images_to_test,
                      n_splits=args.n_splits, eps_indices=args.eps_indices,
                      precise_only=args.precise_only,
                      selectors=dict(vectorized=USE_VECTORIZED_PRECISE,
@@ -152,7 +188,15 @@ else:  # define forward functions for the "3/4/5-layer" networks
         x = x @ abstract_di(net.fc_final.weight.T) + abstract_di(net.fc_final.bias.data)
         return x
 
-correct_indices = torch.load(f'trained/indices_{network}.pth', map_location=torch.device('cpu'))
+correct_indices = {
+    int(index)
+    for index in torch.load(f'trained/indices_{network}.pth', map_location=torch.device('cpu'))
+}
+if num_images_to_test > len(correct_indices):
+    parser.error(
+        f"--num-images {num_images_to_test} exceeds the {len(correct_indices)} "
+        f"available correctly classified images for {network}"
+    )
 
 lc_zonos = []
 lc_zonos_precise = []
@@ -257,6 +301,12 @@ for epsilon in test_range:  # change back to 2,18
 
             img_index += 1
 
+    if correct_images != num_images_to_test:
+        raise RuntimeError(
+            f"requested {num_images_to_test} correctly classified images, "
+            f"but only found {correct_images} in the dataset"
+        )
+
     lc_zonos_precise.append(lc_zono_precise_total / correct_images)
     time_precise.append(time_precise_total / correct_images)
     if not args.precise_only:
@@ -272,14 +322,17 @@ pbar_total.close()
 print('lc_precise', lc_zonos_precise)
 if not args.precise_only:
     print('lc_zonos', lc_zonos)
+    print('lc_intervals', lc_intervals)
 print('time_precise', time_precise)
 print('image_ids', used_ids)
 
 if not args.no_save:
-    os.system('mkdir -p results')
+    os.makedirs(args.results_dir, exist_ok=True)
     # A run that differs from the default setup gets its own file names, so it can
     # never overwrite the reference results.
     sfx = ''
+    if args.precise_only:
+        sfx += '_preciseonly'
     if n_splits != 1:
         sfx += f'_split{n_splits}'
     if num_images_to_test != 30:
@@ -289,13 +342,28 @@ if not args.no_save:
     if args.seed is not None:
         sfx += f'_seed{args.seed}'
     if device.type != 'cpu':
-        sfx += f'_{device.type}'
-    if not args.precise_only:
-        torch.save(lc_zonos, f'results/lc_zonos_{network}{sfx}.pth')
-        torch.save(lc_intervals, f'results/lc_intervals_{network}{sfx}.pth')
-    torch.save(lc_zonos_precise, f'results/lc_precise_{network}{sfx}.pth')
+        sfx += '_' + str(device).replace(':', '-')
+    if dtype_name != default_dtype_name:
+        sfx += f'_{dtype_name}'
+    selector_values = (
+        USE_VECTORIZED_PRECISE,
+        USE_VECTORIZED_BOUNDARY,
+        USE_BATCHED_LSTSQ,
+        USE_BATCHED_GRID,
+        USE_REAL_CUBIC,
+    )
+    selector_defaults = (True, True, False, False, False)
+    if selector_values != selector_defaults:
+        sfx += '_sel' + ''.join('1' if value else '0' for value in selector_values)
+    def result_path(kind):
+        return os.path.join(args.results_dir, f'{kind}_{network}{sfx}.pth')
 
     if not args.precise_only:
-        torch.save(time_zonos, f'results/time_zonos_{network}{sfx}.pth')
-        torch.save(time_intervals, f'results/time_intervals_{network}{sfx}.pth')
-    torch.save(time_precise, f'results/time_precise_{network}{sfx}.pth')
+        torch.save(lc_zonos, result_path('lc_zonos'))
+        torch.save(lc_intervals, result_path('lc_intervals'))
+    torch.save(lc_zonos_precise, result_path('lc_precise'))
+
+    if not args.precise_only:
+        torch.save(time_zonos, result_path('time_zonos'))
+        torch.save(time_intervals, result_path('time_intervals'))
+    torch.save(time_precise, result_path('time_precise'))

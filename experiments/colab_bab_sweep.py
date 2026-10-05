@@ -72,7 +72,7 @@ def load_test_images():
 
 
 class HazeJacobian(nn.Module):
-    """dF/dt for x(t) = img + t*(1 - img) -- exactly Pasado's Section 5.4 quantity."""
+    """dF/dt for x(t) = img + t*(1 - img) - exactly Pasado's Section 5.4 quantity."""
 
     def __init__(self, net):
         super().__init__()

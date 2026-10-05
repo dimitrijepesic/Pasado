@@ -3,7 +3,6 @@ import torchvision
 import torchvision.transforms as transforms
 import torch.nn as nn
 import torch.optim as optim
-from torchsummary import summary
 from timeit import default_timer as timer
 import os
 
@@ -11,6 +10,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Train MNIST Network')
 parser.add_argument('--network', choices=['3layer', '4layer', '5layer', 'big'], help='neural network architecture')
 args = parser.parse_args()
+
+from torchsummary import summary
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Device:", device)
@@ -66,7 +67,7 @@ for epoch in range(num_epochs):
     end = timer()
     t = end - start
     total_time += t
-    print(f'Epoch {epoch+1} in {round(t, 5)}s -- Train Loss: {round(running_loss/len(trainset), 3)}')
+    print(f'Epoch {epoch+1} in {round(t, 5)}s - Train Loss: {round(running_loss/len(trainset), 3)}')
     scheduler.step()
 
 os.system('mkdir -p trained')

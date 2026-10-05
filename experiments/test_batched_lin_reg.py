@@ -166,7 +166,8 @@ def main():
         print("\nSKIP device cases: no cuda or mps device on this machine")
     print(f"\nALL PASS (assert_close, rtol/atol per dtype); "
           f"bitwise-identical everywhere: {'YES' if all_bitwise else 'NO'}")
+    return 0 if all_bitwise else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

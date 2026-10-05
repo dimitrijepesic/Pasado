@@ -64,7 +64,7 @@ def check_randomness_survives_compile(n=64):
 
     sigmoid_prime_product_tensor perturbs coefficient A with np.random.normal.
     If Dynamo folds that into a constant, two calls would return identical
-    results -- silently freezing a value the analysis expects to be random.
+    results - silently freezing a value the analysis expects to be random.
     Two eager calls differ, so two compiled calls must differ too.
     """
     print("\n=== does np.random survive compilation? ===")

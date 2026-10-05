@@ -13,6 +13,11 @@ ATOL = 1e-9
 SEED = 12345
 
 
+def require(condition, message):
+    if not condition:
+        raise AssertionError(message)
+
+
 class CallCounter:
     """Counts how often a function is called."""
 
@@ -63,18 +68,18 @@ def run_with_flags(x, y, vectorized, vec_boundary=True):
 def check_routing(counts, expect_active, expect_inactive, label):
     """Assert which functions were called."""
     for name in expect_active:
-        assert counts[name] > 0, f"{label}: {name} was not called ({counts})"
+        require(counts[name] > 0, f"{label}: {name} was not called ({counts})")
     for name in expect_inactive:
-        assert counts[name] == 0, f"{label}: {name} was unexpectedly called ({counts})"
+        require(counts[name] == 0, f"{label}: {name} was unexpectedly called ({counts})")
 
 
 def compare_outputs(z_old, z_new, label):
     """Assert that two zonotopes match in shape, dtype and values."""
     dc = (z_old.centers - z_new.centers).abs().max().item()
     dg = (z_old.generators - z_new.generators).abs().max().item()
-    assert z_old.centers.shape == z_new.centers.shape, label
-    assert z_old.generators.shape == z_new.generators.shape, label
-    assert z_old.centers.dtype == z_new.centers.dtype == torch.float64, label
+    require(z_old.centers.shape == z_new.centers.shape, label)
+    require(z_old.generators.shape == z_new.generators.shape, label)
+    require(z_old.centers.dtype == z_new.centers.dtype == torch.float64, label)
     torch.testing.assert_close(z_old.centers, z_new.centers, rtol=RTOL, atol=ATOL)
     torch.testing.assert_close(z_old.generators, z_new.generators, rtol=RTOL, atol=ATOL)
     print(f"  {label}: max|dc|={dc:.3e}  max|dg|={dg:.3e}  OK")

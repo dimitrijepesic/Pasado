@@ -1,7 +1,8 @@
 """Tries torch.compile on the pure tensor kernels (corner check, nonlinear boundary
 check, the max-objective helper and the batched regression): first-call time,
-steady-state time, match with eager mode and graph breaks. Appends rows to
-logs/microbenchmark_results.csv."""
+steady-state time, match with eager mode and graph breaks. Use --out to append
+rows to a CSV file."""
+import argparse
 import csv
 import os
 import statistics
@@ -18,7 +19,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import precise_transformer as pt
 
-CSV_PATH = os.path.join(REPO, "logs", "microbenchmark_results.csv")
 SEED = 12345
 WARMUP, REPS = 5, 30
 
@@ -97,6 +97,11 @@ def run_candidate(name, fn, args, n, rows):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default=None,
+                    help="optional CSV output path; default: print results only")
+    args = ap.parse_args()
+
     print(f"torch {torch.__version__}, float64, CPU. NOTE: in CSV rows for "
           f"compile experiments, min_ms column holds FIRST-CALL ms and max_ms "
           f"holds numeric-equality status.")
@@ -123,20 +128,24 @@ def main():
             lin_reg_tensor_batched,
             (inp["grids"], inp["zs"]), n, rows)
 
-    if rows:
-        exists = os.path.exists(CSV_PATH)
+    if rows and args.out:
+        out_path = os.path.abspath(args.out)
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        exists = os.path.exists(out_path)
         fields = ["datetime_utc", "experiment", "variant", "n", "m", "dtype",
                   "warmup", "reps", "median_ms", "min_ms", "max_ms"]
         from datetime import datetime, timezone
         now = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        with open(CSV_PATH, "a", newline="") as f:
+        with open(out_path, "a", newline="") as f:
             w = csv.DictWriter(f, fieldnames=fields)
             if not exists:
                 w.writeheader()
             for r in rows:
                 r["datetime_utc"] = now
                 w.writerow(r)
-        print(f"appended {len(rows)} rows to {CSV_PATH}")
+        print(f"appended {len(rows)} rows to {out_path}")
+    elif rows:
+        print(f"completed {len(rows)} measurements; no CSV written")
 
 
 if __name__ == "__main__":

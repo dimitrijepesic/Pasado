@@ -26,6 +26,19 @@ def run(*extra):
     return p.returncode, p.stdout + p.stderr
 
 
+def saved_files(*extra):
+    env = {**os.environ, **FLAGS}
+    env.pop("PASADO_DEVICE", None)
+    with tempfile.TemporaryDirectory() as tmp:
+        base = [arg for arg in BASE if arg != "--no-save"]
+        p = subprocess.run(
+            [sys.executable, "get_lipschitz.py", *base,
+             "--results-dir", tmp, *extra],
+            cwd=SEC, env=env, capture_output=True, text=True,
+        )
+        return p.returncode, p.stdout + p.stderr, sorted(os.listdir(tmp))
+
+
 def called_functions(*extra):
     """Names of all functions get_lipschitz.py calls, from a cProfile run."""
     env = {**os.environ, **FLAGS}
@@ -84,10 +97,45 @@ def main():
     check(len(values(out_a, "image_ids")) == 3, "image_ids lists the images that were used")
     check("config {" in out_a, "the run prints its configuration")
 
+    code, _, full_files = saved_files("--seed", "5")
+    check(code == 0 and len(full_files) == 6,
+          "a non-default full run saves exactly six files")
+    check(all("_n3_eps0-15_seed5_sel11110" in name for name in full_files),
+          "non-default image/epsilon/seed/selectors are encoded in every filename")
+
+    code, _, precise_files = saved_files("--seed", "5", "--precise-only")
+    check(code == 0 and len(precise_files) == 2,
+          "a precise-only run saves exactly two files")
+    check(all("_preciseonly_" in name for name in precise_files),
+          "precise-only files cannot overwrite default results")
+
+    invalid_cases = [
+        (("--num-images", "0"), "must be at least 1"),
+        (("--n-splits", "0"), "must be at least 1"),
+        (("--eps-indices", "0", "0"), "must not contain duplicates"),
+        (("--eps-indices", "16"), "between 0 and 15"),
+        (("--seed", "-1"), "between 0 and 2**32 - 1"),
+        (("--device", "not-a-device"), "invalid --device"),
+    ]
+    for extra, message in invalid_cases:
+        code, out = run(*extra)
+        check(code != 0 and message in out,
+              f"invalid {' '.join(extra)} is rejected during argument validation")
+
     if not torch.cuda.is_available():
         code, out = run("--device", "cuda")
         check(code != 0 and "CUDA is not available" in out,
               "--device cuda without CUDA stops with a clear message")
+
+    if torch.backends.mps.is_available():
+        code, out_mps = run("--device", "mps", "--num-images", "1",
+                             "--eps-indices", "0", "--precise-only", "--seed", "5")
+        _, out_ref = run("--device", "cpu", "--num-images", "1",
+                         "--eps-indices", "0", "--precise-only", "--seed", "5")
+        mps_lc = values(out_mps, "lc_precise")[0]
+        cpu_lc = values(out_ref, "lc_precise")[0]
+        check(code == 0 and abs(mps_lc - cpu_lc) / abs(cpu_lc) < 1e-3,
+              "the real get_lipschitz MPS CLI path runs within float32 tolerance")
 
     print("ALL PASS" if not failures else f"{len(failures)} FAILED")
     return 1 if failures else 0

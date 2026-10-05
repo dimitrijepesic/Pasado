@@ -76,7 +76,7 @@ def contains_empty_interval(a: torch.Tensor, b: torch.Tensor):
 def iintersect(a: torch.Tensor, b: torch.Tensor, c: torch.Tensor, d: torch.Tensor):
     l, u = torch.maximum(a, c), torch.minimum(b, d)
     mask = torch.le(l, u)
-    neg_mask = (~mask).double()
+    neg_mask = (~mask).to(a.dtype)
     l = (l * mask) + (neg_mask)
     u = (u * mask) - (neg_mask)
     return l, u
@@ -84,15 +84,15 @@ def iintersect(a: torch.Tensor, b: torch.Tensor, c: torch.Tensor, d: torch.Tenso
 
 # elementwise division
 def idiv(a: torch.Tensor, b: torch.Tensor, c: torch.Tensor, d: torch.Tensor):
-    one = torch.ones(a.shape)
+    one = torch.ones_like(a)
     guard = torch.le(c, 0) * torch.ge(d, 0)  # true if the division is undefined (contains zero in the interval)
     dguarded = ((~guard) * d) + (guard * one)
     cguarded = ((~guard) * c) + (guard * one)  # just puts a 1 in any place there the division wouldn't be defined
 
     minus_inf_mask = (torch.le(c, 0) * torch.ge(d, 0)).type(a.dtype)
-    minus_inf_mask[torch.gt(minus_inf_mask, 0)] = torch.tensor(-np.inf)
+    minus_inf_mask[torch.gt(minus_inf_mask, 0)] = -np.inf
     plus_inf_mask = (torch.le(c, 0) * torch.ge(d, 0)).type(a.dtype)
-    plus_inf_mask[torch.gt(plus_inf_mask, 0)] = torch.tensor(np.inf)
+    plus_inf_mask[torch.gt(plus_inf_mask, 0)] = np.inf
 
     dinv = torch.div(one, dguarded) + minus_inf_mask
     cinv = torch.div(one, cguarded) + plus_inf_mask
@@ -136,7 +136,7 @@ def isigmoid(a: torch.Tensor, b: torch.Tensor, Beta=1):
 
 def ifstderivsigmoid(a: torch.Tensor, b: torch.Tensor, Beta=1):
     i1, i2 = isigmoid(a, b, Beta)
-    one = torch.ones(a.shape, device=a.device)
+    one = torch.ones_like(a)
     i3, i4 = isub(one, one, i1, i2)
     l, u = imul(i1, i2, i3, i4)
     return (l, u)
@@ -162,17 +162,17 @@ class HyperDualIntervalTensor:
         e1e2_u: torch.Tensor = None,
     ):
         if e1_l is None:
-            e1_l = torch.zeros(real_l.shape)
+            e1_l = torch.zeros_like(real_l)
         if e1_u is None:
-            e1_u = torch.zeros(real_l.shape)
+            e1_u = torch.zeros_like(real_l)
         if e2_l is None:
-            e2_l = torch.zeros(real_l.shape)
+            e2_l = torch.zeros_like(real_l)
         if e2_u is None:
-            e2_u = torch.zeros(real_l.shape)
+            e2_u = torch.zeros_like(real_l)
         if e1e2_l is None:
-            e1e2_l = torch.zeros(real_l.shape)
+            e1e2_l = torch.zeros_like(real_l)
         if e1e2_u is None:
-            e1e2_u = torch.zeros(real_l.shape)
+            e1e2_u = torch.zeros_like(real_l)
 
         assert (real_l.shape == e1_l.shape) and (e1_l.shape == e2_l.shape) and (real_l.device == e1_l.device)
         assert torch.all(torch.le(real_l, real_u)) and torch.all(torch.le(e1_l, e1_u)) and torch.all(torch.le(e2_l, e2_u)) and torch.all(torch.le(e1e2_l, e1e2_u))
@@ -243,13 +243,13 @@ class HyperDualIntervalTensor:
             t5l, t5u = iadd(t1l, t1u, t2l, t2u)
             t6l, t6u = iadd(t3l, t3u, t4l, t4u)
             e1e2_l, e1e2_u = iadd(t5l, t5u, t6l, t6u)
-            
+
             return HyperDualIntervalTensor(rl, ru, e1_l, e1_u, e2_l, e2_u, e1e2_l, e1e2_u)
         elif isinstance(other, (int, float, torch.Tensor)):
             prl, pru, pe1_l, pe1_u = self.real_l * other, self.real_u * other, self.e1_l * other, self.e1_u * other
             pe2_l, pe2_u, pe1e2_l, pe1e2_u = self.e2_l * other, self.e2_u * other, self.e1e2_l * other, self.e1e2_u * other
 
-            zero = torch.tensor(0.0, device=self.device)
+            zero = torch.tensor(0.0, device=self.device, dtype=self.dtype)
             prl = prl * (torch.le(zero, other))
             pru = pru * (torch.le(zero, other))
             pe1_l = pe1_l * (torch.le(zero, other))
@@ -287,7 +287,7 @@ class HyperDualIntervalTensor:
 
     def __truediv__(self, other):
         if isinstance(other, self.__class__):
-            one = torch.tensor(1.0)
+            one = other.real_l.new_tensor(1.0)
             inv_other_rl, inv_other_ru = idiv(one, one, other.real_l, other.real_u)
             squared_real_l, squared_real_u = isquare(other.real_l, other.real_u)
             cubed_real_l, cubed_real_u = imul(other.real_l, other.real_u, squared_real_l, squared_real_u)
@@ -306,7 +306,7 @@ class HyperDualIntervalTensor:
 
             inv_other_e1e2_l, inv_other_e1e2_u = iadd(fst_l, fst_u, snd_l, snd_u)
             inv = HyperDualIntervalTensor(inv_other_rl, inv_other_ru, inv_other_e1_l, inv_other_e1_u, inv_other_e2_l, inv_other_e2_u, inv_other_e1e2_l, inv_other_e1e2_u)
-            
+
             return self * inv
         elif isinstance(other, (int, float)):  # division by constant is trivial (just scale each term)
             if other < 0:

@@ -1,5 +1,5 @@
-"""Times get_lipschitz.py end to end for different PASADO_* variants and appends
-the results to logs/benchmark_results.csv.
+"""Times get_lipschitz.py end to end for different PASADO_* variants and
+optionally appends the results to a CSV file.
 
 Example: python experiments/benchmark_lipschitz.py --network 3layer --variant original vec_both --runs 3"""
 import argparse
@@ -14,8 +14,6 @@ from datetime import datetime, timezone
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEC = os.path.join(REPO_ROOT, "Section_5_4")
-CSV_PATH = os.path.join(REPO_ROOT, "logs", "benchmark_results.csv")
-
 def _flags(vec, bnd, lstsq, grid, cubic):
     """All five selectors, always given. A PASADO_* variable exported in the shell
     can then never change what a variant measures."""
@@ -112,10 +110,11 @@ def env_meta():
     }
 
 
-def append_csv(rows):
-    exists = os.path.exists(CSV_PATH)
-    os.makedirs(os.path.dirname(CSV_PATH), exist_ok=True)
-    with open(CSV_PATH, "a", newline="") as f:
+def append_csv(path, rows):
+    exists = os.path.exists(path)
+    parent = os.path.dirname(os.path.abspath(path))
+    os.makedirs(parent, exist_ok=True)
+    with open(path, "a", newline="") as f:
         w = csv.DictWriter(f, fieldnames=CSV_FIELDS)
         if not exists:
             w.writeheader()
@@ -180,6 +179,8 @@ def main():
                          "variants: both see the same load pattern.")
     ap.add_argument("--no-save", action="store_true", default=True)
     ap.add_argument("--save", dest="no_save", action="store_false")
+    ap.add_argument("--out", default=None,
+                    help="optional CSV output path; default: print results only")
     ap.add_argument("--pin-pcores", action="store_true",
                     help="Pin the benchmark to the CPU's performance cores. On a "
                          "hybrid P/E processor the scheduler otherwise migrates "
@@ -217,7 +218,8 @@ def main():
             })
             all_rows.append(row)
             # written after every run, so a killed matrix keeps the runs that finished
-            append_csv([row])
+            if args.out:
+                append_csv(args.out, [row])
             print(f"[{network:7s} {variant:16s} run {run}/{args.runs}] {dt:8.2f}s "
                   f"(machine {health:.0f} GFLOP/s)")
 
@@ -233,7 +235,10 @@ def main():
             print(f"  -> {network} paired {a}/{b}: per-pair ratios "
                   f"{', '.join(f'{p:.2f}x' for p in pairs)}  "
                   f"median={statistics.median(pairs):.3f}x")
-    print(f"appended {len(all_rows)} rows to {CSV_PATH}")
+    if args.out:
+        print(f"appended {len(all_rows)} rows to {os.path.abspath(args.out)}")
+    else:
+        print(f"completed {len(all_rows)} runs; no CSV written")
 
 
 if __name__ == "__main__":

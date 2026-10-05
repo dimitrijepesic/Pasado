@@ -29,6 +29,8 @@ USE_REAL_CUBIC = os.environ.get("PASADO_REAL_CUBIC", "0") != "0"
 
 # lx, ly, ux, uy are TENSORS/VECTORS who have as many columns as neurons/variables in a layer
 def get_linspace(lx, ux, ly, uy, STEPS=5):
+    if lx.device.type != "cpu":
+        return list(get_linspace_batched(lx, ux, ly, uy, STEPS).unbind(0))
     xs = [torch.linspace(lx[i].item(), ux[i].item(), steps=STEPS) for i in range(lx.shape[0])]
     ys = [torch.linspace(ly[i].item(), uy[i].item(), steps=STEPS) for i in range(ly.shape[0])]
 
@@ -121,7 +123,10 @@ def lin_reg(input_points,zs):
 # https://medium.com/@rcorbish/linear-regression-using-pytorch-dcf0165e3a6e
 def lin_reg_tensor(x, zs):
     # zs = f(x)
-    xplusone = torch.cat((torch.ones(x.size(0), 1), x), 1)
+    device = x.device
+    if device.type != "cpu":
+        x, zs = x.cpu(), zs.cpu()
+    xplusone = torch.cat((x.new_ones(x.size(0), 1), x), 1)
     R = torch.linalg.lstsq(xplusone, zs, driver='gelsd').solution  # torch's least squares solver for linear regression
     R = R[0:xplusone.size(1)]
 
@@ -132,7 +137,7 @@ def lin_reg_tensor(x, zs):
     #	return shuffled
     #	yh = xplusone.mm( R )
     #	print("R ",R)
-    return R
+    return R.to(device)
 
 
 def lin_reg_tensor_batched(x_batch, zs_batch):
@@ -311,13 +316,13 @@ def objective_fn_softplus(A, B, C, xy_tensor):
 def check_corners(ABCs, lx, ux, ly, uy):
     maxs = []
     for i in range(lx.size()[0]):
-        corner1 = torch.tensor([lx[i], ly[i]])
+        corner1 = torch.stack((lx[i], ly[i]))
 
-        corner2 = torch.tensor([lx[i], uy[i]])
+        corner2 = torch.stack((lx[i], uy[i]))
 
-        corner3 = torch.tensor([ux[i], ly[i]])
+        corner3 = torch.stack((ux[i], ly[i]))
 
-        corner4 = torch.tensor([ux[i], uy[i]])
+        corner4 = torch.stack((ux[i], uy[i]))
 
         all_corners = torch.stack((corner1, corner2, corner3, corner4))
         # print("all corners ",all_corners)
@@ -356,13 +361,13 @@ def check_corners_tensor(ABCs_tensor, lx, ux, ly, uy):
 def check_corners_softplus(ABCs, lx, ux, ly, uy):
     maxs = []
     for i in range(lx.size()[0]):
-        corner1 = torch.tensor([lx[i], ly[i]])
+        corner1 = torch.stack((lx[i], ly[i]))
 
-        corner2 = torch.tensor([lx[i], uy[i]])
+        corner2 = torch.stack((lx[i], uy[i]))
 
-        corner3 = torch.tensor([ux[i], ly[i]])
+        corner3 = torch.stack((ux[i], ly[i]))
 
-        corner4 = torch.tensor([ux[i], uy[i]])
+        corner4 = torch.stack((ux[i], uy[i]))
 
         all_corners = torch.stack((corner1, corner2, corner3, corner4))
         # print("all corners ",all_corners)
@@ -377,9 +382,8 @@ def check_corners_softplus(ABCs, lx, ux, ly, uy):
 # solves the problem
 # max xi in [l_xi,u_xi] sigmoid'(xi)yi - (Ai*xi + Bi*yi + Ci) where yi is fixed as either l_yi or u_yi
 def check_nonlinear_boundary(lx, ux, ly, uy, ABCs):
-    A_by_ly = torch.tensor([ABCs[i][0] / ly[i] for i in range(
-        len(ABCs))])
-    A_by_uy = torch.tensor([ABCs[i][0] / uy[i] for i in range(len(ABCs))])
+    A_by_ly = torch.stack([ABCs[i][0] / ly[i] for i in range(len(ABCs))])
+    A_by_uy = torch.stack([ABCs[i][0] / uy[i] for i in range(len(ABCs))])
     A_by_ly = (inf_to_nan(A_by_ly))  # Checks the case ly=0 (meaning A/ly is undefined)
     A_by_uy = (inf_to_nan(A_by_uy))
 
@@ -501,9 +505,8 @@ def check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor):
 
 
 def check_nonlinear_boundary_softplus(lx, ux, ly, uy, ABCs):
-    A_by_ly = torch.tensor([ABCs[i][0] / ly[i] for i in range(
-        len(ABCs))])
-    A_by_uy = torch.tensor([ABCs[i][0] / uy[i] for i in range(len(ABCs))])
+    A_by_ly = torch.stack([ABCs[i][0] / ly[i] for i in range(len(ABCs))])
+    A_by_uy = torch.stack([ABCs[i][0] / uy[i] for i in range(len(ABCs))])
     A_by_ly = (inf_to_nan(A_by_ly))  # Checks the case ly=0 (meaning A/ly is undefined)
     A_by_uy = (inf_to_nan(A_by_uy))
 
@@ -673,9 +676,9 @@ def sigmoid_prime_product_tensor(x, y):
         ABCs = [(lineqs[i][1], lineqs[i][2], lineqs[i][0]) for i in range(len(lineqs))]
         ABCs = [(x[0] + np.random.normal(0, .0001), x[1], x[2]) for x in ABCs]
         assert (all([(x[0] > 0 or x[0] < 0) for x in ABCs]))
-        As = torch.tensor([x[0] for x in ABCs])
-        Bs = torch.tensor([x[1] for x in ABCs])
-        Cs = torch.tensor([x[2] for x in ABCs])
+        As = torch.stack([x[0] for x in ABCs])
+        Bs = torch.stack([x[1] for x in ABCs])
+        Cs = torch.stack([x[2] for x in ABCs])
 
     # [n, 3] tensor form of ABCs for the vectorized checks; None selects the
     # original per-neuron path.
@@ -717,9 +720,9 @@ def softplus_prime_product_tensor(x, y):
     # this has to be 1,2,0 since the linreg function gives the constant offset (c) as the 0th element of the tuple
     ABCs = [(lineqs[i][1], lineqs[i][2], lineqs[i][0]) for i in range(len(lineqs))]
     assert (all([(x[0] > 0 or x[0] < 0) for x in ABCs]))
-    As = torch.tensor([x[0] for x in ABCs])
-    Bs = torch.tensor([x[1] for x in ABCs])
-    Cs = torch.tensor([x[2] for x in ABCs])
+    As = torch.stack([x[0] for x in ABCs])
+    Bs = torch.stack([x[1] for x in ABCs])
+    Cs = torch.stack([x[2] for x in ABCs])
 
     # Everything up to this point works (the linear regression and the lower and upper bounds of the input Zonotopes)
     errors = compute_max_error_softplus(lx, ux, ly, uy, ABCs)

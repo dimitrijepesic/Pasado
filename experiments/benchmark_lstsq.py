@@ -1,7 +1,8 @@
 """Compares the per-neuron lin_reg_tensor loop with lin_reg_tensor_batched.
-Results go to logs/microbenchmark_results.csv. Run on an idle machine.
+Run on an idle machine; use --out to append results to a CSV file.
 
 Run: python experiments/benchmark_lstsq.py"""
+import argparse
 import csv
 import os
 import statistics
@@ -21,7 +22,6 @@ import precise_transformer as pt
 from batched_lin_reg import lin_reg_tensor_batched
 from test_batched_lin_reg import realistic_grids, old_loop
 
-CSV_PATH = os.path.join(REPO, "logs", "microbenchmark_results.csv")
 SEED = 12345
 WARMUP = 3
 REPS = 15
@@ -39,6 +39,11 @@ def bench(fn, reps=REPS, warmup=WARMUP):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default=None,
+                    help="optional CSV output path; default: print results only")
+    args = ap.parse_args()
+
     rows = []
     print(f"torch {torch.__version__}, float64, threads={torch.get_num_threads()}, "
           f"warmup={WARMUP}, reps={REPS}")
@@ -63,13 +68,18 @@ def main():
                              median_ms=f"{med * 1e3:.4f}",
                              min_ms=f"{lo * 1e3:.4f}", max_ms=f"{hi * 1e3:.4f}"))
 
-    exists = os.path.exists(CSV_PATH)
-    with open(CSV_PATH, "a", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
-        if not exists:
-            w.writeheader()
-        w.writerows(rows)
-    print(f"appended {len(rows)} rows to {CSV_PATH}")
+    if args.out:
+        out_path = os.path.abspath(args.out)
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        exists = os.path.exists(out_path)
+        with open(out_path, "a", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+            if not exists:
+                w.writeheader()
+            w.writerows(rows)
+        print(f"appended {len(rows)} rows to {out_path}")
+    else:
+        print(f"completed {len(rows)} measurements; no CSV written")
 
 
 if __name__ == "__main__":

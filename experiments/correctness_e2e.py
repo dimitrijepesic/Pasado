@@ -1,8 +1,9 @@
 """Compares the original per-neuron checks with the vectorized ones on real 3layer
 inputs (a few images and epsilons) with fixed seeds. Writes
-logs/correctness_results.csv and exits with 1 if any case differs.
+an optional CSV report and exits with 1 if any case differs.
 
 Pass --batched to also switch on the batched regression."""
+import argparse
 import csv
 import os
 import sys
@@ -27,10 +28,6 @@ from precise_transformer import (
 )
 from model import FCN
 
-CSV_PATH = os.path.join(
-    REPO, "logs",
-    "correctness_results_batched.csv" if "--batched" in sys.argv
-    else "correctness_results.csv")
 SEED = 12345
 # tolerance justified by float64 op reordering propagated through 2 sigmoid layers
 ATOL = 1e-9
@@ -64,7 +61,7 @@ def make_hazed(img_f, epsilon):
 
 # --batched: the "new" side additionally enables the batched-lstsq path, so the
 # comparison becomes old-loop-everything vs vectorized-checks+batched-regression.
-BATCHED = "--batched" in sys.argv
+BATCHED = False
 
 
 def run_precise(net, img_f, epsilon, vectorized):
@@ -113,14 +110,26 @@ def cmp_tensor(a, b):
 
 
 def main():
+    global BATCHED
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--batched", action="store_true",
+                    help="also enable batched regression on the new path")
+    ap.add_argument("--out", default=None,
+                    help="optional CSV output path; default: do not write a report")
+    args = ap.parse_args()
+    BATCHED = args.batched
+
     net = build_net()
 
     testset = torchvision.datasets.MNIST(
         root=os.path.join(REPO, "Section_5_4", "MNIST_Data"), train=False,
-        download=True, transform=transforms.ToTensor())
-    correct_indices = torch.load(
-        os.path.join(REPO, "Section_5_4", "trained", "indices_3layer.pth"),
-        map_location="cpu")
+        download=False, transform=transforms.ToTensor())
+    correct_indices = {
+        int(index)
+        for index in torch.load(
+            os.path.join(REPO, "Section_5_4", "trained", "indices_3layer.pth"),
+            map_location="cpu")
+    }
 
     test_range = [10 ** (-k / 4) * 2 for k in range(2, 18)]
     epsilons = [("largest", test_range[0]),
@@ -137,6 +146,8 @@ def main():
             if len(imgs) == n_images:
                 break
         idx += 1
+    if len(imgs) != n_images:
+        raise RuntimeError(f"requested {n_images} images, found {len(imgs)}")
 
     rows = []
     all_pass = True
@@ -188,15 +199,16 @@ def main():
                   f"naninf_pos_match={all(c['naninf_pos_match'] for c in checks)} "
                   f"nan={nan_old}/{nan_new}")
 
-    os.makedirs(os.path.dirname(CSV_PATH), exist_ok=True)
-    with open(CSV_PATH, "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=[
-            "case", "network", "epsilon", "eps_name", "output",
-            "old_value", "new_value", "abs_diff", "rel_diff", "pass"])
-        w.writeheader()
-        w.writerows(rows)
-
-    print(f"\nwrote {CSV_PATH} ({len(rows)} rows)")
+    if args.out:
+        out_path = os.path.abspath(args.out)
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        with open(out_path, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=[
+                "case", "network", "epsilon", "eps_name", "output",
+                "old_value", "new_value", "abs_diff", "rel_diff", "pass"])
+            w.writeheader()
+            w.writerows(rows)
+        print(f"\nwrote {out_path} ({len(rows)} rows)")
     print("ALL PASS" if all_pass else "SOME FAILED")
     sys.exit(0 if all_pass else 1)
 
