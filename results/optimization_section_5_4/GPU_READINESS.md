@@ -229,3 +229,40 @@ MPS selector matrices exercise that path.
 
 The separate CNN compatibility issue (`np.product` in `conv.py`) remains
 outside this FFNN GPU remediation.
+
+## Phase 15: full A100 correctness matrix
+
+The final matrix ran on an NVIDIA A100-SXM4-80GB on 2026-10-08. It covered
+3layer, 4layer, 5layer and big; all 30 selected images; and all 16 epsilon
+values. The reported values are per-network/per-epsilon averages over the 30
+images.
+
+All 28 summary checks passed:
+
+| check | worst full-run result |
+|---|---:|
+| real-cubic float64 precise CPU/CUDA relative difference | `1.786e-15` |
+| real-cubic float64 zonotope CPU/CUDA relative difference | `4.792e-16` |
+| real-cubic float64 interval CPU/CUDA relative difference | `5.517e-16` |
+| real-cubic float32 precise CPU/CUDA relative difference | `8.318e-7` |
+| repeated CUDA run | exactly identical |
+| full versus precise-only CUDA | exactly identical |
+
+The dtype-specific limits were `1e-9` for float64 and `1e-5` for float32.
+The first draft used `1e-9` for both, which is below float32's practical
+precision; the protocol was corrected explicitly rather than hiding the
+initial failed check.
+
+The obsolete complex solver remained a strong negative control. Its CPU/CUDA
+relative divergence increased with network depth: 14.39% (3layer), 33.42%
+(4layer), 48.72% (5layer), and 63.78% (big). The real-cubic solver removes
+that device-dependent root filtering and restores float64 agreement to about
+machine precision.
+
+Raw CSV files and complete logs are stored in
+`results/gpu_hybrid_verification_2026-10-08/`.
+
+This phase establishes cross-device correctness and reproducibility, not
+speed. The matrix does not report end-to-end timing, and its 30-image values
+are averages rather than per-image maxima. Controlled CPU/A100 timing and a
+per-image discrepancy sweep remain separate follow-up experiments.
