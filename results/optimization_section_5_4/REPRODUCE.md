@@ -155,10 +155,14 @@ still works and is what the analysis reports.
 
 # Fast gate before the full matrix.
 !python experiments/check_device_plumbing.py --device cuda --real-cubic --selector-matrix
-!python experiments/colab_verify_gpu_hybrid.py --quick --out /content/gpu_hybrid_quick.csv
+!python experiments/colab_verify_gpu_hybrid.py --quick \
+    --float64-limit 1e-9 --float32-limit 1e-5 \
+    --out /content/gpu_hybrid_quick.csv
 
 # Full verification: all four FFNNs, 30 images and all 16 epsilons.
-!python experiments/colab_verify_gpu_hybrid.py --out /content/gpu_hybrid_full.csv
+!python experiments/colab_verify_gpu_hybrid.py \
+    --float64-limit 1e-9 --float32-limit 1e-5 \
+    --out /content/gpu_hybrid_full.csv
 ```
 
 The quick gate checks every selector combination plus a reduced end-to-end
@@ -166,3 +170,8 @@ matrix. The full command compares real-cubic float64 CPU/CUDA results, CUDA
 determinism, full versus precise-only execution, real-cubic float32 results and
 the expected complex-solver divergence. It exits nonzero if a required check
 fails and optionally writes a CSV report.
+
+The limits are dtype-specific. Float64 uses `1e-9`; float32 uses the standard
+`1e-5` relative tolerance because a universal `1e-9` threshold is below
+float32's practical precision. The final A100 run from 2026-10-08 is archived
+under `results/gpu_hybrid_verification_2026-10-08/`.

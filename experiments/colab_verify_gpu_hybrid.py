@@ -186,7 +186,8 @@ def main():
     ap.add_argument("--quick", action="store_true",
                     help="use 5 images and epsilon indices 0, 8 and 15")
     ap.add_argument("--float64-limit", type=float, default=1e-9)
-    ap.add_argument("--float32-limit", type=float, default=1e-9)
+    ap.add_argument("--float32-limit", type=float, default=1e-5,
+                    help="relative CPU/CUDA tolerance; default matches float32 assert_close")
     ap.add_argument("--out", default=None,
                     help="optional CSV output path")
     args = ap.parse_args()
