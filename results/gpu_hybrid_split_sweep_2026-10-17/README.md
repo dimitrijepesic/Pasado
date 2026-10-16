@@ -1,0 +1,37 @@
+# Interval splitting (`--n-splits`) sweep on CPU and CUDA - 2026-10-17
+
+This directory contains the raw CSV and log outputs from
+`COLAB_GPU_HYBRID_SPLIT_SWEEP.ipynb` (`experiments/measure_split_sweep.py`)
+evaluating `n_splits = 1, 2, 4, 8, 16` across `3layer`, `4layer`, `5layer`, and
+`big` in `float64` with the real Viète cubic solver (`real_cubic = True`).
+
+## Protocol
+
+- 3 correctly classified MNIST test images (`image_ids = [0, 1, 2]`),
+- 3 epsilon indices (`0, 8, 15`), `seed = 7`, `dtype = float64`,
+- CUDA: 2 warm-up passes + 5 timed repeats per `(image, epsilon, n_splits)`,
+- CPU: 1 warm-up pass + 3 timed repeats per `(image, epsilon, n_splits)`,
+- explicit `torch.cuda.synchronize()` at every timer boundary.
+
+## Summary at largest $\varepsilon$ (`eps_idx = 0`, $\varepsilon = 0.632456$, mean over 3 images)
+
+### 1. `big` network (`CPU` vs. `CUDA`, `float64`)
+
+| `n_splits` | Mean `lc_precise` | Bound reduction (%) | Tightening factor | CPU median time (ms) | CUDA median time (ms) | CUDA time multiplier |
+|---:|---:|---:|---:|---:|---:|---:|
+| `1` | `14191.72` | `0.00%` | `1.00x` | `525.65` | `61.70` | `1.00x` |
+| `2` | `7693.10` | `45.79%` | `1.84x` | `1067.34` | `123.10` | `2.00x` |
+| `4` | `3918.94` | `72.39%` | `3.62x` | `2118.79` | `248.47` | `4.03x` |
+| `8` | `1471.45` | `89.63%` | **`9.64x`** | `4235.96` | **`492.41`** | `7.98x` |
+| `16` | `563.78` | `96.03%` | **`25.17x`** | `8534.46` | **`989.14`** | `16.03x` |
+
+**Key takeaway**: On `big`, CUDA at `n_splits = 8` (`492.4 ms`) finishes faster than a single unsplit CPU pass (`n_splits = 1`, `525.7 ms`) while tightening the Lipschitz bound by **`9.64x`** (`14,191.72` $\to$ `1,471.45`, an **89.6% reduction**). At `n_splits = 16` (`989.1 ms` on CUDA vs. `8,534.5 ms` on CPU), the bound tightens by **`25.17x`** (`14,191.72` $\to$ `563.78`, a **96.0% reduction**).
+
+### 2. All networks on CUDA (`float64`, `eps_idx = 0`)
+
+| Network | `n_splits=1` (`lc` / ms) | `n_splits=2` (`lc` / ms) | `n_splits=4` (`lc` / ms) | `n_splits=8` (`lc` / ms) | `n_splits=16` (`lc` / ms) | Tightening at `16` |
+|---|---:|---:|---:|---:|---:|---:|
+| `3layer` | `591.04` (12.6 ms) | `441.28` (24.8 ms) | `380.66` (50.1 ms) | `327.08` (99.6 ms) | `242.61` (199.9 ms) | **`2.44x`** (-58.95%) |
+| `4layer` | `1750.56` (17.9 ms) | `1110.32` (35.4 ms) | `804.23` (70.9 ms) | `592.15` (141.9 ms) | `397.53` (283.5 ms) | **`4.40x`** (-77.29%) |
+| `5layer` | `4113.32` (23.1 ms) | `2402.76` (46.3 ms) | `1604.41` (93.6 ms) | `1022.46` (184.6 ms) | `634.78` (368.7 ms) | **`6.48x`** (-84.57%) |
+| `big` | `14191.72` (61.7 ms) | `7693.10` (123.1 ms) | `3918.94` (248.5 ms) | `1471.45` (492.4 ms) | `563.78` (989.1 ms) | **`25.17x`** (-96.03%) |
