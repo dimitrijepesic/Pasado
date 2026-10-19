@@ -52,6 +52,7 @@ CSV_COLUMNS = [
     "time_split1_median_ms",
     "time_multiplier",
     "per_split_ms",
+    "peak_vram_mb",
 ]
 
 
@@ -332,26 +333,35 @@ def main():
             print(f"\n--- eps_idx={eps_idx} (epsilon={eps_val:.6f}), averaged over {len(selected_images)} images ---")
             print(
                 f"{'n_splits':>8s} | {'mean_lc_precise':>16s} | {'reduction_pct':>13s} | "
-                f"{'tightening':>11s} | {'time_med_ms':>12s} | {'time_mult':>10s} | {'ms_per_split':>12s}"
+                f"{'tightening':>11s} | {'time_med_ms':>12s} | {'time_mult':>10s} | "
+                f"{'ms_per_split':>12s} | {'peak_vram_mb':>12s}"
             )
-            print("-" * 98)
+            print("-" * 113)
 
             per_image_split1 = {}
             for image_id, image in selected_images:
                 for n_splits in args.splits:
                     times_ms = []
+                    peak_mbs = []
                     lc_val = None
                     for _ in range(args.repeats):
+                        if device.type == "cuda":
+                            torch.cuda.reset_peak_memory_stats(device)
                         t0 = stamp(device)
                         lc_val = eval_splits_once(
                             forward_fn, image, eps_val, n_splits, args.seed, device, dtype
                         )
                         t1 = stamp(device)
                         times_ms.append((t1 - t0) * 1000.0)
+                        if device.type == "cuda":
+                            peak_mbs.append(torch.cuda.max_memory_allocated(device) / (1024.0 ** 2))
+                        else:
+                            peak_mbs.append(0.0)
 
                     t_med = statistics.median(times_ms)
                     t_min = min(times_ms)
                     t_max = max(times_ms)
+                    peak_mb = max(peak_mbs)
 
                     if n_splits == 1:
                         per_image_split1[image_id] = (lc_val, t_med)
@@ -380,6 +390,7 @@ def main():
                             "time_split1_median_ms": t_1,
                             "time_multiplier": t_mult,
                             "per_split_ms": t_med / n_splits,
+                            "peak_vram_mb": peak_mb,
                         }
                     )
 
@@ -399,9 +410,11 @@ def main():
                 med_time1 = statistics.mean(r["time_split1_median_ms"] for r in sub)
                 t_mult = med_time / max(med_time1, 1e-300)
                 per_split = med_time / n_splits
+                peak_vram = max(r["peak_vram_mb"] for r in sub)
                 print(
                     f"{n_splits:8d} | {mean_lc:16.6f} | {red_pct:12.2f}% | "
-                    f"{tight:10.2f}x | {med_time:12.2f} | {t_mult:9.2f}x | {per_split:12.2f}"
+                    f"{tight:10.2f}x | {med_time:12.2f} | {t_mult:9.2f}x | "
+                    f"{per_split:12.2f} | {peak_vram:10.2f}MB"
                 )
 
     if args.out:
