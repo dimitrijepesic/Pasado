@@ -179,7 +179,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--cuda-csv",
-        default="results/gpu_hybrid_split_sweep_2026-10-17/split_sweep_cuda_fp64.csv",
+        default="results/gpu_hybrid_split_sweep_2026-10-17/split_sweep_cuda_fp64_to64.csv",
     )
     ap.add_argument(
         "--cpu64-csv",
