@@ -1,5 +1,5 @@
 """Checks that the tests can fail. One deliberate bug at a time is planted in a
-temporary copy of precise_transformer.py and every test is run against it.
+temporary copy of the source tree and every test is run against it.
 A test that still passes does not guard against that bug. The repository is
 never modified.
 
@@ -16,6 +16,7 @@ import tempfile
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = "forward_mode_tensorized_src"
 TARGET = f"{SRC}/precise_transformer.py"
+SIMPLE_ZONO = f"{SRC}/SimpleZono.py"
 
 # (short name, path relative to the repo root)
 TESTS = [
@@ -30,10 +31,13 @@ TESTS = [
     # End-to-end comparison on real images. Slower than the unit tests, and it is
     # the check that originally caught the float32 root precision bug (M6).
     ("e2e",       "experiments/correctness_e2e.py"),
+    # Brute-force and autograd lower bounds; the other tests compare code paths
+    # that share SimpleZono, so they cannot see a bug common to both.
+    ("soundness", "experiments/test_soundness.py"),
 ]
 
 # Each mutant: id, the function it breaks, why it is a realistic mistake, and an
-# exact (old, new) text replacement inside precise_transformer.py.
+# exact (old, new) text replacement inside `file` (default: precise_transformer.py).
 MUTANTS = [
     dict(id="M1", func="_linspace_rows",
          why="wrong step size in the batched sampling grid",
@@ -79,6 +83,26 @@ MUTANTS = [
              "rounding, not bit-identical",
          old="    R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsd').solution  # [n, 3, 1]\n",
          new="    R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsy').solution  # [n, 3, 1]\n"),
+    dict(id="M11", func="Zonotope.__neg__", file=SIMPLE_ZONO,
+         why="negate the center only, keeping the generators (the upstream bug)",
+         old="        return Zonotope(-self.centers, -self.generators)\n",
+         new="        return Zonotope(-self.centers, self.generators)\n"),
+    dict(id="M12", func="DualZonotope.__neg__", file=SIMPLE_ZONO,
+         why="negate the centers only, keeping the generators (the upstream bug)",
+         old="        return DualZonotope(-self.real.centers, -self.real.generators, "
+             "-self.dual.centers, -self.dual.generators)\n",
+         new="        return DualZonotope(-self.real.centers, self.real.generators, "
+             "-self.dual.centers, self.dual.generators)\n"),
+    dict(id="M13", func="_max_objective_over_x_candidates",
+         why="maximize E instead of |E| at the boundary roots (the upstream bug)",
+         old="    evaluation = (sigmoid_prime_y - planar).abs()\n",
+         new="    evaluation = sigmoid_prime_y - planar\n"),
+    dict(id="M14", func="check_nonlinear_boundary",
+         why="maximize E instead of |E| on the ly edge of the original path (the upstream bug)",
+         old="        evaluation = objective_fn(ABCs[i][0], ABCs[i][1], ABCs[i][2], "
+             "roots_paired_stacked[i]).abs()\n",
+         new="        evaluation = objective_fn(ABCs[i][0], ABCs[i][1], ABCs[i][2], "
+             "roots_paired_stacked[i])\n"),
 ]
 
 
@@ -137,9 +161,10 @@ def run_all_tests(root):
 
 def show_diff(m, original):
     """Print the mutant as a diff."""
+    target = m.get("file", TARGET)
     mutated = original.replace(m["old"], m["new"])
     diff = difflib.unified_diff(original.splitlines(True), mutated.splitlines(True),
-                                f"a/{TARGET}", f"b/{TARGET}", n=2)
+                                f"a/{target}", f"b/{target}", n=2)
     print("".join(diff))
 
 
@@ -160,9 +185,10 @@ def main():
     root = None
     try:
         root = make_workdir()
-        target_path = os.path.join(root, TARGET)
-        with open(target_path, encoding="utf-8") as f:
-            original = f.read()
+        originals = {}
+        for target in {m.get("file", TARGET) for m in mutants}:
+            with open(os.path.join(root, target), encoding="utf-8") as f:
+                originals[target] = f.read()
 
         print("=== baseline: all tests on the unmodified copy ===")
         base = run_all_tests(root)
@@ -174,8 +200,11 @@ def main():
 
         matrix = {}
         for m in mutants:
+            target = m.get("file", TARGET)
+            target_path = os.path.join(root, target)
+            original = originals[target]
             if original.count(m["old"]) != 1:
-                print(f"\n{m['id']}: original text found {original.count(m['old'])} times, expected 1")
+                print(f"\n{m['id']}: text in {target} found {original.count(m['old'])} times, expected 1")
                 return 2
             print(f"\n=== {m['id']}  {m['func']}: {m['why']} ===")
             show_diff(m, original)
