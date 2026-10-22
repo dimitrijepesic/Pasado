@@ -5,10 +5,13 @@
    - Plug the real part r = Re(x) back into P(r) = 2*r^3 - 3*r^2 + r - y
      and verify that |P(r)| <= res_tol.
 
-2. Sound floating-point rounding bound (Mine 2004):
-   - Propagate floating-point rounding error bounds through Cardano's formula
-     and the cubic polynomial evaluation P(r) = 2*r^3 - 3*r^2 + r - y to derive
-     per-element thresholds delta_imag(y) and delta_res(r, y) automatically.
+2. Analytical floating-point rounding estimate inspired by Mine (2004):
+   - Propagate first-order floating-point rounding error estimates through Cardano's
+     formula and the cubic polynomial evaluation P(r) = 2*r^3 - 3*r^2 + r - y to
+     compute per-element thresholds delta_imag(y) and delta_res(r, y). Note that
+     because complex pow/sqrt library ULP bounds are approximated by an effective
+     operation count (k_ops = 12), this serves as an analytical estimate rather than
+     a formally proved sound interval enclosure.
 """
 import math
 import os
@@ -59,19 +62,21 @@ def filter_complex_root_fixed_tol(xk, y, imag_tol=1e-6, res_tol=2e-5):
 
 
 # ---------------------------------------------------------------------------
-# Method 2: Mine (2004) floating-point rounding error interval bounds
+# Method 2: Analytical FP rounding error estimate inspired by Mine (2004)
 # ---------------------------------------------------------------------------
 def mine_cardano_rounding_bounds(r, y, complex_dtype=torch.complex64, legacy_exp=True):
-    """Compute sound upper bounds (delta_imag, delta_res) from Mine (2004) FP semantics.
+    """Compute analytical estimates (delta_imag, delta_res) inspired by Mine (2004) FP semantics.
 
-    In Mine (2004), each FP operation op(a, b) introduces relative error eps_mach
-    plus subnormal floor eta_min:
+    In Mine (2004), each elementary FP operation op(a, b) introduces relative error
+    eps_mach plus subnormal floor eta_min:
         |fl(a op b) - (a op b)| <= eps_mach * |a op b| + eta_min
 
     For Cardano on u^3 - u/4 - y/2 = 0 in the casus irreducibilis (|y| <= 1/(6*sqrt(3))):
       - |S| = |T| = sqrt(|Q|) = 1 / sqrt(12) ~= 0.288675
-      - Each complex sqrt, add, pow(1/3), and linear combination accumulates at most
-        k_op = 12 elementary FP roundings of size eps_c * |S|.
+      - We approximate the accumulated complex sqrt, add, pow(1/3), and linear combination
+        error using an effective count of k_ops = 12 roundings of size eps_c * |S|
+        (heuristic estimate; a formal proof would require platform-specific ULP bounds
+        for complex csqrt/cpow).
       - If the legacy exponent 0.33333 is used instead of 1/3, there is an additional
         exponent truncation error: |z^0.33333 - z^(1/3)| <= |1/3 - 0.33333| * |z^(1/3)| * |ln(z)|.
     """
@@ -166,11 +171,15 @@ def main():
         for xk in x_valid_exact
     )
 
-    # On invalid y (outside [-1/(6*sqrt(3)), +1/(6*sqrt(3))]), only 1 root per y is real
-    # (outside [0, 1], later rejected by inv_sigmoid) and 2 roots are genuinely complex (400 complex roots).
+    # On out-of-domain y (outside [-1/(6*sqrt(3)), +1/(6*sqrt(3))]), no root lies in [0, 1].
+    # Because legacy Cardano uses principal complex cube roots for S and T, for y < l
+    # all three outputs x1, x2, x3 have non-zero imaginary parts (none is a real root);
+    # checking x2 and x3 verifies that neither filter accepts non-real Cardano outputs.
+    # (Note: for soundness of the upper bound, only false negatives—dropped valid roots—can
+    # cause under-approximation; extra candidate points in [lx, ux] only increase max|E|.)
     m1_false_pos = sum(
         torch.isfinite(filter_complex_root_fixed_tol(xk, y_invalid, imag_tol=1e-6, res_tol=2e-5)).sum().item()
-        for xk in x_invalid_legacy[1:]  # x2, x3 are the complex conjugate pair
+        for xk in x_invalid_legacy[1:]
     )
     m2_false_pos = sum(
         torch.isfinite(filter_complex_root_mine(xk, y_invalid, legacy_exp=True)).sum().item()

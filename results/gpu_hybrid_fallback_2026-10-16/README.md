@@ -1,5 +1,10 @@
 # GPU hybrid fallback timing - CUDA, 2026-10-16
 
+> **Pre-fix code.** Timed before the negation and `|E|` soundness fixes (see
+> section 5 of `../gpu_hybrid_split_sweep_2026-10-17/README.md`). The fixes add
+> one elementwise `abs` per boundary check and change no tensor shapes or
+> transfers; the timings have not been re-measured.
+
 This directory contains the raw CSV and log outputs from
 `COLAB_GPU_HYBRID_FALLBACK.ipynb` for commit
 `a4dd04509b4b8c84b526fce11239446ed70a368c` (`torch 2.11.0+cu130`, 6 CPU threads).
@@ -36,3 +41,9 @@ This directory contains the raw CSV and log outputs from
 | `4layer` | 100 | 3 | 18.453 | 3.466 | 2.755 | 0.522 | 18.75% |
 | `5layer` | 100 | 4 | 24.239 | 4.644 | 3.692 | 0.702 | 19.11% |
 | `big` | 1024 | 4 | 63.344 | 34.569 | 32.108 | 1.403 | 54.54% |
+
+## Interpretation and caveats
+
+- **Decision rule outcome**: On `3layer`, `4layer`, and `5layer`, the CPU fallback accounts for `18.0%–19.1%` of `precise` time (`2.2–4.6 ms` total per pass), whereas on `big` (`n = 1024`) it accounts for **`54.54%`** (`34.57 ms` out of `63.34 ms`, with `32.11 ms` spent inside CPU `gelsd` and only `1.40 ms` in D2H/H2D transfers). Because this exceeds the `15%` threshold on wide networks, further acceleration on `big` requires either batching independent subproblems (e.g., across `n_splits`) or replacing CPU `gelsd` with a GPU SVD/minimum-norm solver.
+- **Note on `sync_free` naming and timer boundaries**: `sync_free` removes avoidable host-sync assertions inside per-layer operations (`assert bool(...)` in `precise_transformer.py` and `torch.all(lb == ub)` in `SimpleZono.py`), but necessarily retains the `.cpu()` transfer inside `lin_reg_tensor_batched` and the final `.item()` readout. In addition, the per-segment breakdown uses `torch.cuda.synchronize()` at segment boundaries for accurate attribution, which adds synchronization points not present in an uninstrumented end-to-end call.
+

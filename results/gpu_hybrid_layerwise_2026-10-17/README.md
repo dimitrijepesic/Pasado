@@ -1,5 +1,11 @@
 # Layerwise CPU vs. CUDA divergence - 2026-10-17
 
+> **Pre-fix results.** These runs predate the negation and `|E|` soundness fixes
+> (see section 5 of `../gpu_hybrid_split_sweep_2026-10-17/README.md`). Both CPU
+> and CUDA ran the same pre-fix code, so the CPU/CUDA comparison is internally
+> consistent, but the absolute bounds, root counts and divergence percentages
+> have not been re-measured with the fixed code.
+
 This directory contains the raw CSV and log outputs from
 `COLAB_GPU_HYBRID_LAYERWISE.ipynb` (`experiments/measure_layerwise_device_diff.py`)
 comparing CPU and CUDA layer-by-layer across `3layer`, `4layer`, `5layer`, and
@@ -54,3 +60,8 @@ the `real` Viète solver (`inverse_poly_real_tensor`).
 | `5layer` | `real` | 0 / 600 | `1.25e-15 / 6.96e-15 / 8.99e-15` |
 | `big` | `complex` | 2843 / 6144 | `3.49e-05 / 6.50e-01 / 6.52e-01` (up to **65.2%**) |
 | `big` | `real` | 0 / 6144 | `4.06e-16 / 1.08e-15 / 1.41e-15` |
+
+### 4. Additional note: CPU-side root loss in the legacy `complex64` path
+
+Even on CPU (where `torch.isreal` kills `0` roots because imaginary parts happen to evaluate to `+0.0`), the legacy `complex64` Cardano path still loses valid roots near $s \approx 0$ or $s \approx 1$ due to single-precision (`float32`/`complex64`) rounding before `inv_sigmoid(s) = ln(s / (1 - s))`. For example, on `big` (`image_id = 0`, `eps_idx = 0`), in layer 2 the `complex` path on CPU retains only `2049` roots after `inv_sigmoid` (`2048` in `[lx, ux]`) and in layer 3 `2048` roots, whereas the `float64` `real` Viète solver retains all `4096` real roots after `inv_sigmoid` (`2348` in `[lx, ux]` in layer 2 and `2670` in layer 3). Thus, the shortcoming of the legacy complex Cardano implementation is not limited to `torch.isreal` on CUDA; its `complex64` intermediate precision also drops boundary roots on CPU.
+

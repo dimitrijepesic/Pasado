@@ -1,5 +1,9 @@
 # Interval splitting (`--n-splits`) sweep on CPU and CUDA - 2026-10-17
 
+> **Pre-fix results.** All `lc_precise` values below were computed before the
+> negation and `|E|` soundness fixes (section 5). Some rows are below the true
+> derivative maximum. Use `../soundness_fix_2026-10-22/` for post-fix values.
+
 This directory contains the raw CSV and log outputs from
 `COLAB_GPU_HYBRID_SPLIT_SWEEP.ipynb` (`experiments/measure_split_sweep.py`)
 evaluating `n_splits = 1, 2, 4, 8, 16` across `3layer`, `4layer`, `5layer`, and
@@ -25,7 +29,7 @@ evaluating `n_splits = 1, 2, 4, 8, 16` across `3layer`, `4layer`, `5layer`, and
 | `8` | `1471.45` | `89.63%` | **`9.64x`** | `4235.96` | **`492.41`** | `7.98x` |
 | `16` | `563.78` | `96.03%` | **`25.17x`** | `8534.46` | **`989.14`** | `16.03x` |
 
-**Key takeaway**: On `big`, CUDA at `n_splits = 8` (`492.4 ms`) finishes faster than a single unsplit CPU pass (`n_splits = 1`, `525.7 ms`) while tightening the Lipschitz bound by **`9.64x`** (`14,191.72` $\to$ `1,471.45`, an **89.6% reduction**). At `n_splits = 16` (`989.1 ms` on CUDA vs. `8,534.5 ms` on CPU), the bound tightens by **`25.17x`** (`14,191.72` $\to$ `563.78`, a **96.0% reduction**).
+**Key takeaway**: On `big`, CUDA at `n_splits = 8` (`492.4 ms`) finishes faster than a single unsplit CPU pass on the same 6-thread Colab host (`n_splits = 1`, `525.7 ms`) while reducing the reported `lc_precise` by **`9.64x`** (`14,191.72` $\to$ `1,471.45`, an **89.6% reduction**). At `n_splits = 16` (`989.1 ms` on CUDA vs. `8,534.5 ms` on the 6-thread Colab CPU), the reported bound drops by **`25.17x`** (`14,191.72` $\to$ `563.78`, a **96.0% reduction**). *(Note: CPU times here are from the 6-thread Colab instance; local Apple Silicon M-series CPU times are recorded separately in `split_sweep_mac_cpu_fp64_to64.csv`. Also see the upstream Pasado bug note below regarding the exact `lc_precise` values.)*
 
 ### 2. All networks on CUDA (`float64`, `eps_idx = 0`)
 
@@ -53,13 +57,22 @@ evaluating `n_splits = 1, 2, 4, 8, 16` across `3layer`, `4layer`, `5layer`, and
 
 Evaluating `experiments/verify_complex_cubic_fixes.py` directly on CUDA (`float64`, `image_id = 0`, `eps = 0.632456`):
 - On 3,000 valid roots on CUDA, legacy `torch.isreal(x)` keeps only `1895 / 3000` roots (dropping 1,105 valid roots due to `complex64` imaginary rounding residuals), which severely underestimates `lc_precise`.
-- Both Method 1 (`|Im(x)| <= 1e-6` + cubic residual check) and Method 2 (Miné 2004 floating-point rounding bounds, `delta_imag = 8.26e-7`) keep `3000 / 3000` valid roots and `0 / 400` false positives:
+- Both Method 1 (`|Im(x)| <= 1e-6` + cubic residual check) and Method 2 (an analytical rounding-error estimate inspired by Miné 2004, `delta_imag = 8.26e-7`, using an estimated 12-op constant for the Cardano evaluation) keep `3000 / 3000` valid roots and `0 / 400` out-of-domain complex candidates:
 
-| Network | Legacy `torch.isreal` (CUDA) | Viète (real) | Method 1 (`0.33333`) | Method 1 (`1/3`) | Method 2 Miné (`0.33333`) | Method 2 Miné (`1/3`) |
+| Network | Legacy `torch.isreal` (CUDA) | Viète (real) | Method 1 (`0.33333`) | Method 1 (`1/3`) | Method 2 Miné-est (`0.33333`) | Method 2 Miné-est (`1/3`) |
 |---|---:|---:|---:|---:|---:|---:|
 | `3layer` | `493.162386` | `574.396403` | `574.396388` | `574.396403` | `574.396388` | `574.396403` |
 | `4layer` | `1021.444522` | `1659.975192` | `1659.975116` | `1659.975192` | `1659.975116` | `1659.975192` |
 | `5layer` | `2184.834761` | `4454.414814` | `4454.414582` | `4454.414814` | `4454.414582` | `4454.414814` |
 | `big` | `5035.151424` | `14466.403262` | `14466.403138` | `14466.403262` | `14466.403138` | `14466.403262` |
+
+### 5. Caveat on Upstream Pasado Bugs Affecting `lc_precise` Values
+
+All experiments above ran on the upstream `SimpleZono.py` and `precise_transformer.py` code. An autograd (`jvp`) audit on 2026-10-20 found two bugs in the upstream (`origin/main`) Pasado implementation, and 13 rows of `split_sweep_cuda_fp64.csv` (6 of `split_sweep_cpu_fp64.csv`) have `lc_precise` below the sampled maximum of `|d logit / dt|` (by up to `5.9e-4` relative):
+1. `Zonotope.__neg__` (`SimpleZono.py:115-117`) and `DualZonotope.__neg__` (`SimpleZono.py:369-370`) negate `self.centers` but not `self.generators`. In `(one - zono_eps) * img + zono_eps` the real generator becomes `g * (1 + img)` instead of `g * (1 - img)`, so for every sub-interval `[l, r]` (including `l = 0`) the hazed input is the segment from `(1 - r) * img + l` to `(1 - l) * img + r` instead of the haze path from `(1 - l) * img + l` to `(1 - r) * img + r`. Each pixel interval still contains the true one, but after the first affine layer the real zonotope no longer contains the true activations. The same bug affects `SigmoidDualZonotope` (`-sigmoid_real + 1`), i.e. the plain zonotope baseline.
+2. `check_nonlinear_boundary` and `_max_objective_over_x_candidates` (`precise_transformer.py:417, 440, 453`, and the softplus variant) maximize `E` instead of `|E|`, missing negative approximation errors at interior critical points.
+
+Both are fixed on `gpu-hybrid` and guarded by `experiments/test_soundness.py` (mutants `M11`-`M14` in `experiments/mutation_check.py`). The linear `O(n)` runtime scaling, flat `O(1)` peak VRAM, and CPU/CUDA agreement (`~1e-15`) are not affected by the fixes; the `lc_precise` values and tightening ratios in this directory are pre-fix numbers. Post-fix CPU numbers are in `../soundness_fix_2026-10-22/`; the CUDA sweep has to be re-run.
+
 
 

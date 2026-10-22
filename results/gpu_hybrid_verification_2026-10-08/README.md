@@ -1,5 +1,11 @@
 # GPU hybrid verification - A100, 2026-10-08
 
+> **Pre-fix code.** This matrix compares CPU and CUDA running the same code
+> before the negation and `|E|` soundness fixes (see section 5 of
+> `../gpu_hybrid_split_sweep_2026-10-17/README.md`). The CPU/CUDA agreement it
+> reports is about that code; it says nothing about soundness, and it has to be
+> re-run on the fixed commit.
+
 This directory contains the raw output of the final CPU/CUDA correctness
 matrix for commit `c2a2c657d9249b084d8fc0a91c67d683adfda86e` on an
 NVIDIA A100-SXM4-80GB.

@@ -1,0 +1,4 @@
+results/soundness_fix_2026-10-22/split_sweep_mac_cpu_fp64.csv: rows=180 min lc/sampled_max=1.000041 below=0
+results/soundness_fix_2026-10-22/split_sweep_mac_cpu_fp64_to64.csv: rows=84 min lc/sampled_max=1.012815 below=0
+Wrote 264 rows to results/soundness_fix_2026-10-22/soundness_check.csv
+ALL SOUND
