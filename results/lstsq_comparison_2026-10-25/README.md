@@ -37,9 +37,12 @@ Self-test: all 10 planted bugs caught (`g0_selftest.csv`).
 
 ## Real boxes
 
-119 904 boxes recorded from the batched forward pass (`real_rank_stats.csv`): gelsd
-truncates none of them beyond their exact rank and none lies within a factor 2 of its
-cutoff, so on real data the rank rules of A1 and A2 coincide.
+119 904 boxes recorded from the batched forward pass in float64 (`real_rank_stats.csv`):
+gelsd truncates none of them beyond their exact rank and none lies within a factor 2 of
+its cutoff, so in float64 the rank rules of A1 and A2 coincide on real data. This does
+not hold in float32: cast to float32, the 2000 sampled real boxes are truncated by gelsd
+in 129 cases (`box_summary.csv`, family `real`). See the joint report of v1 and v2 in
+`../lstsq_comparison_2026-10-25_v2_scaled/README.md`.
 
 ## Files
 

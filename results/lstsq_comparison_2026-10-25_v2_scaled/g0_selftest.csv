@@ -1,0 +1,11 @@
+mutant,parent,description,caught,caught_by
+S1,A1,slope A with the wrong sign,True,"contract: C4 degenerate_x/float32, C4 degenerate_x/float64, C4 degenerate_y/float32 | R2a: 114637.11 > 4.62 of A1 | R3: 0 > -6 of A1"
+S2,A1,degenerate axis: C = k instead of k / (1 + x0^2),True,"contract: C5 degenerate_y/float32, C5 degenerate_y/float64, C5 point/float32 | gate: G2 large_magnitude/float32: 4 non-finite > G's 0 | R2a: inf > 1.09 of A1 | R3: 0 > -6 of A1"
+S3,A1,"degeneracy from a variance about fl(mean), not the endpoints",True,"contract: C4 degenerate_x/float32, C4 degenerate_x/float64, C4 degenerate_y/float32 | gate: G1 near_degenerate/float64: shortfall 1.67e-09 > 6.21e-11"
+S4,A1,centred on fl(mean) instead of a data point,True,gate: G1 near_degenerate/float64: shortfall 1.67e-09 > 6.21e-11
+S5,A1,A and B swapped,True,"contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32 | gate: G2 large_magnitude/float32: 3 non-finite > G's 0 | R2a: inf > 2.19 of A1 | R3: 0 > -6 of A1"
+S6,A1,grid read as y running slowest,True,"contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32 | R2a: 369.13 > 1.28 of A1 | R3: -1 > -6 of A1"
+S7,A2,cutoff drops the other axis,True,"contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32 | gate: G1 near_degenerate/float64: shortfall 1.67e-09 > 6.21e-11 | R2a: 14.0 > 1.23 of A2 | R3: -1 > -6 of A2"
+S8,A1,degenerate axis gets coefficient 0 and C = k,True,"contract: C6 degenerate_y/float32, C6 degenerate_y/float64, C6 point/float32 | gate: G1 near_degenerate/float64: shortfall 1.67e-09 > 6.21e-11 | R3: 0 > -6 of A1"
+S9,A3,h = sigmoid^2 instead of sigmoid',True,"contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32 | R2a: 263058.57 > 1.19 of A3 | R3: 12 > -4 of A3"
+S10,P,pinv cutoff rtol = 0.1,True,"contract: C2 well_conditioned/float64, C5 degenerate_x/float32, C5 degenerate_x/float64"

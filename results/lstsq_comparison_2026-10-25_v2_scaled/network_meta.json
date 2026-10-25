@@ -1,0 +1,45 @@
+{
+  "torch": "2.12.1",
+  "numpy": "2.5.1",
+  "python": "3.13.15",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "device": "cpu",
+  "device_name": "",
+  "cuda": "",
+  "commit": "077ab862f50242d5741fa9d1abc95b5be5930f07",
+  "code_sha256": "002b7bf6cf47bc7908f843d94a2b4d25d68d808c4d4cdd19d4116708e0ad0a26",
+  "time": "2026-10-25 20:55:33",
+  "config": {
+    "networks": [
+      "3layer",
+      "4layer",
+      "5layer",
+      "big"
+    ],
+    "num_images": 3,
+    "eps_indices": [
+      0,
+      4,
+      8,
+      12,
+      15
+    ],
+    "splits": [
+      1,
+      4,
+      16
+    ],
+    "chunk": 4,
+    "seed": 7,
+    "autograd_samples": 1001
+  },
+  "candidates": [
+    "G",
+    "A1",
+    "A2",
+    "A3",
+    "H"
+  ],
+  "forced": false,
+  "smoke": false
+}
