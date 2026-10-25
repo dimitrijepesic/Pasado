@@ -18,6 +18,11 @@ It records:
 Run:
   python experiments/measure_split_sweep.py --device cuda --networks 3layer big --out split_sweep.csv
   python experiments/measure_split_sweep.py --device mps --networks 3layer
+  python experiments/measure_split_sweep.py --device cuda --split-mode batched --splits 1 8 32 64
+
+--split-mode batched runs all sub-intervals in one forward pass (batched_splits.py)
+instead of a Python loop. --split-chunk caps how many go through together, which
+bounds memory (it grows linearly with the number of splits in a batch).
 """
 import argparse
 import csv
@@ -53,6 +58,8 @@ CSV_COLUMNS = [
     "time_multiplier",
     "per_split_ms",
     "peak_vram_mb",
+    "split_mode",
+    "split_chunk",
 ]
 
 
@@ -135,6 +142,19 @@ def parse_args():
         help="number of timed repeats per (image, epsilon, n_splits); default: 3",
     )
     ap.add_argument(
+        "--split-mode",
+        choices=["sequential", "batched"],
+        default="sequential",
+        help="sequential: one forward pass per sub-interval (original); "
+             "batched: all sub-intervals in one pass; default: sequential",
+    )
+    ap.add_argument(
+        "--split-chunk",
+        type=positive_int,
+        default=None,
+        help="batched mode only: sub-intervals per forward pass; default: all at once",
+    )
+    ap.add_argument(
         "--real-cubic",
         dest="real_cubic",
         action="store_true",
@@ -154,6 +174,8 @@ def parse_args():
     )
     args = ap.parse_args()
 
+    if args.split_chunk is not None and args.split_mode != "batched":
+        ap.error("--split-chunk needs --split-mode batched")
     if 1 not in args.splits:
         args.splits = [1] + list(args.splits)
     if len(set(args.eps_indices)) != len(args.eps_indices):
@@ -297,6 +319,7 @@ def main():
     args, device, dtype_name, dtype = parse_args()
 
     import precise_transformer as pt
+    import batched_splits
 
     torch.set_default_dtype(dtype)
     pt.USE_VECTORIZED_PRECISE = True
@@ -311,7 +334,8 @@ def main():
     print(
         f"Split sweep | device={device} | dtype={dtype_name} | real_cubic={args.real_cubic} | "
         f"splits={args.splits} | num_images={args.num_images} | eps_indices={args.eps_indices} | "
-        f"warmup={args.warmup} | repeats={args.repeats}"
+        f"warmup={args.warmup} | repeats={args.repeats} | split_mode={args.split_mode} | "
+        f"split_chunk={args.split_chunk}"
     )
 
     for network_name in args.networks:
@@ -319,12 +343,22 @@ def main():
             network_name, device, dtype, args.num_images
         )
         forward_fn = build_forward_precise(pt, net, network_name)
+        layers = batched_splits.extract_affine_layers(net, network_name)
 
-        # Warm-up passes on the first image and first epsilon
+        def run_splits(image, eps_value, n_splits):
+            if args.split_mode == "batched":
+                return batched_splits.lipschitz_bound(
+                    layers, image, eps_value, n_splits, args.seed, args.split_chunk)
+            return eval_splits_once(forward_fn, image, eps_value, n_splits, args.seed, device, dtype)
+
+        # Warm-up passes on the first image and first epsilon. Batched mode also
+        # warms up at the largest split count, since its shapes depend on it.
         _, first_img = selected_images[0]
         first_eps = eps_schedule[args.eps_indices[0]]
         for _ in range(args.warmup):
-            eval_splits_once(forward_fn, first_img, first_eps, 1, args.seed, device, dtype)
+            run_splits(first_img, first_eps, 1)
+            if args.split_mode == "batched":
+                run_splits(first_img, first_eps, max(args.splits))
 
         print(f"\n==================== Network: {network_name} ({device}, {dtype_name}) ====================")
 
@@ -348,9 +382,7 @@ def main():
                         if device.type == "cuda":
                             torch.cuda.reset_peak_memory_stats(device)
                         t0 = stamp(device)
-                        lc_val = eval_splits_once(
-                            forward_fn, image, eps_val, n_splits, args.seed, device, dtype
-                        )
+                        lc_val = run_splits(image, eps_val, n_splits)
                         t1 = stamp(device)
                         times_ms.append((t1 - t0) * 1000.0)
                         if device.type == "cuda":
@@ -391,6 +423,8 @@ def main():
                             "time_multiplier": t_mult,
                             "per_split_ms": t_med / n_splits,
                             "peak_vram_mb": peak_mb,
+                            "split_mode": args.split_mode,
+                            "split_chunk": args.split_chunk if args.split_chunk else "",
                         }
                     )
 
