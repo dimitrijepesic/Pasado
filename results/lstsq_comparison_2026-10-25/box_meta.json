@@ -1,0 +1,89 @@
+{
+  "torch": "2.12.1",
+  "numpy": "2.5.1",
+  "python": "3.13.15",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "device": "cpu",
+  "device_name": "",
+  "cuda": "",
+  "commit": "4509e1f68976de35d8dae072781e5967d6ff316e",
+  "code_sha256": "fc5aad1ebcf238a36682d63a77b4634e412e0430a782297ecc8bb6bb43a5a0f0",
+  "time": "2026-10-25 20:32:13",
+  "config": {
+    "box_count": 500,
+    "seed": 20261025,
+    "g0": {
+      "boxes": 200,
+      "seed": 20261125
+    },
+    "selftest": {
+      "box_count": 50,
+      "seed": 20261225
+    },
+    "real": {
+      "networks": [
+        "3layer",
+        "4layer",
+        "5layer",
+        "big"
+      ],
+      "num_images": 2,
+      "eps_indices": [
+        0,
+        8,
+        15
+      ],
+      "n_splits": 4,
+      "seed": 7,
+      "per_network": 500
+    },
+    "network": {
+      "networks": [
+        "3layer",
+        "4layer",
+        "5layer",
+        "big"
+      ],
+      "num_images": 3,
+      "eps_indices": [
+        0,
+        4,
+        8,
+        12,
+        15
+      ],
+      "splits": [
+        1,
+        4,
+        16
+      ],
+      "chunk": 4,
+      "seed": 7,
+      "autograd_samples": 1001
+    },
+    "timing": {
+      "sizes": [
+        1024,
+        8192,
+        32768,
+        65536
+      ],
+      "warmup": 3,
+      "repeats": 10
+    }
+  },
+  "candidates": [
+    "G",
+    "A1",
+    "A2",
+    "A3",
+    "H",
+    "P"
+  ],
+  "dtypes": [
+    "float64",
+    "float32"
+  ],
+  "smoke": false,
+  "selftest_passed": true
+}

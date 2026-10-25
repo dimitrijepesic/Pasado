@@ -1,0 +1,67 @@
+out: results/lstsq_comparison_2026-10-25  device: cpu  smoke: False
+
+=== network ===
+  survivors of G0-G2: ['G', 'A3']; out: ['A1', 'A2', 'H', 'P']
+  3layer image 0 eps_idx 0 done
+  3layer image 0 eps_idx 4 done
+  3layer image 0 eps_idx 8 done
+  3layer image 0 eps_idx 12 done
+  3layer image 0 eps_idx 15 done
+  3layer image 1 eps_idx 0 done
+  3layer image 1 eps_idx 4 done
+  3layer image 1 eps_idx 8 done
+  3layer image 1 eps_idx 12 done
+  3layer image 1 eps_idx 15 done
+  3layer image 2 eps_idx 0 done
+  3layer image 2 eps_idx 4 done
+  3layer image 2 eps_idx 8 done
+  3layer image 2 eps_idx 12 done
+  3layer image 2 eps_idx 15 done
+  4layer image 0 eps_idx 0 done
+  4layer image 0 eps_idx 4 done
+  4layer image 0 eps_idx 8 done
+  4layer image 0 eps_idx 12 done
+  4layer image 0 eps_idx 15 done
+  4layer image 1 eps_idx 0 done
+  4layer image 1 eps_idx 4 done
+  4layer image 1 eps_idx 8 done
+  4layer image 1 eps_idx 12 done
+  4layer image 1 eps_idx 15 done
+  4layer image 2 eps_idx 0 done
+  4layer image 2 eps_idx 4 done
+  4layer image 2 eps_idx 8 done
+  4layer image 2 eps_idx 12 done
+  4layer image 2 eps_idx 15 done
+  5layer image 0 eps_idx 0 done
+  5layer image 0 eps_idx 4 done
+  5layer image 0 eps_idx 8 done
+  5layer image 0 eps_idx 12 done
+  5layer image 0 eps_idx 15 done
+  5layer image 1 eps_idx 0 done
+  5layer image 1 eps_idx 4 done
+  5layer image 1 eps_idx 8 done
+  5layer image 1 eps_idx 12 done
+  5layer image 1 eps_idx 15 done
+  5layer image 2 eps_idx 0 done
+  5layer image 2 eps_idx 4 done
+  5layer image 2 eps_idx 8 done
+  5layer image 2 eps_idx 12 done
+  5layer image 2 eps_idx 15 done
+  big image 0 eps_idx 0 done
+  big image 0 eps_idx 4 done
+  big image 0 eps_idx 8 done
+  big image 0 eps_idx 12 done
+  big image 0 eps_idx 15 done
+  big image 1 eps_idx 0 done
+  big image 1 eps_idx 4 done
+  big image 1 eps_idx 8 done
+  big image 1 eps_idx 12 done
+  big image 1 eps_idx 15 done
+  big image 2 eps_idx 0 done
+  big image 2 eps_idx 4 done
+  big image 2 eps_idx 8 done
+  big image 2 eps_idx 12 done
+  big image 2 eps_idx 15 done
+  G  : 180/180 ok, all sound: True, max |rel diff| vs G 0.00e+00
+  A3 : 180/180 ok, all sound: True, max |rel diff| vs G 1.97e-13
+exit=0
