@@ -1,0 +1,30 @@
+batched == sequential, per split
+  0%|          | 0.00/9.91M [00:00<?, ?B/s]  1%|          | 98.3k/9.91M [00:00<00:17, 570kB/s]  4%|▍         | 393k/9.91M [00:00<00:07, 1.23MB/s] 16%|█▌        | 1.61M/9.91M [00:00<00:02, 3.86MB/s] 66%|██████▌   | 6.55M/9.91M [00:00<00:00, 13.6MB/s]100%|██████████| 9.91M/9.91M [00:00<00:00, 14.1MB/s]
+  0%|          | 0.00/28.9k [00:00<?, ?B/s]100%|██████████| 28.9k/28.9k [00:00<00:00, 333kB/s]
+  0%|          | 0.00/1.65M [00:00<?, ?B/s]  4%|▍         | 65.5k/1.65M [00:00<00:04, 385kB/s] 10%|▉         | 164k/1.65M [00:00<00:02, 497kB/s]  42%|████▏     | 688k/1.65M [00:00<00:00, 1.67MB/s]100%|██████████| 1.65M/1.65M [00:00<00:00, 2.75MB/s]
+  0%|          | 0.00/4.54k [00:00<?, ?B/s]100%|██████████| 4.54k/4.54k [00:00<00:00, 15.3MB/s]
+  [PASS] 3layer: all per-split bounds (max rel diff 9.84e-15, splits [1, 2, 3, 8], eps [0, 8, 15], 3 images)
+  [PASS] 4layer: all per-split bounds (max rel diff 2.27e-14, splits [1, 2, 3, 8], eps [0, 8, 15], 3 images)
+  [PASS] 5layer: all per-split bounds (max rel diff 1.54e-14, splits [1, 2, 3, 8], eps [0, 8, 15], 3 images)
+batched == sequential, per split
+  [PASS] big: all per-split bounds (max rel diff 2.06e-15, splits [1, 4], eps [0, 8], 1 images)
+chunking does not change the result
+  [PASS] chunk=1 (2.53e-15)
+  [PASS] chunk=3 (1.97e-16)
+  [PASS] chunk=8 (0.00e+00)
+  [PASS] chunk=100 (0.00e+00)
+n_splits=1 equals one sequential forward pass
+  [PASS] single split 
+per-split bound is independent of the other splits in the batch
+  [PASS] 16 splits vs 4 chunks of 4 
+unseeded noise: bound stays above the sampled autograd maximum
+  [PASS] image 0 eps_idx 0 n=1 (lc=508.4182, sampled=198.7162)
+  [PASS] image 0 eps_idx 0 n=16 (lc=243.0204, sampled=198.7162)
+  [PASS] image 0 eps_idx 8 n=1 (lc=170.8867, sampled=168.9099)
+  [PASS] image 0 eps_idx 8 n=16 (lc=168.9322, sampled=168.9099)
+  [PASS] image 1 eps_idx 0 n=1 (lc=249.7742, sampled=86.7925)
+  [PASS] image 1 eps_idx 0 n=16 (lc=99.6081, sampled=86.7925)
+  [PASS] image 1 eps_idx 8 n=1 (lc=87.2968, sampled=86.7925)
+  [PASS] image 1 eps_idx 8 n=16 (lc=86.8185, sampled=86.7925)
+
+ALL CHECKS PASSED
