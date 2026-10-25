@@ -203,8 +203,11 @@ def _stats_variance_test(grid):
     xs, ys = lc._grid_axes(grid)
     dx, xbar = _centred_mean(xs)
     dy, ybar = _centred_mean(ys)
-    sxx, syy = (dx * dx).sum(1), (dy * dy).sum(1)
-    return lc._Stats(xs.shape[1], xs, ys, dx, dy, xbar, ybar, sxx, syy, sxx == 0, syy == 0)
+    ax, ay = lc._pow2_scale(dx), lc._pow2_scale(dy)
+    dxn, dyn = dx / ax[:, None], dy / ay[:, None]
+    nxx, nyy = (dxn * dxn).sum(1), (dyn * dyn).sum(1)
+    return lc._Stats(xs.shape[1], xs, ys, dxn, dyn, xbar, ybar, ax, ay, nxx, nyy,
+                     nxx == 0, nyy == 0)
 
 
 def _axes_y_slowest(grid):

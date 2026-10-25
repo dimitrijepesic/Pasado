@@ -22,6 +22,12 @@ equations decouple. A degenerate axis makes its column collinear with the
 intercept; the minimum-norm solution then splits the intercept between C and
 that axis' coefficient.
 
+The sums of squares and of products are formed from centred values divided by a
+power of two near their maximum, and the power is multiplied back afterwards.
+Scaling by a power of two is exact, so the result has the same bits as the
+unscaled sums wherever those are finite, and stays finite where they overflow
+(run v1 of the comparison: centred y of 1e294 times centred targets of 1e293).
+
 Compared by experiments/compare_lstsq_solvers.py. Nothing in the analysis uses
 these solvers yet.
 """
@@ -47,7 +53,8 @@ def default_rcond(dtype, m):
     return torch.finfo(dtype).eps * max(m, 3)
 
 
-_Stats = namedtuple("_Stats", "s xs ys dx dy xbar ybar sxx syy xdeg ydeg")
+# dxn = dx / ax with ax a power of two, nxx = sum(dxn^2), so sum(dx^2) = ax^2 nxx
+_Stats = namedtuple("_Stats", "s xs ys dxn dyn xbar ybar ax ay nxx nyy xdeg ydeg")
 
 
 def _grid_axes(grid):
@@ -69,18 +76,31 @@ def _centred(v):
     return r - rm, v[:, 0] + rm[:, 0]
 
 
+def _pow2_scale(v):
+    """2^e per row, where max |v| = f 2^e with 0.5 <= f < 1 (1 for a zero row)."""
+    _, e = torch.frexp(v.abs().amax(dim=1))
+    return torch.ldexp(torch.ones_like(v[:, 0]), e)
+
+
 def _stats(grid):
     xs, ys = _grid_axes(grid)
     dx, xbar = _centred(xs)
     dy, ybar = _centred(ys)
-    sxx = (dx * dx).sum(1)
-    syy = (dy * dy).sum(1)
+    ax, ay = _pow2_scale(dx), _pow2_scale(dy)
+    dxn, dyn = dx / ax[:, None], dy / ay[:, None]
+    nxx = (dxn * dxn).sum(1)
+    nyy = (dyn * dyn).sum(1)
     # Degeneracy from the exact endpoints: the mean of s equal floats is not always
-    # that float, so a computed variance can be 1e-34 instead of 0. sxx == 0 also
-    # catches widths so small that the squares underflow.
-    xdeg = (xs[:, 0] == xs[:, -1]) | (sxx == 0)
-    ydeg = (ys[:, 0] == ys[:, -1]) | (syy == 0)
-    return _Stats(xs.shape[1], xs, ys, dx, dy, xbar, ybar, sxx, syy, xdeg, ydeg)
+    # that float, so a computed variance can be 1e-34 instead of 0. A zero sum of
+    # the unscaled squares also catches widths so small that the squares underflow.
+    xdeg = (xs[:, 0] == xs[:, -1]) | ((dx * dx).sum(1) == 0)
+    ydeg = (ys[:, 0] == ys[:, -1]) | ((dy * dy).sum(1) == 0)
+    return _Stats(xs.shape[1], xs, ys, dxn, dyn, xbar, ybar, ax, ay, nxx, nyy, xdeg, ydeg)
+
+
+def _spreads(st):
+    """Standard deviations sx, sy of the s values of each axis, without squaring them."""
+    return st.ax * (st.nxx / st.s).sqrt(), st.ay * (st.nyy / st.s).sqrt()
 
 
 def _safe(den, deg):
@@ -115,19 +135,27 @@ def _fit_targets(st, z, xdeg, ydeg):
     z3 = z.reshape(n, s, s)  # [n, x index, y index]
     zbar = z.mean(1)
     dz = z3 - zbar[:, None, None]
+    az = _pow2_scale(dz.reshape(n, s * s))
+    zx = dz.mean(2) / az[:, None]
+    zy = dz.mean(1) / az[:, None]
     zero = torch.zeros_like(zbar)
-    # Elementwise products and sums, not matmul: no TF32 on CUDA in float32.
-    a0 = torch.where(xdeg, zero, (st.dx * dz.mean(2)).sum(1) / _safe(st.sxx, xdeg))
-    b0 = torch.where(ydeg, zero, (st.dy * dz.mean(1)).sum(1) / _safe(st.syy, ydeg))
+    # Elementwise products and sums, not matmul: no TF32 on CUDA in float32. The
+    # scaled slope is multiplied by az and divided by ax in two exact steps.
+    a0 = torch.where(xdeg, zero,
+                     (st.dxn * zx).sum(1) / _safe(st.nxx, xdeg) * az / _safe(st.ax, xdeg))
+    b0 = torch.where(ydeg, zero,
+                     (st.dyn * zy).sum(1) / _safe(st.nyy, ydeg) * az / _safe(st.ay, ydeg))
     k = zbar - a0 * st.xbar - b0 * st.ybar
     return _min_norm(k, a0, b0, st.xbar, st.ybar, xdeg, ydeg)
 
 
-def gram_eigenvalues(xbar, ybar, vx, vy, steps=8):
+def gram_eigenvalues(xbar, ybar, sx, sy, steps=8):
     """Eigenvalues l1 >= l2 >= l3 of K^T K / m^2, m = max(1, |xbar|, |ybar|, sx, sy).
 
-    vx, vy are the variances sx^2, sy^2. Uses the invariants e1 (trace), e2 (sum of
-    the principal 2x2 minors) and e3 (determinant), which are sums of non-negative
+    sx, sy are the standard deviations; dividing every entry of K by m before
+    squaring keeps the invariants finite for any finite box. Uses the invariants
+    e1 (trace), e2 (sum of the principal 2x2 minors) and e3 (determinant), which
+    are sums of non-negative
     terms and so accurate to a few ulps; forming X^T X and calling an eigensolver
     resolves l3 only down to about eps * l1. l1 is the largest root of
     l^3 - e1 l^2 + e2 l - e3; Newton from l = e1 >= l1 descends monotonically
@@ -137,7 +165,6 @@ def gram_eigenvalues(xbar, ybar, vx, vy, steps=8):
     """
     one = torch.ones_like(xbar)
     zero = torch.zeros_like(xbar)
-    sx, sy = vx.sqrt(), vy.sqrt()
     m = torch.maximum(torch.maximum(one, torch.maximum(xbar.abs(), ybar.abs())),
                       torch.maximum(sx, sy))
     c2 = (one / m) ** 2
@@ -171,7 +198,7 @@ def gelsd_cutoff_axes(st, rcond):
     whose spread is smaller relative to its offset from the origin (an exactly
     degenerate axis always has spread 0, so it is the one chosen).
     """
-    l1, l2, l3, tx, ty = gram_eigenvalues(st.xbar, st.ybar, st.sxx / st.s, st.syy / st.s)
+    l1, l2, l3, tx, ty = gram_eigenvalues(st.xbar, st.ybar, *_spreads(st))
     r2 = rcond * rcond
     drop2 = l2 <= r2 * l1
     drop3 = l3 <= r2 * l1
@@ -182,7 +209,7 @@ def gelsd_cutoff_axes(st, rcond):
 def singular_value_ratios(grid):
     """s2/s1 and s3/s1 of X = [1, x, y] for each grid, from gram_eigenvalues."""
     st = _stats(grid)
-    l1, l2, l3, _, _ = gram_eigenvalues(st.xbar, st.ybar, st.sxx / st.s, st.syy / st.s)
+    l1, l2, l3, _, _ = gram_eigenvalues(st.xbar, st.ybar, *_spreads(st))
     return (l2 / l1).sqrt(), (l3 / l1).sqrt()
 
 
@@ -223,8 +250,10 @@ def solve_A3(grid, z):
     h = _sigmoid_prime(st.xs)
     hbar = h.mean(1)
     zero = torch.zeros_like(hbar)
+    # same operation order as the unscaled ybar * sum(dx (h - hbar)) / sum(dx^2)
     a0 = torch.where(st.xdeg, zero,
-                     st.ybar * (st.dx * (h - hbar[:, None])).sum(1) / _safe(st.sxx, st.xdeg))
+                     st.ybar * (st.dxn * (h - hbar[:, None])).sum(1) / _safe(st.nxx, st.xdeg)
+                     / _safe(st.ax, st.xdeg))
     b0 = torch.where(st.ydeg, zero, hbar)
     k = hbar * st.ybar - a0 * st.xbar - b0 * st.ybar
     return _min_norm(k, a0, b0, st.xbar, st.ybar, st.xdeg, st.ydeg)
