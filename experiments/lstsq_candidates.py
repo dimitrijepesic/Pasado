@@ -24,9 +24,11 @@ that axis' coefficient.
 
 The sums of squares and of products are formed from centred values divided by a
 power of two near their maximum, and the power is multiplied back afterwards.
-Scaling by a power of two is exact, so the result has the same bits as the
-unscaled sums wherever those are finite, and stays finite where they overflow
-(run v1 of the comparison: centred y of 1e294 times centred targets of 1e293).
+Scaling by a power of two is exact as long as no scaled intermediate becomes
+subnormal; then the result has the same bits as the unscaled sums wherever those
+are finite, and it stays finite where they overflow (run v1 of the comparison:
+centred y of 1e294 times centred targets of 1e293). Measured on 160 000 outputs:
+see results/lstsq_comparison_2026-10-25_v2_scaled/README.md.
 
 Compared by experiments/compare_lstsq_solvers.py. Nothing in the analysis uses
 these solvers yet.
