@@ -29,9 +29,11 @@ A3 never reads z (it rebuilds the separable targets from the grid), so C3 and C4
 do not apply to it and its z is always the production target.
 
 Self-test: the planted bugs S1-S10 below run through the same pipeline. Each must
-be caught by C1-C7, by gate G1 or G2, or rank strictly below the candidate it was
-planted in on R2a, R2b or R3. One that survives means the harness is blind to
-that bug, and the measurement does not start.
+fail a check of C1-C7 or a gate G1/G2 that the candidate it was planted in
+passes, lose at least a factor 100 in accuracy against it on some family and
+dtype, or rank strictly below it on R2a or R3 (rules in
+compare_lstsq_solvers.py). One that survives means the harness is blind to that
+bug, and the measurement does not start.
 """
 import contextlib
 import math

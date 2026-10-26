@@ -67,10 +67,25 @@ Gates: a candidate that fails one is out.
      oracle), on boxes where no rank decision is ambiguous. Before any of this
      counts, the self-test runs the planted bugs S1-S10 of lstsq_contract.py
      through C1-C7, G1, G2 and a reduced box level (families 0-9, 50 boxes each,
-     seeds 20261025 + 200 + k): each must fail C1-C7, G1 or G2, or rank strictly
-     below its parent on R2a or R3. If one survives, the box level stops before
-     the measurement. (R2b is not used there: its order-of-magnitude buckets can
+     seeds 20261025 + 200 + k, plus the deterministic family offset_narrow
+     below). A planted bug is caught when it fails a check of C1-C7 or a gate
+     G1/G2 (per family and dtype) that its parent passes, or when its median
+     distance to the exact solution on some family and dtype is at least 100
+     times its parent's (and above 1 ulp), or when it ranks strictly below its
+     parent on R2a or R3. If one survives, the box level stops before the
+     measurement. (R2b is not used there: its order-of-magnitude buckets can
      split two equal planes by rounding alone.)
+     offset_narrow (self-test only, not part of the measurement): x centred at
+     +-1.3, +-2.7, +-5.1, +-9.9 with width r times the gelsd cutoff width of the
+     dtype, r in {4, 16, 64, 256}, y in [0.5, 1.7] or fixed at 0.9: 64 boxes of
+     full rank for every candidate on which the centring of narrow axes matters.
+     Amended 2026-10-26, before any CUDA measurement: the first CUDA run stopped
+     because S4 (centring on fl(mean)) survived. On the CPU it had been counted
+     as caught through G1 on near_degenerate, a gate its parent fails on the same
+     reduced boxes, so that catch proved nothing; its real effect, a median
+     error of 2.5e-8 against 1.0e-16 for its parent on near_degenerate in
+     float64, was hidden by R3's worst-family aggregation. The candidates, the
+     families of the measurement, the gates and the ranking are unchanged.
   G1 numerical safety regression against gelsd. This is not a soundness proof:
      Pasado's error term is computed in floating point, and the float32 pipeline
      falls short of the true maximum with gelsd itself (see
@@ -352,6 +367,24 @@ def synthetic_bounds(family, n, seed, dtype_name):
     return lx, lx + wx, ly, ly + wy
 
 
+def offset_narrow_bounds(dtype_name):
+    """The 64 boxes of the self-test family offset_narrow, in float64 on the CPU."""
+    rcond = lc.default_rcond(getattr(torch, dtype_name), 25)
+    rows = []
+    for c in (1.3, 2.7, 5.1, 9.9):
+        for sign in (1.0, -1.0):
+            for r in (4.0, 16.0, 64.0, 256.0):
+                for ly, uy in ((0.5, 1.7), (0.9, 0.9)):
+                    cy, sy = 0.5 * (ly + uy), (uy - ly) / (2 * math.sqrt(2))
+                    # r times the predicted gelsd cutoff width of x (see synthetic_bounds)
+                    w = r * 2 * math.sqrt(2) * rcond * math.sqrt(1 + c * c) * math.sqrt(
+                        1 + c * c + cy * cy + sy * sy)
+                    lx = sign * c - w / 2
+                    rows.append((lx, lx + w, ly, uy))
+    t = torch.tensor(rows, dtype=torch.float64)
+    return t[:, 0], t[:, 1], t[:, 2], t[:, 3]
+
+
 def nonfinite_bounds():
     nan, inf = float("nan"), float("inf")
     one_minus = math.nextafter(1.0, 0.0)
@@ -579,24 +612,45 @@ def run_g0(cfg, dtypes, device, out, smoke):
     solvers.update({mid: solve for mid, _, _, solve in ct.MUTANTS})
     summaries, per_box = [], []
     for dtype_name in dtypes:
-        for k, family in enumerate(FAMILIES[:10]):
+        for k, family in enumerate(FAMILIES[:10] + ["offset_narrow"]):
             seed = st_cfg["seed"] + k
-            bounds = synthetic_bounds(family, st_cfg["box_count"], seed, dtype_name)
+            if family == "offset_narrow":
+                bounds = offset_narrow_bounds(dtype_name)
+            else:
+                bounds = synthetic_bounds(family, st_cfg["box_count"], seed, dtype_name)
             s, b = evaluate_family(family, dtype_name, bounds, None, seed, solvers, device)
             summaries += s
             per_box += b
 
+    def where(reason):
+        return reason.split(":")[0]  # "G1 near_degenerate/float64"
+
     rows, all_caught = [], True
     for mid, parent, desc, _ in ct.MUTANTS:
         how = []
+        # only what the parent itself passes counts as a catch
+        parent_bad = {(r["check"], r["family"], r["dtype"]) for r in contract
+                      if r["candidate"] == parent and r["n_failed"]}
         failed = sorted({f"{r['check']} {r['family']}/{r['dtype']}" for r in m_contract
-                         if r["candidate"] == mid and r["n_failed"]})
+                         if r["candidate"] == mid and r["n_failed"]
+                         and (r["check"], r["family"], r["dtype"]) not in parent_bad})
         if failed:
             how.append("contract: " + ", ".join(failed[:3]))
         group = [r for r in summaries if r["candidate"] in ("G", parent, mid)]
-        reasons = gate_failures(group, [], None, [mid])[mid]
-        if reasons:
-            how.append("gate: " + reasons[0])
+        gates = gate_failures(group, [], None, [mid, parent])
+        parent_gates = {where(x) for x in gates[parent]}
+        mine = [x for x in gates[mid] if where(x) not in parent_gates]
+        if mine:
+            how.append("gate: " + mine[0])
+        by = {(r["dtype"], r["family"], r["candidate"]): r for r in group}
+        for (dt, fam, c), r in sorted(by.items()):
+            p = by.get((dt, fam, parent))
+            if c != mid or p is None or r["status"] != "ok" or p["status"] != "ok":
+                continue
+            em, ep = num(r["oracle_err_median"]), num(p["oracle_err_median"])
+            ulp = torch.finfo(getattr(torch, dt)).eps
+            if not math.isnan(ep) and em > 100 * max(ep, ulp):
+                how.append(f"accuracy {fam}/{dt}: median {em:.1e} vs {ep:.1e} of {parent}")
         keys = ranking_keys(group, [r for r in per_box if r["candidate"] in ("G", parent, mid)],
                             [], [], ["G", parent, mid])
         for label, i in (("R2a", 1), ("R3", 3)):
