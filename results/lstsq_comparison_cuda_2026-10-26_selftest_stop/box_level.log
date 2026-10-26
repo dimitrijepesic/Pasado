@@ -1,0 +1,22 @@
+out: /content/lstsq_comparison_cuda  device: cuda  smoke: False
+
+=== box ===
+G0 contract checks ...
+  G   PASS 
+  A1  PASS 
+  A2  PASS 
+  A3  PASS 
+  H   PASS 
+  P   PASS 
+G0 self-test with planted bugs ...
+  S1   in A1  caught: slope A with the wrong sign  <- contract: C4 degenerate_x/float32, C4 degenerate_x/float64, C4 degenerate_y/float32
+  S2   in A1  caught: degenerate axis: C = k instead of k / (1 + x0^2)  <- contract: C5 degenerate_y/float32, C5 degenerate_y/float64, C5 point/float32
+  S3   in A1  caught: degeneracy from a variance about fl(mean), not the endpoints  <- contract: C4 degenerate_x/float32, C4 degenerate_x/float64, C4 degenerate_y/float32
+  S4   in A1  SURVIVED: centred on fl(mean) instead of a data point
+  S5   in A1  caught: A and B swapped  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+  S6   in A1  caught: grid read as y running slowest  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+  S7   in A2  caught: cutoff drops the other axis  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+  S8   in A1  caught: degenerate axis gets coefficient 0 and C = k  <- contract: C6 degenerate_y/float32, C6 degenerate_y/float64, C6 point/float32
+  S9   in A3  caught: h = sigmoid^2 instead of sigmoid'  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+  S10  in P   caught: pinv cutoff rtol = 0.1  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+SELF-TEST FAILED: the harness misses a planted bug; the measurement does not start
