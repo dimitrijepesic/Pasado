@@ -1,0 +1,263 @@
+out: /content/smoke_cuda  device: cuda  smoke: True
+
+=== box ===
+G0 contract checks ...
+  G   PASS 
+  A1  PASS 
+  A2  PASS 
+  A3  PASS 
+  H   PASS 
+  P   PASS 
+G0 self-test with planted bugs ...
+  S1   in A1  caught: slope A with the wrong sign  <- contract: C4 degenerate_x/float32, C4 degenerate_x/float64, C4 degenerate_y/float32
+  S2   in A1  caught: degenerate axis: C = k instead of k / (1 + x0^2)  <- contract: C5 degenerate_y/float32, C5 degenerate_y/float64, C5 point/float32
+  S3   in A1  caught: degeneracy from a variance about fl(mean), not the endpoints  <- contract: C4 degenerate_x/float64, C6 degenerate_x/float32, C6 degenerate_x/float64
+  S4   in A1  caught: centred on fl(mean) instead of a data point  <- accuracy near_degenerate/float64: median 1.0e-08 vs 9.2e-17 of A1
+  S5   in A1  caught: A and B swapped  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+  S6   in A1  caught: grid read as y running slowest  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+  S7   in A2  caught: cutoff drops the other axis  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+  S8   in A1  caught: degenerate axis gets coefficient 0 and C = k  <- contract: C6 degenerate_y/float32, C6 degenerate_y/float64, C6 point/float32
+  S9   in A3  caught: h = sigmoid^2 instead of sigmoid'  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+  S10  in P   caught: pinv cutoff rtol = 0.1  <- contract: C5 degenerate_x/float32, C5 degenerate_x/float64, C5 degenerate_y/float32
+recording real boxes ...
+  0%|          | 0.00/9.91M [00:00<?, ?B/s]  0%|          | 32.8k/9.91M [00:00<01:04, 154kB/s]  1%|          | 98.3k/9.91M [00:00<00:40, 243kB/s]  2%|▏         | 164k/9.91M [00:00<00:35, 272kB/s]   4%|▎         | 360k/9.91M [00:00<00:18, 527kB/s]  7%|▋         | 721k/9.91M [00:01<00:09, 944kB/s] 15%|█▍        | 1.47M/9.91M [00:01<00:04, 1.82MB/s] 30%|██▉       | 2.95M/9.91M [00:01<00:02, 3.48MB/s] 60%|█████▉    | 5.93M/9.91M [00:01<00:00, 6.80MB/s] 92%|█████████▏| 9.08M/9.91M [00:01<00:00, 9.26MB/s]100%|██████████| 9.91M/9.91M [00:01<00:00, 5.13MB/s]
+  0%|          | 0.00/28.9k [00:00<?, ?B/s]100%|██████████| 28.9k/28.9k [00:00<00:00, 134kB/s]100%|██████████| 28.9k/28.9k [00:00<00:00, 134kB/s]
+  0%|          | 0.00/1.65M [00:00<?, ?B/s]  2%|▏         | 32.8k/1.65M [00:00<00:10, 154kB/s]  4%|▍         | 65.5k/1.65M [00:00<00:10, 154kB/s] 12%|█▏        | 197k/1.65M [00:00<00:03, 365kB/s]  22%|██▏       | 360k/1.65M [00:00<00:02, 524kB/s] 48%|████▊     | 786k/1.65M [00:01<00:00, 1.06MB/s] 95%|█████████▌| 1.57M/1.65M [00:01<00:00, 1.95MB/s]100%|██████████| 1.65M/1.65M [00:01<00:00, 1.29MB/s]
+  0%|          | 0.00/4.54k [00:00<?, ?B/s]100%|██████████| 4.54k/4.54k [00:00<00:00, 12.1MB/s]
+  400 boxes recorded, gelsd truncates 0 beyond the exact rank, 0 lie within 2x of the cutoff; 4 kept
+  float64  normal               4 boxes (0.1 s)
+  float64  degenerate_x         4 boxes (0.1 s)
+  float64  degenerate_y         4 boxes (0.1 s)
+  float64  point                4 boxes (0.1 s)
+  float64  near_degenerate      4 boxes (0.1 s)
+  float64  saturated            4 boxes (0.1 s)
+  float64  mixed_scale          4 boxes (0.1 s)
+  float64  cutoff_band_x        4 boxes (0.1 s)
+  float64  cutoff_band_y        4 boxes (0.1 s)
+  float64  large_magnitude      4 boxes (0.1 s)
+  float64  real                 4 boxes (0.1 s)
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to DGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to DGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to DGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to DGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to DGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to DGELSD.
+  float64  nonfinite            8 boxes (0.1 s)
+  float32  normal               4 boxes (0.1 s)
+  float32  degenerate_x         4 boxes (0.1 s)
+  float32  degenerate_y         4 boxes (0.1 s)
+  float32  point                4 boxes (0.1 s)
+  float32  near_degenerate      4 boxes (0.1 s)
+  float32  saturated            4 boxes (0.1 s)
+  float32  mixed_scale          4 boxes (0.1 s)
+  float32  cutoff_band_x        4 boxes (0.1 s)
+  float32  cutoff_band_y        4 boxes (0.1 s)
+  float32  large_magnitude      4 boxes (0.1 s)
+  float32  real                 4 boxes (0.1 s)
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to SGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to SGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to SGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to SGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to SGELSD.
+
+Intel MKL ERROR: Parameter 4 was incorrect on entry to SGELSD.
+  float32  nonfinite            8 boxes (0.0 s)
+
+dtype    family           cand status nonfin A==0  worst_sf  W/G p99   W/G max   err med |coef|max
+float64  normal           G    ok          0    0  9.86e-15   1.0000 1.000e+00  1.95e-15  6.10e-01
+float64  normal           A1   ok          0    0  1.01e-14   1.0000 1.000e+00  1.32e-16  6.10e-01
+float64  normal           A2   ok          0    0  1.01e-14   1.0000 1.000e+00  1.32e-16  6.10e-01
+float64  normal           A3   ok          0    0  1.02e-14   1.0000 1.000e+00  4.15e-16  6.10e-01
+float64  normal           H    ok          0    0  1.01e-14   1.0000 1.000e+00  1.32e-16  6.10e-01
+float64  normal           P    ok          0    0  1.04e-14   1.0000 1.000e+00  2.13e-15  6.10e-01
+float64  degenerate_x     G    ok          0    0  4.94e-16   1.0000 1.000e+00  4.86e-16  2.02e-01
+float64  degenerate_x     A1   ok          0    0  4.82e-17   1.0000 1.000e+00  1.22e-16  2.02e-01
+float64  degenerate_x     A2   ok          0    0  4.82e-17   1.0000 1.000e+00  1.22e-16  2.02e-01
+float64  degenerate_x     A3   ok          0    0  2.84e-17   1.0000 1.000e+00  1.20e-16  2.02e-01
+float64  degenerate_x     H    ok          0    0  4.82e-17   1.0000 1.000e+00  1.22e-16  2.02e-01
+float64  degenerate_x     P    ok          0    0  6.73e-18   1.0000 1.000e+00  4.65e-16  2.02e-01
+float64  degenerate_y     G    ok          0    0  1.91e-17   1.0000 1.000e+00  6.27e-16  2.31e-01
+float64  degenerate_y     A1   ok          0    0  3.19e-15   1.0000 1.000e+00  8.25e-17  2.31e-01
+float64  degenerate_y     A2   ok          0    0  3.19e-15   1.0000 1.000e+00  8.25e-17  2.31e-01
+float64  degenerate_y     A3   ok          0    0  1.65e-16   1.0000 1.000e+00  8.23e-17  2.31e-01
+float64  degenerate_y     H    ok          0    0  3.19e-15   1.0000 1.000e+00  8.25e-17  2.31e-01
+float64  degenerate_y     P    ok          0    0  0.00e+00   1.0000 1.000e+00  6.95e-16  2.31e-01
+float64  point            G    ok          0    0  6.95e-14   1.0000 1.000e+00  7.60e-17  1.06e-01
+float64  point            A1   ok          0    0  6.71e-14   1.0000 1.000e+00  1.17e-16  1.06e-01
+float64  point            A2   ok          0    0  6.71e-14   1.0000 1.000e+00  1.17e-16  1.06e-01
+float64  point            A3   ok          0    0  7.29e-14   1.0000 1.000e+00  5.94e-17  1.06e-01
+float64  point            H    ok          0    0  6.71e-14   1.0000 1.000e+00  1.17e-16  1.06e-01
+float64  point            P    ok          0    0  7.53e-14   1.0000 1.000e+00  5.13e-16  1.06e-01
+float64  near_degenerate  G    ok          0    0  0.00e+00   1.0000 1.000e+00  1.05e-03  2.49e-01
+float64  near_degenerate  A1   ok          0    0  3.10e-10   1.0000 1.000e+00  2.14e-16  2.49e-01
+float64  near_degenerate  A2   ok          0    0  3.10e-10   1.0000 1.000e+00  2.14e-16  2.49e-01
+float64  near_degenerate  A3   ok          0    0  0.00e+00   1.0000 1.000e+00  2.92e-04  2.49e-01
+float64  near_degenerate  H    ok          0    0  3.10e-10   1.0000 1.000e+00  2.14e-16  2.49e-01
+float64  near_degenerate  P    ok          0    0  2.74e-12  74.7380 7.474e+01  4.59e-04  2.49e-01
+float64  saturated        G    ok          0    0  2.37e-13   1.0000 1.000e+00  2.76e-15  2.06e-11
+float64  saturated        A1   ok          0    0  2.37e-13   1.0000 1.000e+00  1.43e-16  2.06e-11
+float64  saturated        A2   ok          0    0  2.37e-13   1.0000 1.000e+00  1.43e-16  2.06e-11
+float64  saturated        A3   ok          0    0  2.37e-13   1.0000 1.000e+00  1.74e-16  2.06e-11
+float64  saturated        H    ok          0    0  2.37e-13   1.0000 1.000e+00  1.43e-16  2.06e-11
+float64  saturated        P    ok          0    0  2.37e-13   1.0000 1.000e+00  2.84e-15  2.06e-11
+float64  mixed_scale      G    ok          0    0  1.68e-16   1.0000 1.000e+00  2.33e-04  2.50e-01
+float64  mixed_scale      A1   ok          0    0  5.14e-17   1.0000 1.000e+00  1.47e-11  2.50e-01
+float64  mixed_scale      A2   ok          0    0  6.97e-17   1.0000 1.000e+00  1.47e-11  2.50e-01
+float64  mixed_scale      A3   ok          0    0  6.97e-17   1.0000 1.000e+00  2.33e-04  2.50e-01
+float64  mixed_scale      H    ok          0    0  1.68e-16   1.0000 1.000e+00  1.47e-11  2.50e-01
+float64  mixed_scale      P    ok          0    0  0.00e+00   1.0000 1.000e+00  9.53e-03  2.50e-01
+float64  cutoff_band_x    G    ok          0    0  3.72e-13   1.0000 1.000e+00  3.96e-03  2.15e-01
+float64  cutoff_band_x    A1   ok          0    0  3.70e-13   1.0000 1.000e+00  2.30e-05  2.13e-01
+float64  cutoff_band_x    A2   ok          0    0  3.70e-13   1.0000 1.000e+00  2.30e-05  2.13e-01
+float64  cutoff_band_x    A3   ok          0    0  3.69e-13   1.0000 1.000e+00  3.31e-04  2.13e-01
+float64  cutoff_band_x    H    ok          0    0  3.70e-13   1.0000 1.000e+00  2.30e-05  2.13e-01
+float64  cutoff_band_x    P    ok          0    0  3.71e-13   1.0005 1.001e+00  1.97e-03  2.14e-01
+float64  cutoff_band_y    G    ok          0    0  2.55e-09   1.0000 1.000e+00  3.51e+07  8.41e+07
+float64  cutoff_band_y    A1   ok          0    0  6.47e-17   1.0000 1.000e+00  1.99e-16  2.88e+00
+float64  cutoff_band_y    A2   ok          0    0  6.47e-17   1.0000 1.000e+00  1.99e-16  1.76e+00
+float64  cutoff_band_y    A3   ok          0    0  2.51e-16   1.0000 1.000e+00  1.05e-04  2.88e+00
+float64  cutoff_band_y    H    ok          0    0  6.47e-17   1.0000 1.000e+00  1.99e-16  1.76e+00
+float64  cutoff_band_y    P    ok          0    0  8.82e-09   1.0002 1.000e+00  5.73e+07  1.16e+08
+float64  large_magnitude  G    ok          0    0  2.14e-16   1.0000 1.000e+00  0.00e+00  1.23e-01
+float64  large_magnitude  A1   ok          0    0  0.00e+00   1.0655 1.066e+00  0.00e+00  1.38e+15
+float64  large_magnitude  A2   ok          0    0  2.14e-16   1.0000 1.000e+00  0.00e+00  1.23e-01
+float64  large_magnitude  A3   ok          0    0  1.75e-16   1.0655 1.066e+00  0.00e+00  1.38e+15
+float64  large_magnitude  H    ok          0    0  2.14e-16   1.0000 1.000e+00  0.00e+00  1.23e-01
+float64  large_magnitude  P    ok          0    0  2.14e-16   1.0000 1.000e+00  0.00e+00  1.23e-01
+float64  real             G    ok          0    0  0.00e+00   1.0000 1.000e+00  4.98e-16  2.44e-01
+float64  real             A1   ok          0    0  1.45e-16   1.0000 1.000e+00  1.78e-16  2.44e-01
+float64  real             A2   ok          0    0  1.45e-16   1.0000 1.000e+00  1.78e-16  2.44e-01
+float64  real             A3   ok          0    0  1.21e-16   1.0000 1.000e+00  1.03e-16  2.44e-01
+float64  real             H    ok          0    0  1.45e-16   1.0000 1.000e+00  1.78e-16  2.44e-01
+float64  real             P    ok          0    0  1.21e-16   1.0000 1.000e+00  6.20e-16  2.44e-01
+float64  nonfinite        G    error: RuntimeError: false INTERNAL ASSERT FAILED at "/pytorch/aten/src/ATen/native/BatchLinearAlgebra.cpp":1613, please report a bug to PyTo
+float64  nonfinite        A1   ok          6    0       nan      nan       nan       nan  4.00e-01
+float64  nonfinite        A2   ok          6    0       nan      nan       nan       nan  1.97e-01
+float64  nonfinite        A3   ok          6    0       nan      nan       nan       nan  2.29e-01
+float64  nonfinite        H    ok          6    0       nan      nan       nan       nan  1.97e-01
+float64  nonfinite        P    ok          6    0       nan      nan       nan       nan  1.97e-01
+float32  normal           G    ok          0    0  2.51e-06   1.0000 1.000e+00  1.37e-06  6.10e-01
+float32  normal           A1   ok          0    0  2.74e-06   1.0000 1.000e+00  9.79e-08  6.10e-01
+float32  normal           A2   ok          0    0  2.74e-06   1.0000 1.000e+00  9.79e-08  6.10e-01
+float32  normal           A3   ok          0    0  2.85e-06   1.0000 1.000e+00  1.81e-07  6.10e-01
+float32  normal           H    ok          0    0  2.74e-06   1.0000 1.000e+00  9.79e-08  6.10e-01
+float32  normal           P    ok          0    0  2.27e-06   1.0000 1.000e+00  1.09e-06  6.10e-01
+float32  degenerate_x     G    ok          0    0  2.48e-07   1.0000 1.000e+00  3.25e-07  2.02e-01
+float32  degenerate_x     A1   ok          0    0  3.23e-08   1.0000 1.000e+00  8.23e-08  2.02e-01
+float32  degenerate_x     A2   ok          0    0  3.23e-08   1.0000 1.000e+00  8.23e-08  2.02e-01
+float32  degenerate_x     A3   ok          0    0  1.62e-08   1.0000 1.000e+00  6.59e-08  2.02e-01
+float32  degenerate_x     H    ok          0    0  3.23e-08   1.0000 1.000e+00  8.23e-08  2.02e-01
+float32  degenerate_x     P    ok          0    0  1.02e-07   1.0000 1.000e+00  1.12e-07  2.02e-01
+float32  degenerate_y     G    ok          0    0  0.00e+00   1.0000 1.000e+00  1.74e-07  2.31e-01
+float32  degenerate_y     A1   ok          0    0  4.97e-07   1.0000 1.000e+00  7.80e-08  2.31e-01
+float32  degenerate_y     A2   ok          0    0  4.97e-07   1.0000 1.000e+00  7.80e-08  2.31e-01
+float32  degenerate_y     A3   ok          0    0  1.23e-06   1.0000 1.000e+00  1.20e-07  2.31e-01
+float32  degenerate_y     H    ok          0    0  4.97e-07   1.0000 1.000e+00  7.80e-08  2.31e-01
+float32  degenerate_y     P    ok          0    0  5.53e-07   1.0000 1.000e+00  4.00e-07  2.31e-01
+float32  point            G    ok          0    0  9.14e-05   1.0000 1.000e+00  1.32e-07  1.06e-01
+float32  point            A1   ok          0    0  8.95e-05   1.0001 1.000e+00  4.49e-08  1.06e-01
+float32  point            A2   ok          0    0  8.95e-05   1.0001 1.000e+00  4.49e-08  1.06e-01
+float32  point            A3   ok          0    0  9.32e-05   1.0000 1.000e+00  6.47e-08  1.06e-01
+float32  point            H    ok          0    0  8.95e-05   1.0001 1.000e+00  4.49e-08  1.06e-01
+float32  point            P    ok          0    0  8.78e-05   1.0001 1.000e+00  2.34e-07  1.06e-01
+float32  near_degenerate  G    ok          0    0  1.12e-03   1.0000 1.000e+00  8.29e-08  2.18e-01
+float32  near_degenerate  A1   ok          0    0  1.28e-02   1.0076 1.008e+00  1.82e-08  2.18e-01
+float32  near_degenerate  A2   ok          0    0  1.28e-02   1.0076 1.008e+00  1.82e-08  2.18e-01
+float32  near_degenerate  A3   ok          0    0  2.88e-02   1.0095 1.009e+00  2.88e-08  2.18e-01
+float32  near_degenerate  H    ok          0    0  1.28e-02   1.0076 1.008e+00  1.82e-08  2.18e-01
+float32  near_degenerate  P    ok          0    0  5.47e-01   1.0033 1.003e+00  3.81e-07  2.18e-01
+float32  saturated        G    ok          0    0  4.60e-08   1.0000 1.000e+00  0.00e+00  0.00e+00
+float32  saturated        A1   ok          0    0  4.60e-08   1.0000 1.000e+00  0.00e+00  0.00e+00
+float32  saturated        A2   ok          0    0  4.60e-08   1.0000 1.000e+00  0.00e+00  0.00e+00
+float32  saturated        A3   ok          0    0  4.60e-08   1.0000 1.000e+00  0.00e+00  0.00e+00
+float32  saturated        H    ok          0    0  4.60e-08   1.0000 1.000e+00  0.00e+00  0.00e+00
+float32  saturated        P    ok          0    0  4.60e-08   1.0000 1.000e+00  0.00e+00  0.00e+00
+float32  mixed_scale      G    ok          0    0  4.64e-08   1.0000 1.000e+00       nan  2.50e-01
+float32  mixed_scale      A1   ok          0    0  5.96e-08   1.0000 1.000e+00       nan  2.50e-01
+float32  mixed_scale      A2   ok          0    0  5.96e-08   1.0000 1.000e+00       nan  2.50e-01
+float32  mixed_scale      A3   ok          0    0  3.61e-15   1.0000 1.000e+00       nan  2.50e-01
+float32  mixed_scale      H    ok          0    0  4.64e-08   1.0000 1.000e+00       nan  2.50e-01
+float32  mixed_scale      P    ok          0    0  2.18e-06   1.0000 1.000e+00       nan  2.50e-01
+float32  cutoff_band_x    G    ok          0    0  2.73e-08   1.0000 1.000e+00  2.07e-03  2.12e-01
+float32  cutoff_band_x    A1   ok          0    0  0.00e+00   1.0000 1.000e+00  3.45e-05  2.13e-01
+float32  cutoff_band_x    A2   ok          0    0  2.73e-08   1.0000 1.000e+00  3.45e-05  2.13e-01
+float32  cutoff_band_x    A3   ok          0    0  1.03e-08   1.0000 1.000e+00  1.99e-04  2.13e-01
+float32  cutoff_band_x    H    ok          0    0  2.73e-08   1.0000 1.000e+00  3.45e-05  2.13e-01
+float32  cutoff_band_x    P    ok          0    0  2.73e-08   1.0000 1.000e+00  2.04e-03  2.14e-01
+float32  cutoff_band_y    G    ok          0    0  1.18e-06   1.0000 1.000e+00  6.07e-02  1.70e+00
+float32  cutoff_band_y    A1   ok          0    0  1.78e-06   1.0000 1.000e+00  1.95e-07  2.88e+00
+float32  cutoff_band_y    A2   ok          0    0  1.79e-06   1.0000 1.000e+00  1.95e-07  1.76e+00
+float32  cutoff_band_y    A3   ok          0    0  1.47e-06   1.0000 1.000e+00  4.84e-05  2.88e+00
+float32  cutoff_band_y    H    ok          0    0  1.18e-06   1.0000 1.000e+00  1.95e-07  1.76e+00
+float32  cutoff_band_y    P    ok          0    0  7.97e-07   1.0000 1.000e+00  7.59e-02  1.82e+00
+float32  large_magnitude  G    ok          0    0  1.79e-08   1.0000 1.000e+00       nan  1.23e-01
+float32  large_magnitude  A1   ok          0    0  1.28e-08   1.0655 1.066e+00       nan  1.37e+15
+float32  large_magnitude  A2   ok          0    0  3.06e-08   1.0000 1.000e+00       nan  1.23e-01
+float32  large_magnitude  A3   ok          0    0  2.92e-08   1.0655 1.066e+00       nan  1.38e+15
+float32  large_magnitude  H    ok          0    0  1.79e-08   1.0000 1.000e+00       nan  1.23e-01
+float32  large_magnitude  P    ok          0    0  4.32e-08   1.0000 1.000e+00       nan  1.23e-01
+float32  real             G    ok          0    0  8.67e-04   1.0000 1.000e+00  1.96e-07  2.44e-01
+float32  real             A1   ok          0    0  8.67e-04   1.0000 1.000e+00  6.12e-08  2.44e-01
+float32  real             A2   ok          0    0  8.67e-04   1.0000 1.000e+00  6.12e-08  2.44e-01
+float32  real             A3   ok          0    0  8.67e-04   1.0000 1.000e+00  1.05e-07  2.44e-01
+float32  real             H    ok          0    0  8.67e-04   1.0000 1.000e+00  6.12e-08  2.44e-01
+float32  real             P    ok          0    0  8.67e-04   1.0000 1.000e+00  3.01e-07  2.44e-01
+float32  nonfinite        G    error: RuntimeError: false INTERNAL ASSERT FAILED at "/pytorch/aten/src/ATen/native/BatchLinearAlgebra.cpp":1613, please report a bug to PyTo
+float32  nonfinite        A1   ok          6    0       nan      nan       nan       nan  1.97e-01
+float32  nonfinite        A2   ok          6    0       nan      nan       nan       nan  1.97e-01
+float32  nonfinite        A3   ok          6    0       nan      nan       nan       nan  2.29e-01
+float32  nonfinite        H    ok          6    0       nan      nan       nan       nan  1.97e-01
+float32  nonfinite        P    ok          6    0       nan      nan       nan       nan  1.97e-01
+
+=== network ===
+  survivors of G0-G2: ['G']; out: ['A1', 'A2', 'A3', 'H', 'P']
+  3layer image 0 eps_idx 0 done
+  G  : 2/2 ok, all sound: True, max |rel diff| vs G 0.00e+00
+
+=== timing ===
+  float64  n=   256 G       2.653 ms  ok
+  float64  n=   256 A1      1.541 ms  ok
+  float64  n=   256 A2      3.808 ms  ok
+  float64  n=   256 A3      1.282 ms  ok
+  float64  n=   256 H       3.799 ms  ok
+  float64  n=   256 P       0.809 ms  ok
+  float32  n=   256 G       2.391 ms  ok
+  float32  n=   256 A1      1.513 ms  ok
+  float32  n=   256 A2      3.788 ms  ok
+  float32  n=   256 A3      1.273 ms  ok
+  float32  n=   256 H       3.906 ms  ok
+  float32  n=   256 P       0.698 ms  ok
+
+=== decide ===
+Gates
+  G   PASS
+  A1  FAIL
+        G1 near_degenerate/float32: shortfall 1.28e-02 > 1.12e-02
+        G1 near_degenerate/float64: shortfall 3.10e-10 > 1.00e-11
+  A2  FAIL
+        G1 near_degenerate/float32: shortfall 1.28e-02 > 1.12e-02
+        G1 near_degenerate/float64: shortfall 3.10e-10 > 1.00e-11
+  A3  FAIL
+        G1 near_degenerate/float32: shortfall 2.88e-02 > 1.12e-02
+  H   FAIL
+        G1 near_degenerate/float32: shortfall 1.28e-02 > 1.12e-02
+        G1 near_degenerate/float64: shortfall 3.10e-10 > 1.00e-11
+  P   FAIL
+        G1 near_degenerate/float32: shortfall 5.47e-01 > 1.12e-02
+
+Ranking keys (lower is better; None = not measured yet)
+          R1 tightness  R2a W/W_best p99     R2b shortfall       R3 accuracy          R4 speed     R5 simplicity
+  G                0.0               1.0                -3                 7              None                 2
+
+Winner: G (decided by R1 tightness)

@@ -1,0 +1,7 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "vram_gib": 79.250732421875,
+  "torch": "2.11.0+cu130",
+  "cuda": "13.0",
+  "commit": "7740ba43c83c8baa3a2609deefc602668b5f0c97"
+}

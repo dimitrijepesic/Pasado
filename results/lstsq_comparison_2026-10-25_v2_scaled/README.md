@@ -2,8 +2,14 @@
 
 Both runs apply the same pre-registered rule (`experiments/compare_lstsq_solvers.py`,
 committed in `385397e`) with the same seeds and box families, on the CPU (Apple M5 Pro,
-torch 2.12.1, float64 and float32). The A100 timing (R4) and the CUDA box level for P
-have not run.
+torch 2.12.1, float64 and float32).
+
+Update 2026-10-27: the A100 timing has run. With it (`timing_cuda.csv`, copied from
+`../lstsq_comparison_cuda_2026-10-27/`) the rule picks **A2** on this run
+(`decide_with_a100_timing.log`): A2 and H tie through R4 and R5 prefers A2. A2 is the
+choice; the full CUDA run and its sensitivity result are described in
+`../lstsq_comparison_cuda_2026-10-27/README.md`. The sections below describe the state
+before that timing.
 
 | Run | Folder | Candidate code | Source hash |
 |---|---|---|---|
