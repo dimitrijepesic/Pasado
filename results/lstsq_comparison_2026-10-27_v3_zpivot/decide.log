@@ -1,0 +1,22 @@
+out: results/lstsq_comparison_2026-10-27_v3_zpivot  device: cpu  smoke: False
+
+=== decide ===
+Gates
+  G   PASS
+  A1  PASS
+  A2  PASS
+  A3  PASS
+  H   PASS
+  P   FAIL
+        G0 C2 well_conditioned/float64: 1 of 1
+
+Ranking keys (lower is better; None = not measured yet)
+          R1 tightness  R2a W/W_best p99     R2b shortfall       R3 accuracy          R4 speed     R5 simplicity
+  G                0.0               1.0                -1                 7              None                 2
+  A1               0.0              1.25                -1                -7              None                 0
+  A2               0.0               1.0                -1                -7              None                 0
+  A3               0.0              1.25                -2                -4              None                 0
+  H                0.0               1.0                -1                -7              None                 1
+
+Undecided at R4 speed: not measured for ['A2', 'H']. Tied so far: ['A2', 'H']
+P was evaluated on the CPU (gesdd); its place is provisional until the box level runs on CUDA.
