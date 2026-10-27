@@ -23,6 +23,7 @@ solution jumps by O(1) as it must at a rank switch, and treating a dropped axis
 as constant is close to, not identical with, gelsd's truncated-SVD projection.
 """
 import math
+import warnings
 from collections import namedtuple
 
 import torch
@@ -215,3 +216,42 @@ def fit_planes(grid, z, rcond=None):
     rcond = default_rcond(grid.dtype, grid.shape[1]) if rcond is None else rcond
     cx, cy = gelsd_cutoff_axes(st, rcond)
     return _fit_targets(st, z, st.xdeg | cx, st.ydeg | cy)
+
+
+_compiled = {}
+# mode -> why compilation failed; fit_planes runs instead for that mode
+compile_fallback = {}
+
+
+def compiled_fit_planes(mode=None):
+    """fit_planes compiled by TorchInductor, created on first use, one per mode.
+
+    Dynamo captures fit_planes as one graph; on CUDA the 303 kernels of the eager
+    version become about 5 (results/inductor_dispatch_a3_2026-10-27/README.md). The
+    result is not bit-identical to fit_planes, since fusion changes the order of
+    roundings; with the pivot-centred targets both stay within a few ulps of the exact
+    solution (experiments/test_planar_fit.py --compiled). The first two shapes
+    compile, several seconds each, so this pays off only over many calls. With
+    mode="reduce-overhead" the outputs live in a CUDA graph's memory and are
+    overwritten by the next call: copy them if they are kept.
+
+    If compilation fails (no Triton, a device Inductor does not support), the call
+    warns once and runs fit_planes from then on; compile_fallback[mode] holds the
+    reason, so a caller can check that the compiled path is really in use.
+    """
+    if mode not in _compiled:
+        compiled = torch.compile(fit_planes, fullgraph=True, mode=mode)
+
+        def run(grid, z, rcond=None):
+            if mode in compile_fallback:
+                return fit_planes(grid, z, rcond)
+            try:
+                return compiled(grid, z, rcond)
+            except Exception as e:  # compilation runs inside the first call of a shape
+                compile_fallback[mode] = f"{type(e).__name__}: {str(e).splitlines()[0][:200]}"
+                warnings.warn("planar_fit: TorchInductor failed, using the eager fit_planes "
+                              f"({compile_fallback[mode]})")
+                return fit_planes(grid, z, rcond)
+
+        _compiled[mode] = run
+    return _compiled[mode]

@@ -12,9 +12,17 @@
 4. With the inputs on another device: result on that device, in the input dtype, and
    close to the CPU result.
 
+With --compiled the same checks run on planar_fit.compiled_fit_planes(), which is not
+bit-identical to fit_planes, so check 1 becomes, box by box: non-finite results in the
+same places, and within 64 * eps * (1 + max|x| + max|y|) of fit_planes on every box
+outside the band 0.9 to 1.1 times the rank cutoff (where the two may decide the rank
+differently; counted and printed). It also checks that compilation did not fall back to
+the eager function.
+
 Run:
   python experiments/test_planar_fit.py
   python experiments/test_planar_fit.py --device cuda
+  python experiments/test_planar_fit.py --device cuda --compiled
 """
 import argparse
 import math
@@ -42,8 +50,10 @@ BOXES = 500
 GELSD_RTOL = {"float64": 1e-10, "float32": 1e-3}
 DEVICE_RTOL = {"float64": 1e-12, "float32": 1e-5}
 ACCURACY_ULPS = 32
+COMPILED_ULPS = 64
 
 failures = []
+solve = planar_fit.fit_planes  # the function under test; main may switch to the compiled one
 
 
 def check(name, ok, detail=""):
@@ -70,26 +80,55 @@ def family_bounds(family, dtype_name, k):
     return h.synthetic_bounds(family, BOXES, SEED + k, dtype_name)
 
 
-def test_same_as_candidate(device, dtype_name):
-    print(f"same bits as candidate A2 ({device}, {dtype_name})")
+def close_to_eager(grid, z):
+    """(ok, detail): the compiled function against fit_planes, box by box."""
+    got, ref = solve(grid, z).cpu(), planar_fit.fit_planes(grid, z).cpu()
+    fin_got, fin_ref = torch.isfinite(got).all(1), torch.isfinite(ref).all(1)
+    if not torch.equal(fin_got, fin_ref):
+        return False, f"({int((fin_got != fin_ref).sum())} boxes finite in only one of them)"
+    rcond = lc.default_rcond(grid.dtype, grid.shape[1])
+    r2, r3 = (r.cpu() for r in lc.singular_value_ratios(grid))
+    band = ((r2 > 0.9 * rcond) & (r2 < 1.1 * rcond)) | ((r3 > 0.9 * rcond) & (r3 < 1.1 * rcond))
+    scale = (1 + grid[..., 0].abs().amax(1) + grid[..., 1].abs().amax(1)).cpu()
+    eps = torch.finfo(grid.dtype).eps
+    rows = [i for i in range(grid.shape[0]) if fin_ref[i] and not band[i]]
+    if not rows:
+        return True, f"(no finite box outside the cutoff band, {int(band.sum())} in it)"
+    d = (got - ref).abs().max(1).values / ref.abs().max(1).values.clamp_min(torch.finfo(grid.dtype).tiny)
+    ratio = d / (eps * scale)
+    worst = float(ratio[rows].max())
+    over = int((ratio[rows] > COMPILED_ULPS).sum())
+    return over == 0, f"(worst {worst:.2f}, {over} of {len(rows)} over, {int(band.sum())} in the cutoff band)"
+
+
+def test_same_as_candidate(device, dtype_name, compiled):
+    print(f"{'close to fit_planes box by box' if compiled else 'same bits as candidate A2'} "
+          f"({device}, {dtype_name})")
     dtype = getattr(torch, dtype_name)
     families = h.FAMILIES[:10] + ["offset_narrow", "nonfinite"]
     for k, family in enumerate(families):
         b = [t.to(device=device, dtype=dtype) for t in family_bounds(family, dtype_name, k)]
         grid, z = h.grid_and_targets(*b)
-        check(family, same_bits(planar_fit.fit_planes(grid, z), lc.solve_A2(grid, z)),
-              f"({grid.shape[0]} boxes)")
+        if compiled:
+            check(family, *close_to_eager(grid, z))
+        else:
+            check(family, same_bits(planar_fit.fit_planes(grid, z), lc.solve_A2(grid, z)),
+                  f"({grid.shape[0]} boxes)")
 
 
-def test_same_on_real_boxes(device, dtype_name):
-    print(f"same bits on boxes from the batched forward pass of 3layer ({device}, {dtype_name})")
+def test_same_on_real_boxes(device, dtype_name, compiled):
+    print(f"boxes from the batched forward pass of 3layer ({device}, {dtype_name})")
     cfg = dict(networks=["3layer"], num_images=1, eps_indices=[0, 8, 15], n_splits=4, seed=7,
                per_network=2000, seed_family=SEED)
     bounds, _, _ = h.capture_real_boxes(cfg, torch.device("cpu"))
     dtype = getattr(torch, dtype_name)
     grid, z = h.grid_and_targets(*(t.to(device=device, dtype=dtype) for t in bounds))
-    check("real 3layer", same_bits(planar_fit.fit_planes(grid, z), lc.solve_A2(grid, z)),
-          f"({grid.shape[0]} boxes)")
+    if compiled:
+        check("real 3layer, close to fit_planes", *close_to_eager(grid, z))
+    else:
+        check("real 3layer, same bits as candidate A2",
+              same_bits(planar_fit.fit_planes(grid, z), lc.solve_A2(grid, z)),
+              f"({grid.shape[0]} boxes)")
 
 
 def per_box_accuracy(grid, z, coef):
@@ -116,13 +155,13 @@ def test_accurate_per_box(device, dtype_name):
     for k, family in enumerate(h.FAMILIES[:10] + ["offset_narrow"]):
         b = [t.to(device=device, dtype=dtype) for t in family_bounds(family, dtype_name, k)]
         grid, z = h.grid_and_targets(*b)
-        worst, over, n = per_box_accuracy(grid, z, planar_fit.fit_planes(grid, z))
+        worst, over, n = per_box_accuracy(grid, z, solve(grid, z))
         check(family, over == 0, f"(worst {worst:.2f}, {over} of {n} boxes over)")
 
 
 def test_contract(device, dtype_name):
     print(f"contract checks C1-C7 ({device}, {dtype_name})")
-    rows = ct.contract_checks("planar_fit", planar_fit.fit_planes,
+    rows = ct.contract_checks("planar_fit", solve,
                               lambda grid, z: lc.chosen_rank("A2", grid, z), True, dtype_name,
                               device=device)
     for r in rows:
@@ -137,7 +176,7 @@ def test_close_to_gelsd(device, dtype_name):
     for k, family in enumerate(ct.G0_FAMILIES):
         b = [t.to(device=device, dtype=dtype) for t in ct.g0_bounds(family, BOXES, SEED + 50 + k)]
         grid, z = h.grid_and_targets(*b)
-        d = rel_diff(planar_fit.fit_planes(grid, z), pt.lin_reg_tensor_batched(grid, z))
+        d = rel_diff(solve(grid, z), pt.lin_reg_tensor_batched(grid, z))
         check(family, d <= GELSD_RTOL[dtype_name], f"(max rel diff {d:.2e})")
 
 
@@ -147,7 +186,7 @@ def test_device(device, dtype_name):
     b = [t.to(dtype) for t in ct.g0_bounds("well_conditioned", BOXES, SEED + 99)]
     grid, z = h.grid_and_targets(*b)
     ref = planar_fit.fit_planes(grid, z)
-    got = planar_fit.fit_planes(grid.to(device), z.to(device))
+    got = solve(grid.to(device), z.to(device))
     check("device and dtype kept", got.device.type == device.type and got.dtype == dtype)
     d = rel_diff(got.cpu(), ref)
     check("close to the CPU result", d <= DEVICE_RTOL[dtype_name], f"(max rel diff {d:.2e})")
@@ -156,21 +195,32 @@ def test_device(device, dtype_name):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--device", default="cpu")
+    ap.add_argument("--compiled", action="store_true",
+                    help="test planar_fit.compiled_fit_planes() instead of fit_planes")
     args = ap.parse_args()
     device = torch.device(args.device)
     h.set_production_flags()
+    global solve
+    if args.compiled:
+        solve = planar_fit.compiled_fit_planes()
+    print("function under test:", "planar_fit.compiled_fit_planes()" if args.compiled
+          else "planar_fit.fit_planes")
 
     for dtype_name in ("float64", "float32"):
         if device.type == "mps" and dtype_name == "float64":
             print("SKIP float64 on mps: the device has no float64")
             continue
-        test_same_as_candidate(device, dtype_name)
-        test_same_on_real_boxes(device, dtype_name)
+        test_same_as_candidate(device, dtype_name, args.compiled)
+        test_same_on_real_boxes(device, dtype_name, args.compiled)
         test_accurate_per_box(device, dtype_name)
         test_contract(device, dtype_name)
         test_close_to_gelsd(device, dtype_name)
         if device.type != "cpu":
             test_device(device, dtype_name)
+    if args.compiled:
+        graphs = torch._dynamo.utils.counters["stats"].get("unique_graphs", 0)
+        check("compiled, not the eager fallback", not planar_fit.compile_fallback and graphs > 0,
+              f"({planar_fit.compile_fallback or f'{graphs} graph(s) compiled'})")
 
     print()
     if failures:

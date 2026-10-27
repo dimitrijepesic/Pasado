@@ -40,6 +40,9 @@ TESTS = [
     ("planar_fit", "experiments/test_planar_fit.py"),
     ("batched",   "experiments/test_batched_splits.py", ["--quick"]),
     ("batched_cf", "experiments/test_batched_splits.py", ["--quick", "--closed-form"]),
+    # the opt-in TorchInductor path (PASADO_COMPILED_FIT)
+    ("planar_cc", "experiments/test_planar_fit.py", ["--compiled"]),
+    ("batched_cc", "experiments/test_batched_splits.py", ["--quick", "--compiled"]),
 ]
 PLANAR_FIT = f"{SRC}/planar_fit.py"
 BATCHED = f"{SRC}/batched_splits.py"
@@ -129,8 +132,16 @@ MUTANTS = [
          new="    r2 = rcond\n"),
     dict(id="M19", func="batched_splits.precise_sigmoid", file=BATCHED,
          why="switch inverted: closed form used exactly when it is off",
-         old="    fit = planar_fit.fit_planes if USE_CLOSED_FORM_FIT else pt.lin_reg_tensor_batched\n",
-         new="    fit = planar_fit.fit_planes if not USE_CLOSED_FORM_FIT else pt.lin_reg_tensor_batched\n"),
+         old="    if USE_CLOSED_FORM_FIT:\n        fit = planar_fit.compiled_fit_planes()",
+         new="    if not USE_CLOSED_FORM_FIT:\n        fit = planar_fit.compiled_fit_planes()"),
+    dict(id="M20", func="batched_splits.precise_sigmoid", file=BATCHED,
+         why="the compiled switch is ignored: always the eager closed form",
+         old="        fit = planar_fit.compiled_fit_planes() if USE_COMPILED_FIT else planar_fit.fit_planes\n",
+         new="        fit = planar_fit.fit_planes\n"),
+    dict(id="M22", func="planar_fit.compiled_fit_planes", file=PLANAR_FIT,
+         why="the wrapper never calls the compiled function (silent eager path)",
+         old="                return compiled(grid, z, rcond)\n",
+         new="                return fit_planes(grid, z, rcond)\n"),
     dict(id="M21", func="planar_fit._fit_targets", file=PLANAR_FIT,
          why="x slope from the targets centred on their computed mean (the bug fixed by "
              "pivot-centring z): depends on the order of summation on narrow boxes",

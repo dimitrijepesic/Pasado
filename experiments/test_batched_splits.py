@@ -13,6 +13,7 @@ Run (CPU, float64):
   python experiments/test_batched_splits.py
   python experiments/test_batched_splits.py --device cuda
   python experiments/test_batched_splits.py --closed-form
+  python experiments/test_batched_splits.py --compiled
 """
 import argparse
 import copy
@@ -159,7 +160,10 @@ def main():
     ap.add_argument("--quick", action="store_true", help="3layer only, fewer cases")
     ap.add_argument("--closed-form", action="store_true",
                     help="batched pass with planar_fit instead of gelsd")
+    ap.add_argument("--compiled", action="store_true",
+                    help="as --closed-form, with planar_fit compiled by TorchInductor")
     args = ap.parse_args()
+    args.closed_form = args.closed_form or args.compiled
 
     device = torch.device(args.device)
     dtype = getattr(torch, args.dtype)
@@ -170,16 +174,32 @@ def main():
     pt.USE_BATCHED_GRID = True
     pt.USE_REAL_CUBIC = True
     bs.USE_CLOSED_FORM_FIT = args.closed_form
-    print(f"batched plane fit: {'planar_fit (closed form)' if args.closed_form else 'gelsd'}")
-    # count the closed-form calls, so a switch that does not switch is caught
+    bs.USE_COMPILED_FIT = args.compiled
+    print("batched plane fit:", "planar_fit compiled" if args.compiled
+          else "planar_fit (closed form)" if args.closed_form else "gelsd")
+    # count the calls of the selected closed form, so a switch that does not switch
+    # is caught; the compiled one is counted outside the compiled function
     closed_form_calls = [0]
-    fit_planes = planar_fit.fit_planes
+    if args.compiled:
+        make_compiled = planar_fit.compiled_fit_planes
 
-    def counted_fit_planes(grid, z, rcond=None):
-        closed_form_calls[0] += 1
-        return fit_planes(grid, z, rcond)
+        def counted_compiled(mode=None):
+            fn = make_compiled(mode)
 
-    planar_fit.fit_planes = counted_fit_planes
+            def run(grid, z, rcond=None):
+                closed_form_calls[0] += 1
+                return fn(grid, z, rcond)
+            return run
+
+        planar_fit.compiled_fit_planes = counted_compiled
+    else:
+        fit_planes = planar_fit.fit_planes
+
+        def counted_fit_planes(grid, z, rcond=None):
+            closed_form_calls[0] += 1
+            return fit_planes(grid, z, rcond)
+
+        planar_fit.fit_planes = counted_fit_planes
 
     if args.quick:
         test_matches_sequential(device, dtype, ["3layer"], [1, 4], [0, 8], 1)
@@ -193,6 +213,10 @@ def main():
     test_unseeded_is_sound(device, dtype)
     check("the selected plane fit was used", (closed_form_calls[0] > 0) == args.closed_form,
           f"({closed_form_calls[0]} closed-form calls)")
+    if args.compiled:
+        graphs = torch._dynamo.utils.counters["stats"].get("unique_graphs", 0)
+        check("compiled, not the eager fallback", not planar_fit.compile_fallback and graphs > 0,
+              f"({planar_fit.compile_fallback or f'{graphs} graph(s) compiled'})")
 
     print()
     if failures:
