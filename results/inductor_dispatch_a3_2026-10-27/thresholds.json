@@ -1,0 +1,16 @@
+{
+  "thresholds": {
+    "float64": {
+      "A2_eager": 800,
+      "A3": 200,
+      "A2_compile_reduce_overhead": 64
+    },
+    "float32": {
+      "A2_eager": 1024,
+      "A3": 256,
+      "A2_compile_reduce_overhead": 64
+    }
+  },
+  "best_compiled": "compile_reduce_overhead",
+  "rule": "t_G/t >= 1.2 at n and >= 1.0 above"
+}
