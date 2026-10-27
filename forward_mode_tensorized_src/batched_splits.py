@@ -24,11 +24,24 @@ Differences from the sequential code, all numerically irrelevant:
 
 Memory grows linearly with S (the sequential loop reuses the same buffers), so
 `chunk` caps how many splits are processed at once.
+
+The planes are fitted with gelsd on the CPU, as in the sequential code. With
+USE_CLOSED_FORM_FIT they are fitted on the device by planar_fit.fit_planes
+instead; the bounds then differ from the sequential code by about 1e-13 relative
+(results/lstsq_comparison_cuda_2026-10-27/README.md).
 """
+import os
+
 import numpy as np
 import torch
 
+import planar_fit
 import precise_transformer as pt
+
+# Closed-form plane fit (planar_fit.py) instead of gelsd on the CPU. Read when the
+# code runs, so a script can flip it; set PASADO_CLOSED_FORM_FIT=1 to change the
+# default. Off until validated: gelsd stays the reference.
+USE_CLOSED_FORM_FIT = os.environ.get("PASADO_CLOSED_FORM_FIT", "0") != "0"
 
 
 class BatchedDualZonotope:
@@ -125,7 +138,8 @@ def precise_sigmoid(z, seed):
     grid = pt.get_linspace_batched(lx_f, ux_f, ly_f, uy_f)  # [S*N, 25, 2]
     gx, gy = grid[..., 0], grid[..., 1]
     targets = (1.0 - torch.sigmoid(gx)) * (torch.sigmoid(gx) * gy)
-    coef = pt.lin_reg_tensor_batched(grid, targets)  # [S*N, 3], intercept first
+    fit = planar_fit.fit_planes if USE_CLOSED_FORM_FIT else pt.lin_reg_tensor_batched
+    coef = fit(grid, targets)  # [S*N, 3], intercept first
     As = coef[:, 1] + _perturbation(S, N, seed, dtype, device).reshape(-1)
     Bs = coef[:, 2]
     Cs = coef[:, 0]

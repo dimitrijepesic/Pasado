@@ -80,8 +80,14 @@ def _centred(v):
 
 def _pow2_scale(v):
     """2^e per row, where max |v| = f 2^e with 0.5 <= f < 1 (1 for a zero row)."""
-    _, e = torch.frexp(v.abs().amax(dim=1))
-    return torch.ldexp(torch.ones_like(v[:, 0]), e)
+    m = v.abs().amax(dim=1)
+    if m.device.type == "mps":
+        # frexp is not implemented on MPS: take the n exponents on the CPU. One host
+        # sync per call, and a fit scales x, y and z, so up to three per fit.
+        _, e = torch.frexp(m.cpu())
+        return torch.ldexp(torch.ones_like(e, dtype=m.dtype), e).to(m.device)
+    _, e = torch.frexp(m)
+    return torch.ldexp(torch.ones_like(m), e)
 
 
 def _stats(grid):
