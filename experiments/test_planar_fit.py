@@ -4,7 +4,10 @@
    comparison chose, on every box family of that comparison (other seeds), on the
    self-test family offset_narrow, on non-finite boxes (NaN in the same places) and
    on boxes recorded from the batched forward pass of 3layer.
-2. The contract checks C1-C7 of lstsq_contract.py.
+2. Accurate box by box: on every box whose rank the fit keeps exact, the distance to
+   the exact minimum-norm solution is at most 32 * eps * (1 + max|x| + max|y|), a few
+   ulps of the size of the data (see experiments/reproduce_target_centring.py).
+2b. The contract checks C1-C7 of lstsq_contract.py.
 3. Close to gelsd (lin_reg_tensor_batched) on well-conditioned boxes.
 4. With the inputs on another device: result on that device, in the input dtype, and
    close to the CPU result.
@@ -14,6 +17,7 @@ Run:
   python experiments/test_planar_fit.py --device cuda
 """
 import argparse
+import math
 import os
 import sys
 
@@ -30,12 +34,14 @@ import precise_transformer as pt  # noqa: E402
 import compare_lstsq_solvers as h  # noqa: E402
 import lstsq_candidates as lc  # noqa: E402
 import lstsq_contract as ct  # noqa: E402
+import lstsq_oracle as orc  # noqa: E402
 
 SEED = 4242  # not a seed of the comparison
 BOXES = 500
 # gelsd is accurate to about cond(X) * eps here (widths >= 0.5, centres within 4)
 GELSD_RTOL = {"float64": 1e-10, "float32": 1e-3}
 DEVICE_RTOL = {"float64": 1e-12, "float32": 1e-5}
+ACCURACY_ULPS = 32
 
 failures = []
 
@@ -86,6 +92,34 @@ def test_same_on_real_boxes(device, dtype_name):
           f"({grid.shape[0]} boxes)")
 
 
+def per_box_accuracy(grid, z, coef):
+    """(worst error / (eps (1 + max|x| + max|y|)), boxes over ACCURACY_ULPS, boxes checked)
+    over the boxes whose rank the fit keeps exact."""
+    keep = (lc.chosen_rank("A2", grid, z) == lc.exact_rank(grid).cpu()).tolist()
+    keep = [k and bool(torch.isfinite(grid[i]).all()) for i, k in enumerate(keep)]
+    if not any(keep):
+        return 0.0, 0, 0
+    s = math.isqrt(grid.shape[1])
+    xs, ys, zl = grid[:, ::s, 0].tolist(), grid[:, :s, 1].tolist(), z.tolist()
+    scale = (1 + grid[..., 0].abs().amax(1) + grid[..., 1].abs().amax(1)).tolist()
+    eps = torch.finfo(grid.dtype).eps
+    coef = coef.cpu()
+    ratios = [orc.relative_error(coef[i].tolist(), orc.exact_min_norm(xs[i], ys[i], zl[i]))
+              / (eps * scale[i]) for i in range(grid.shape[0]) if keep[i]]
+    return max(ratios), sum(r > ACCURACY_ULPS for r in ratios), len(ratios)
+
+
+def test_accurate_per_box(device, dtype_name):
+    print(f"accurate box by box, at most {ACCURACY_ULPS} eps (1 + max|x| + max|y|) "
+          f"({device}, {dtype_name})")
+    dtype = getattr(torch, dtype_name)
+    for k, family in enumerate(h.FAMILIES[:10] + ["offset_narrow"]):
+        b = [t.to(device=device, dtype=dtype) for t in family_bounds(family, dtype_name, k)]
+        grid, z = h.grid_and_targets(*b)
+        worst, over, n = per_box_accuracy(grid, z, planar_fit.fit_planes(grid, z))
+        check(family, over == 0, f"(worst {worst:.2f}, {over} of {n} boxes over)")
+
+
 def test_contract(device, dtype_name):
     print(f"contract checks C1-C7 ({device}, {dtype_name})")
     rows = ct.contract_checks("planar_fit", planar_fit.fit_planes,
@@ -132,6 +166,7 @@ def main():
             continue
         test_same_as_candidate(device, dtype_name)
         test_same_on_real_boxes(device, dtype_name)
+        test_accurate_per_box(device, dtype_name)
         test_contract(device, dtype_name)
         test_close_to_gelsd(device, dtype_name)
         if device.type != "cpu":

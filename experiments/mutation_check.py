@@ -113,8 +113,8 @@ MUTANTS = [
              "roots_paired_stacked[i])\n"),
     dict(id="M15", func="planar_fit._fit_targets", file=PLANAR_FIT,
          why="slope A with the wrong sign",
-         old="                     (st.dxn * zx).sum(1) / _safe(st.nxx, xdeg) * az / _safe(st.ax, xdeg))\n",
-         new="                     -(st.dxn * zx).sum(1) / _safe(st.nxx, xdeg) * az / _safe(st.ax, xdeg))\n"),
+         old="    a0 = torch.where(xdeg, zero, (st.dxn * (px / sx[:, None])).sum(1)\n",
+         new="    a0 = torch.where(xdeg, zero, -(st.dxn * (px / sx[:, None])).sum(1)\n"),
     dict(id="M16", func="planar_fit._min_norm", file=PLANAR_FIT,
          why="the intercept is not split on a degenerate axis (C = k)",
          old="    C = km * inv / denom\n",
@@ -131,6 +131,12 @@ MUTANTS = [
          why="switch inverted: closed form used exactly when it is off",
          old="    fit = planar_fit.fit_planes if USE_CLOSED_FORM_FIT else pt.lin_reg_tensor_batched\n",
          new="    fit = planar_fit.fit_planes if not USE_CLOSED_FORM_FIT else pt.lin_reg_tensor_batched\n"),
+    dict(id="M21", func="planar_fit._fit_targets", file=PLANAR_FIT,
+         why="x slope from the targets centred on their computed mean (the bug fixed by "
+             "pivot-centring z): depends on the order of summation on narrow boxes",
+         old="    px = (z3 - z3[:, :1, :]).mean(2)  # [n, s], one value per x\n"
+             "    px = px - px.mean(1, keepdim=True)\n",
+         new="    px = (z3 - zbar[:, None, None]).mean(2)  # [n, s], one value per x\n"),
 ]
 
 

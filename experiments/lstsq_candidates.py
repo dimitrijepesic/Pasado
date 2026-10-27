@@ -138,21 +138,30 @@ def _min_norm(k, a0, b0, xbar, ybar, xdeg, ydeg):
 
 
 def _fit_targets(st, z, xdeg, ydeg):
-    """Closed form on the s*s targets."""
+    """Closed form on the s*s targets.
+
+    The slopes use z pivot-centred along each axis, z_ij - z_0j and z_ij - z_i0, then
+    centred on the mean of those differences. Along a narrow axis the differences are
+    exact (Sterbenz) and small, so their sums do not depend on the order of summation.
+    Centring z on its computed mean instead leaves a small variation next to a large
+    offset, and the slopes then depend on the reduction order: up to 1e-4 relative on
+    narrow boxes (experiments/reproduce_target_centring.py).
+    """
     n, s = z.shape[0], st.s
     z3 = z.reshape(n, s, s)  # [n, x index, y index]
     zbar = z.mean(1)
-    dz = z3 - zbar[:, None, None]
-    az = _pow2_scale(dz.reshape(n, s * s))
-    zx = dz.mean(2) / az[:, None]
-    zy = dz.mean(1) / az[:, None]
+    px = (z3 - z3[:, :1, :]).mean(2)  # [n, s], one value per x
+    px = px - px.mean(1, keepdim=True)
+    py = (z3 - z3[:, :, :1]).mean(1)  # [n, s], one value per y
+    py = py - py.mean(1, keepdim=True)
+    sx, sy = _pow2_scale(px), _pow2_scale(py)
     zero = torch.zeros_like(zbar)
     # Elementwise products and sums, not matmul: no TF32 on CUDA in float32. The
-    # scaled slope is multiplied by az and divided by ax in two exact steps.
-    a0 = torch.where(xdeg, zero,
-                     (st.dxn * zx).sum(1) / _safe(st.nxx, xdeg) * az / _safe(st.ax, xdeg))
-    b0 = torch.where(ydeg, zero,
-                     (st.dyn * zy).sum(1) / _safe(st.nyy, ydeg) * az / _safe(st.ay, ydeg))
+    # scaled slope is multiplied by sx and divided by ax in two exact steps.
+    a0 = torch.where(xdeg, zero, (st.dxn * (px / sx[:, None])).sum(1)
+                     / _safe(st.nxx, xdeg) * sx / _safe(st.ax, xdeg))
+    b0 = torch.where(ydeg, zero, (st.dyn * (py / sy[:, None])).sum(1)
+                     / _safe(st.nyy, ydeg) * sy / _safe(st.ay, ydeg))
     k = zbar - a0 * st.xbar - b0 * st.ybar
     return _min_norm(k, a0, b0, st.xbar, st.ybar, xdeg, ydeg)
 
