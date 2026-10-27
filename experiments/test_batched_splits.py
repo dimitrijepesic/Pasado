@@ -5,9 +5,14 @@ HyperDualIntervalToDualZonotope -> PreciseSigmoidDualZonotope), run once per spl
 with np.random reseeded each time. The batched pass must reproduce every per-split
 bound, not just their maximum.
 
+With --closed-form the batched pass fits the planes with planar_fit.py
+(batched_splits.USE_CLOSED_FORM_FIT) while the sequential reference keeps gelsd, so
+the same checks compare the closed form against the original code.
+
 Run (CPU, float64):
   python experiments/test_batched_splits.py
   python experiments/test_batched_splits.py --device cuda
+  python experiments/test_batched_splits.py --closed-form
 """
 import argparse
 import copy
@@ -25,6 +30,7 @@ sys.path.insert(0, HERE)
 
 import precise_transformer as pt
 import batched_splits as bs
+import planar_fit
 from Duals import DualIntervalTensor
 from SimpleZono import HyperDualIntervalToDualZonotope
 from measure_split_sweep import build_forward_precise, load_network_and_images
@@ -151,6 +157,8 @@ def main():
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--dtype", choices=["float32", "float64"], default="float64")
     ap.add_argument("--quick", action="store_true", help="3layer only, fewer cases")
+    ap.add_argument("--closed-form", action="store_true",
+                    help="batched pass with planar_fit instead of gelsd")
     args = ap.parse_args()
 
     device = torch.device(args.device)
@@ -161,6 +169,17 @@ def main():
     pt.USE_BATCHED_LSTSQ = True
     pt.USE_BATCHED_GRID = True
     pt.USE_REAL_CUBIC = True
+    bs.USE_CLOSED_FORM_FIT = args.closed_form
+    print(f"batched plane fit: {'planar_fit (closed form)' if args.closed_form else 'gelsd'}")
+    # count the closed-form calls, so a switch that does not switch is caught
+    closed_form_calls = [0]
+    fit_planes = planar_fit.fit_planes
+
+    def counted_fit_planes(grid, z, rcond=None):
+        closed_form_calls[0] += 1
+        return fit_planes(grid, z, rcond)
+
+    planar_fit.fit_planes = counted_fit_planes
 
     if args.quick:
         test_matches_sequential(device, dtype, ["3layer"], [1, 4], [0, 8], 1)
@@ -172,6 +191,8 @@ def main():
     test_split_one_is_plain_bound(device, dtype)
     test_splits_are_independent(device, dtype)
     test_unseeded_is_sound(device, dtype)
+    check("the selected plane fit was used", (closed_form_calls[0] > 0) == args.closed_form,
+          f"({closed_form_calls[0]} closed-form calls)")
 
     print()
     if failures:

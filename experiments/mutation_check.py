@@ -34,7 +34,15 @@ TESTS = [
     # Brute-force and autograd lower bounds; the other tests compare code paths
     # that share SimpleZono, so they cannot see a bug common to both.
     ("soundness", "experiments/test_soundness.py"),
+    # The closed-form plane fit of the batched path: bit-identical to the candidate
+    # chosen by experiments/compare_lstsq_solvers.py, and the batched pass with and
+    # without it against the sequential code.
+    ("planar_fit", "experiments/test_planar_fit.py"),
+    ("batched",   "experiments/test_batched_splits.py", ["--quick"]),
+    ("batched_cf", "experiments/test_batched_splits.py", ["--quick", "--closed-form"]),
 ]
+PLANAR_FIT = f"{SRC}/planar_fit.py"
+BATCHED = f"{SRC}/batched_splits.py"
 
 # Each mutant: id, the function it breaks, why it is a realistic mistake, and an
 # exact (old, new) text replacement inside `file` (default: precise_transformer.py).
@@ -103,6 +111,26 @@ MUTANTS = [
              "roots_paired_stacked[i]).abs()\n",
          new="        evaluation = objective_fn(ABCs[i][0], ABCs[i][1], ABCs[i][2], "
              "roots_paired_stacked[i])\n"),
+    dict(id="M15", func="planar_fit._fit_targets", file=PLANAR_FIT,
+         why="slope A with the wrong sign",
+         old="                     (st.dxn * zx).sum(1) / _safe(st.nxx, xdeg) * az / _safe(st.ax, xdeg))\n",
+         new="                     -(st.dxn * zx).sum(1) / _safe(st.nxx, xdeg) * az / _safe(st.ax, xdeg))\n"),
+    dict(id="M16", func="planar_fit._min_norm", file=PLANAR_FIT,
+         why="the intercept is not split on a degenerate axis (C = k)",
+         old="    C = km * inv / denom\n",
+         new="    C = k\n"),
+    dict(id="M17", func="planar_fit._centred", file=PLANAR_FIT,
+         why="centre on the computed mean instead of a data point",
+         old="    r = v - v[:, :1]\n    rm = r.mean(dim=1, keepdim=True)\n    return r - rm, v[:, 0] + rm[:, 0]\n",
+         new="    m = v.mean(dim=1, keepdim=True)\n    return v - m, m[:, 0]\n"),
+    dict(id="M18", func="planar_fit.gelsd_cutoff_axes", file=PLANAR_FIT,
+         why="cutoff compared with eigenvalues without squaring rcond",
+         old="    r2 = rcond * rcond\n",
+         new="    r2 = rcond\n"),
+    dict(id="M19", func="batched_splits.precise_sigmoid", file=BATCHED,
+         why="switch inverted: closed form used exactly when it is off",
+         old="    fit = planar_fit.fit_planes if USE_CLOSED_FORM_FIT else pt.lin_reg_tensor_batched\n",
+         new="    fit = planar_fit.fit_planes if not USE_CLOSED_FORM_FIT else pt.lin_reg_tensor_batched\n"),
 ]
 
 
@@ -135,11 +163,11 @@ def make_workdir():
         raise
 
 
-def run_one_test(root, rel_path):
+def run_one_test(root, rel_path, args=()):
     """Run one test script in the temporary root; returns (exit code, last output line)."""
     path = os.path.join(root, rel_path)
     try:
-        p = subprocess.run([sys.executable, path], cwd=os.path.dirname(path),
+        p = subprocess.run([sys.executable, path, *args], cwd=os.path.dirname(path),
                            env=clean_env(), capture_output=True, text=True,
                            timeout=900)
     except subprocess.TimeoutExpired:
@@ -155,7 +183,7 @@ def run_one_test(root, rel_path):
 def run_all_tests(root):
     """Run all tests in parallel; returns {name: (exit code, last line)}."""
     with cf.ThreadPoolExecutor(max_workers=3) as ex:
-        futs = {name: ex.submit(run_one_test, root, rel) for name, rel in TESTS}
+        futs = {name: ex.submit(run_one_test, root, rel, *extra) for name, rel, *extra in TESTS}
         return {name: f.result() for name, f in futs.items()}
 
 
@@ -220,7 +248,7 @@ def main():
                 verdict = "KILLED  " if code != 0 else "survived"
                 print(f"  {name:10s} {verdict} exit={code}  {tail}")
 
-        names = [n for n, _ in TESTS]
+        names = [n for n, *_ in TESTS]
         print("\n=== summary (K = killed, . = survived, K* = survived with bitwise loss) ===")
         print(f"{'':5s}" + "".join(f"{n:>11s}" for n in names) + "   caught by any test?")
         all_caught = True
