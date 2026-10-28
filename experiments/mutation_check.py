@@ -166,6 +166,19 @@ MUTANTS = [
          why="the automatic choice uses the compiled closed form",
          old="            return planar_fit.fit_planes\n        return pt.lin_reg_tensor_batched\n",
          new="            return planar_fit.compiled_fit_planes()\n        return pt.lin_reg_tensor_batched\n"),
+    dict(id="M27", func="batched_splits._forward_chunk", file=BATCHED,
+         why="the nonzero-A flags are computed but never checked",
+         old="    assert bool(torch.stack(nonzero).all())\n",
+         new="    torch.stack(nonzero).all()\n"),
+    dict(id="M28", func="batched_splits._forward_chunk", file=BATCHED,
+         why="the generator is reseeded before every layer: a different noise stream",
+         old="        noise = _perturbation(lows.shape[0],",
+         new="        np.random.seed(seed) if seed is not None else None\n"
+             "        noise = _perturbation(lows.shape[0],"),
+    dict(id="M29", func="batched_splits.precise_sigmoid", file=BATCHED,
+         why="the nonzero test lets A == 0 through",
+         old="    a_nonzero = ((As > 0) | (As < 0)).all()\n",
+         new="    a_nonzero = ((As >= 0) | (As < 0)).all()\n"),
 ]
 
 

@@ -153,6 +153,67 @@ def test_splits_are_independent(device, dtype, network="3layer"):
     check("16 splits vs 4 chunks of 4", rel_diff(parts, all16) <= RTOL)
 
 
+def _numpy_state():
+    """The whole state of np.random: name, key array, position, and the cached Gaussian."""
+    state = np.random.get_state()
+    return state[0], state[1].copy(), state[2], state[3], state[4]
+
+
+def _same_state(a, b):
+    return a[0] == b[0] and np.array_equal(a[1], b[1]) and a[2:] == b[2:]
+
+
+def test_noise_protocol(device, dtype, network="3layer"):
+    """The noise on A is drawn outside precise_sigmoid, one draw per sigmoid layer, in
+    the order of the sequential code: the NumPy generator ends in exactly the state of
+    those draws, and the same seed gives the same bits."""
+    print("noise on A: NumPy draws and seeds")
+    net, images = load_network_and_images(network, device, dtype, 1)
+    layers = bs.extract_affine_layers(net, network)
+    widths = [w.shape[1] for w, _ in layers[:-1]]
+    img = images[0][1]
+    eps = EPS_SCHEDULE[3]
+    S = 4
+
+    np.random.seed(3)
+    for n in widths:
+        np.random.normal(0, .0001, size=n)
+    want = _numpy_state()
+    for chunk in (None, 2):
+        np.random.seed(12345)  # the pass reseeds, so this must not matter
+        first = bs.split_bounds(layers, img, eps, S, seed=3, chunk=chunk)
+        check(f"seeded, chunk={chunk}: generator state after the pass", _same_state(_numpy_state(), want))
+        second = bs.split_bounds(layers, img, eps, S, seed=3, chunk=chunk)
+        check(f"seeded, chunk={chunk}: same seed, same bits", torch.equal(first, second))
+
+    np.random.seed(11)
+    for n in widths:
+        np.random.normal(0, .0001, size=(S, n))
+    want = _numpy_state()
+    np.random.seed(11)
+    bs.split_bounds(layers, img, eps, S, seed=None)
+    check("unseeded: generator state after the pass", _same_state(_numpy_state(), want))
+
+
+def test_nonzero_a_is_checked(device, dtype, network="3layer"):
+    """A perturbed A equal to 0 must stop the pass, as the assert in the sequential code."""
+    print("a perturbed A of 0 stops the pass")
+    net, images = load_network_and_images(network, device, dtype, 1)
+    layers = bs.extract_affine_layers(net, network)
+    saved = bs.plane_fit_for, bs._perturbation
+    bs.plane_fit_for = lambda grid: (lambda g, z: torch.zeros(g.shape[0], 3, dtype=g.dtype,
+                                                              device=g.device))
+    bs._perturbation = lambda S, N, seed, dtype_, device_: torch.zeros(S, N, dtype=dtype_,
+                                                                       device=device_)
+    try:
+        bs.split_bounds(layers, images[0][1], EPS_SCHEDULE[3], 2, seed=1)
+        check("AssertionError", False, "(the pass went through)")
+    except AssertionError:
+        check("AssertionError", True)
+    finally:
+        bs.plane_fit_for, bs._perturbation = saved
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--device", default="cpu")
@@ -211,6 +272,8 @@ def main():
     test_split_one_is_plain_bound(device, dtype)
     test_splits_are_independent(device, dtype)
     test_unseeded_is_sound(device, dtype)
+    test_noise_protocol(device, dtype)
+    test_nonzero_a_is_checked(device, dtype)
     check("the selected plane fit was used", (closed_form_calls[0] > 0) == args.closed_form,
           f"({closed_form_calls[0]} closed-form calls)")
     if args.compiled:
