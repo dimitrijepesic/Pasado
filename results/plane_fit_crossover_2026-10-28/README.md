@@ -40,3 +40,6 @@ session in which eager A2 took 5.3 ms per call; with 3.85 ms the crossover is lo
 The number of boxes per call is the number of splits in a pass times the layer width, so
 the small networks (width 100) stay below the float64 threshold up to 4 splits per pass and
 `big` (width 1024) is above it from 1 split.
+
+The automatic choice built on these thresholds (`PASADO_AUTO_PLANE_FIT=1`, opt-in) passed
+its tests on an A100: `../auto_plane_fit_cuda_2026-10-28/`.

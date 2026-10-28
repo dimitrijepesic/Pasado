@@ -1,0 +1,45 @@
+thresholds are the measured ones
+  [PASS] batched_splits.AUTO_PLANE_FIT_THRESHOLD ({torch.float64: 512, torch.float32: 640})
+  [PASS] constants match the archived measurement ({torch.float64: 512, torch.float32: 640})
+choice by size (cuda)
+  [PASS] float64 n=511 (threshold 512: gelsd)
+  [PASS] float64 n=512 (threshold 512: closed_form)
+  [PASS] float64 n=513 (threshold 512: closed_form)
+  [PASS] float32 n=639 (threshold 640: gelsd)
+  [PASS] float32 n=640 (threshold 640: closed_form)
+  [PASS] float32 n=641 (threshold 640: closed_form)
+threshold override (cuda)
+  [PASS] float64 n=99 below the override 
+  [PASS] float64 n=100 at the override 
+  [PASS] float32 n=99 below the override 
+  [PASS] float32 n=100 at the override 
+invalid combinations
+  [PASS] auto with {'closed_form': True} (ValueError)
+  [PASS] auto with {'compiled': True} (ValueError)
+  [PASS] auto with {'closed_form': True, 'compiled': True} (ValueError)
+batched passes against the explicit paths and the sequential loop (cuda)
+  0%|          | 0.00/9.91M [00:00<?, ?B/s]  1%|          | 98.3k/9.91M [00:00<00:16, 586kB/s]  4%|▍         | 393k/9.91M [00:00<00:07, 1.28MB/s] 16%|█▌        | 1.61M/9.91M [00:00<00:02, 4.00MB/s] 49%|████▉     | 4.88M/9.91M [00:00<00:00, 10.0MB/s] 94%|█████████▎| 9.27M/9.91M [00:00<00:00, 15.9MB/s]100%|██████████| 9.91M/9.91M [00:00<00:00, 11.8MB/s]
+  0%|          | 0.00/28.9k [00:00<?, ?B/s]100%|██████████| 28.9k/28.9k [00:00<00:00, 344kB/s]
+  0%|          | 0.00/1.65M [00:00<?, ?B/s]  4%|▍         | 65.5k/1.65M [00:00<00:04, 388kB/s] 16%|█▌        | 262k/1.65M [00:00<00:01, 843kB/s]  72%|███████▏  | 1.18M/1.65M [00:00<00:00, 2.93MB/s]100%|██████████| 1.65M/1.65M [00:00<00:00, 3.24MB/s]
+  0%|          | 0.00/4.54k [00:00<?, ?B/s]100%|██████████| 4.54k/4.54k [00:00<00:00, 15.3MB/s]
+  [PASS] 3layer n_splits=4 chunk=None (400 boxes per call): gelsd only ({'gelsd': 2, 'closed_form': 0})
+  [PASS] 3layer n_splits=4 chunk=None (400 boxes per call): same bits as the explicit gelsd path 
+  [PASS] 3layer n_splits=4 chunk=None (400 boxes per call): per-split bounds against the sequential loop (1.25e-15)
+  [PASS] 3layer n_splits=8 chunk=None (800 boxes per call): closed_form only ({'gelsd': 0, 'closed_form': 2})
+  [PASS] 3layer n_splits=8 chunk=None (800 boxes per call): same bits as the explicit closed_form path 
+  [PASS] 3layer n_splits=8 chunk=None (800 boxes per call): per-split bounds against the sequential loop (2.00e-15)
+  [PASS] 3layer n_splits=8 chunk=4 (400 boxes per call): gelsd only ({'gelsd': 4, 'closed_form': 0})
+  [PASS] 3layer n_splits=8 chunk=4 (400 boxes per call): same bits as the explicit gelsd path 
+  [PASS] 3layer n_splits=8 chunk=4 (400 boxes per call): per-split bounds against the sequential loop (2.12e-15)
+  [PASS] 3layer n_splits=8 chunk=8 (800 boxes per call): closed_form only ({'gelsd': 0, 'closed_form': 2})
+  [PASS] 3layer n_splits=8 chunk=8 (800 boxes per call): same bits as the explicit closed_form path 
+  [PASS] 3layer n_splits=8 chunk=8 (800 boxes per call): per-split bounds against the sequential loop (2.00e-15)
+  [PASS] big n_splits=1 chunk=None (1024 boxes per call): closed_form only ({'gelsd': 0, 'closed_form': 4})
+  [PASS] big n_splits=1 chunk=None (1024 boxes per call): same bits as the explicit closed_form path 
+  [PASS] big n_splits=1 chunk=None (1024 boxes per call): per-split bounds against the sequential loop (3.70e-16)
+default devices ('cuda',): the CPU keeps gelsd
+  [PASS] cpu float64 n=2048 
+  [PASS] cpu float32 n=2560 
+  [PASS] no TorchInductor graph compiled in automatic mode (0)
+
+ALL CHECKS PASSED
