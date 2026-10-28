@@ -1,0 +1,345 @@
+  0%|          | 0.00/9.91M [00:00<?, ?B/s]  1%|          | 98.3k/9.91M [00:00<00:16, 589kB/s]  4%|▍         | 393k/9.91M [00:00<00:07, 1.28MB/s] 16%|█▌        | 1.61M/9.91M [00:00<00:02, 4.00MB/s] 66%|██████▌   | 6.55M/9.91M [00:00<00:00, 14.1MB/s]100%|██████████| 9.91M/9.91M [00:00<00:00, 14.5MB/s]
+  0%|          | 0.00/28.9k [00:00<?, ?B/s]100%|██████████| 28.9k/28.9k [00:00<00:00, 344kB/s]
+  0%|          | 0.00/1.65M [00:00<?, ?B/s]  6%|▌         | 98.3k/1.65M [00:00<00:02, 587kB/s] 24%|██▍       | 393k/1.65M [00:00<00:00, 1.27MB/s] 97%|█████████▋| 1.61M/1.65M [00:00<00:00, 4.00MB/s]100%|██████████| 1.65M/1.65M [00:00<00:00, 3.27MB/s]
+  0%|          | 0.00/4.54k [00:00<?, ?B/s]100%|██████████| 4.54k/4.54k [00:00<00:00, 21.3MB/s]
+### CONFIG network=3layer S=1
+I1028 20:05:12.016000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:05:28.735000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:05:28.815000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:05:29.727000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:05:29.727000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:05:29.727000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:05:29.730000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:05:29.735000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:05:29.759000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:05:30.354000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:05:30.356000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:05:33.917000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 200 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 200"
+I1028 20:05:35.479000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 200*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="200*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:05:35.483000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 100*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1879 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="100*s36 <= 2147483647"
+I1028 20:05:37.192000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 100*s36 <= 2147463647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="100*s36 <= 2147463647"
+I1028 20:05:42.945000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:05:43.026000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+/usr/local/lib/python3.13/dist-packages/torch/profiler/profiler.py:224: UserWarning: Warning: Profiler clears events at the end of each cycle.Only events from the current cycle will be reported.To keep events across cycles, set acc_events=True.
+  _warn_once(
+### CONFIG network=3layer S=8
+I1028 20:05:44.443000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:05:57.042000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:05:57.129000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:05:58.000000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:05:58.000000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:05:58.000000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:05:58.002000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:05:58.007000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:05:58.027000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:05:58.608000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:05:58.609000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:06:01.889000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 200 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 200"
+I1028 20:06:03.847000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 1600*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="1600*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:06:03.851000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 800*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1879 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="800*s36 <= 2147483647"
+I1028 20:06:05.587000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 800*s36 <= 2147323647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="800*s36 <= 2147323647"
+I1028 20:06:10.793000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:06:10.878000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=3layer S=32
+I1028 20:06:13.161000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:06:25.918000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:06:26.002000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:06:26.871000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:06:26.871000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:06:26.871000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:06:26.873000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:06:26.878000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:06:26.898000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:06:27.476000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:06:27.478000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:06:30.791000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 200 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 200"
+I1028 20:06:32.286000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:06:32.291000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 3200*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1879 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="3200*s36 <= 2147483647"
+I1028 20:06:34.469000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 3200*s36 <= 2146843647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="3200*s36 <= 2146843647"
+I1028 20:06:39.486000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:06:39.572000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=3layer S=64
+I1028 20:06:44.209000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:06:56.568000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:06:56.653000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:06:57.518000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:06:57.518000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:06:57.518000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:06:57.520000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:06:57.524000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:06:57.544000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:06:58.119000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:06:58.121000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:07:01.870000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 200 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 200"
+I1028 20:07:03.359000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 12800*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="12800*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:07:03.363000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1879 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*s36 <= 2147483647"
+I1028 20:07:05.123000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*s36 <= 2146203647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*s36 <= 2146203647"
+I1028 20:07:10.613000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:07:10.699000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=3layer S=1 unseeded
+I1028 20:07:16.806000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:07:18.781000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:07:18.818000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:07:18.818000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:07:18.818000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:07:18.819000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:07:18.823000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:07:18.841000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:07:19.403000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:07:19.405000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:07:21.420000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 200*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="200*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:07:21.427000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 100*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="100*s36 <= 2147483647"
+I1028 20:07:21.432000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 100*s36 <= 2147463647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="100*s36 <= 2147463647"
+I1028 20:07:21.437000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:07:21.678000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=3layer S=16 unseeded
+I1028 20:07:21.758000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:07:33.986000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:07:34.073000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:07:34.947000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:07:34.947000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:07:34.947000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:07:34.949000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:07:34.954000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:07:34.973000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:07:35.543000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:07:35.545000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:07:39.361000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 200 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 200"
+I1028 20:07:40.835000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 3200*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="3200*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:07:40.839000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 1600*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1879 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="1600*s36 <= 2147483647"
+I1028 20:07:42.557000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 1600*s36 <= 2147163647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="1600*s36 <= 2147163647"
+I1028 20:07:47.860000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:07:47.949000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=4layer S=1
+I1028 20:07:49.378000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:07:51.353000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:07:51.391000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:07:51.391000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:07:51.391000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:07:51.392000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:07:51.397000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:07:51.414000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:07:51.979000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:07:51.981000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:07:53.974000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 200*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="200*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:07:53.978000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 100*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="100*s36 <= 2147483647"
+I1028 20:07:53.982000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 100*s36 <= 2147463647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="100*s36 <= 2147463647"
+I1028 20:07:53.986000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:07:54.068000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=4layer S=8
+I1028 20:07:54.904000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:07:56.902000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:07:56.936000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:07:56.936000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:07:56.936000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:07:56.938000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:07:56.941000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:07:56.957000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:07:57.525000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:07:57.526000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:07:59.078000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 1600*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="1600*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:07:59.085000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 800*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="800*s36 <= 2147483647"
+I1028 20:07:59.091000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 800*s36 <= 2147323647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="800*s36 <= 2147323647"
+I1028 20:07:59.093000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:07:59.175000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=4layer S=32
+I1028 20:08:01.358000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:08:03.341000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:08:03.375000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:08:03.375000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:08:03.375000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:08:03.376000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:08:03.379000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:03.395000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:03.962000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:08:03.963000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:08:05.510000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:08:05.516000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 3200*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="3200*s36 <= 2147483647"
+I1028 20:08:05.521000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 3200*s36 <= 2146843647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="3200*s36 <= 2146843647"
+I1028 20:08:05.524000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:08:05.605000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=4layer S=64
+I1028 20:08:11.721000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:08:13.710000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:08:13.744000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:08:13.744000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:08:13.744000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:08:13.745000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:08:13.748000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:13.765000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:14.338000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:08:14.339000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:08:15.902000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 12800*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="12800*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:08:15.908000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*s36 <= 2147483647"
+I1028 20:08:15.913000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*s36 <= 2146203647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*s36 <= 2146203647"
+I1028 20:08:15.916000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:08:15.996000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=5layer S=1
+I1028 20:08:24.342000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:08:26.297000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:08:26.334000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:08:26.334000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:08:26.334000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:08:26.335000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:08:26.338000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:26.354000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:26.914000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:08:26.915000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:08:28.408000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 200*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="200*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:08:28.410000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 100*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="100*s36 <= 2147483647"
+I1028 20:08:28.411000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 100*s36 <= 2147463647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="100*s36 <= 2147463647"
+I1028 20:08:28.412000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:08:28.492000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=5layer S=8
+I1028 20:08:29.563000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:08:32.034000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:08:32.069000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:08:32.069000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:08:32.069000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:08:32.070000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:08:32.073000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:32.089000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:32.655000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:08:32.656000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:08:34.202000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 1600*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="1600*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:08:34.203000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 800*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="800*s36 <= 2147483647"
+I1028 20:08:34.204000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 800*s36 <= 2147323647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="800*s36 <= 2147323647"
+I1028 20:08:34.205000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:08:34.285000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=5layer S=32
+I1028 20:08:37.126000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:08:39.109000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:08:39.143000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:08:39.143000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:08:39.143000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:08:39.144000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:08:39.147000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:39.163000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:39.729000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:08:39.730000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:08:41.269000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:08:41.271000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 3200*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="3200*s36 <= 2147483647"
+I1028 20:08:41.272000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 3200*s36 <= 2146843647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="3200*s36 <= 2146843647"
+I1028 20:08:41.273000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:08:41.359000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=5layer S=64
+I1028 20:08:48.711000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+I1028 20:08:50.680000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:08:50.714000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:08:50.714000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:08:50.714000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 202
+I1028 20:08:50.715000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:08:50.718000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 202 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:50.734000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 202 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:08:51.299000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:08:51.300000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+I1028 20:08:53.362000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 12800*(((s36 + 1)//2)) <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="12800*(((s36 + 1)//2)) <= 2147483647"
+I1028 20:08:53.364000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*s36 <= 2147483647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*s36 <= 2147483647"
+I1028 20:08:53.365000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 6400*s36 <= 2146203647 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="6400*s36 <= 2146203647"
+I1028 20:08:53.366000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval s36 <= 9223372036854775606 [guard added] (_inductor/codecache.py:1446 in _lookup_graph), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="s36 <= 9223372036854775606"
+I1028 20:08:53.446000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=big S=1
+I1028 20:09:04.973000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:09:16.998000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:09:17.085000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:09:18.083000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:09:18.083000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:09:18.083000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 2050
+I1028 20:09:18.085000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:09:18.089000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 2050 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:09:18.108000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 2050 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:09:18.693000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:09:18.694000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:09:22.405000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 2048 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 2048"
+I1028 20:09:23.859000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 17408*(((s36 + 16)//17)) <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="17408*(((s36 + 16)//17)) <= 2147483647"
+I1028 20:09:23.863000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 1024*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1879 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="1024*s36 <= 2147483647"
+I1028 20:09:25.577000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 1024*s36 <= 2145386495 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="1024*s36 <= 2145386495"
+I1028 20:09:30.891000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:09:30.991000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=big S=8
+I1028 20:09:33.556000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:09:46.119000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:09:46.212000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:09:47.093000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:09:47.093000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:09:47.093000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 2050
+I1028 20:09:47.094000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:09:47.099000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 2050 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:09:47.118000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 2050 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:09:47.696000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:09:47.698000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:09:50.914000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 2048 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 2048"
+I1028 20:09:52.999000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 8192*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="8192*s36 <= 2147483647"
+I1028 20:09:54.697000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 8192*s36 <= 2130706431 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="8192*s36 <= 2130706431"
+I1028 20:09:59.988000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:10:00.069000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=big S=32
+I1028 20:10:07.165000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:10:19.742000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:10:19.843000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:10:20.712000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:10:20.712000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:10:20.712000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 2050
+I1028 20:10:20.714000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:10:20.719000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 2050 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:10:20.739000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 2050 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:10:21.318000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:10:21.320000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:10:25.149000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 2048 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 2048"
+I1028 20:10:26.692000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 32768*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="32768*s36 <= 2147483647"
+I1028 20:10:28.368000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 32768*s36 <= 2080374783 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="32768*s36 <= 2080374783"
+I1028 20:10:33.994000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:10:34.083000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+### CONFIG network=big S=64
+I1028 20:10:53.969000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/0] create_env
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:11:06.876000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+I1028 20:11:06.977000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/0] produce_guards
+V1028 20:11:07.915000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles] Recompiling function precise_sigmoid in /content/Pasado/forward_mode_tensorized_src/batched_splits.py:167
+V1028 20:11:07.915000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     triggered by the following guard failure(s):
+V1028 20:11:07.915000 4198 torch/_dynamo/guards.py:4760] [0/1] [__recompiles]     - 0/0: tensor 'z.dg' size mismatch at index 1. expected 2, actual 2050
+I1028 20:11:07.917000 4198 torch/fx/experimental/symbolic_shapes.py:3945] [0/1] create_env
+I1028 20:11:07.921000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s78 = 2050 for L['z'].rg.size()[1] [2, int_oo] S, G0, N = z.rg.shape  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:176 in precise_sigmoid (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s78" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:11:07.941000 4198 torch/fx/experimental/symbolic_shapes.py:5377] [0/1] create_symbol s36 = 2050 for L['z'].dg.size()[1] [2, int_oo] radius = generators.abs().sum(dim=1)  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:148 in _bounds (_dynamo/variables/builder.py:4049 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_CREATE_SYMBOL="s36" or to suppress this message run with TORCHDYNAMO_EXTENDED_ADVICE="0"
+I1028 20:11:08.524000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval Eq(s78, s36) [guard added] new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg  # ontent/Pasado/forward_mode_tensorized_src/batched_splits.py:216 in precise_sigmoid (_subclasses/fake_impls.py:1503 in infer_size), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="Eq(s78, s36)"
+I1028 20:11:08.526000 4198 torch/fx/experimental/symbolic_shapes.py:7123] [0/1] set_replacement s78 = s36 (solve) VR[2, int_oo]
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+I1028 20:11:11.783000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 9223372036854775807 > s36 + 2048 [guard added] (_inductor/lowering.py:1323 in <lambda>), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="9223372036854775807 > s36 + 2048"
+I1028 20:11:13.338000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 65536*s36 <= 2147483647 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="65536*s36 <= 2147483647"
+I1028 20:11:15.061000 4198 torch/fx/experimental/symbolic_shapes.py:7516] [0/1] eval 65536*s36 <= 2013265919 [guard added] (_inductor/codegen/simd.py:1877 in can_use_32bit_indexing), for more info run with TORCHDYNAMO_EXTENDED_DEBUG_GUARD_ADDED="65536*s36 <= 2013265919"
+I1028 20:11:20.222000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
+I1028 20:11:20.988000 4198 torch/fx/experimental/symbolic_shapes.py:5523] [0/1] produce_guards
