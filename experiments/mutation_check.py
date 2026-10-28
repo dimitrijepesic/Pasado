@@ -43,6 +43,8 @@ TESTS = [
     # the opt-in TorchInductor path (PASADO_COMPILED_FIT)
     ("planar_cc", "experiments/test_planar_fit.py", ["--compiled"]),
     ("batched_cc", "experiments/test_batched_splits.py", ["--quick", "--compiled"]),
+    # the opt-in automatic choice between gelsd and the eager closed form
+    ("auto",      "experiments/test_auto_plane_fit.py"),
 ]
 PLANAR_FIT = f"{SRC}/planar_fit.py"
 BATCHED = f"{SRC}/batched_splits.py"
@@ -132,12 +134,12 @@ MUTANTS = [
          new="    r2 = rcond\n"),
     dict(id="M19", func="batched_splits.precise_sigmoid", file=BATCHED,
          why="switch inverted: closed form used exactly when it is off",
-         old="    if USE_CLOSED_FORM_FIT:\n        fit = planar_fit.compiled_fit_planes()",
-         new="    if not USE_CLOSED_FORM_FIT:\n        fit = planar_fit.compiled_fit_planes()"),
+         old="    if USE_CLOSED_FORM_FIT:\n        return planar_fit.compiled_fit_planes()",
+         new="    if not USE_CLOSED_FORM_FIT:\n        return planar_fit.compiled_fit_planes()"),
     dict(id="M20", func="batched_splits.precise_sigmoid", file=BATCHED,
          why="the compiled switch is ignored: always the eager closed form",
-         old="        fit = planar_fit.compiled_fit_planes() if USE_COMPILED_FIT else planar_fit.fit_planes\n",
-         new="        fit = planar_fit.fit_planes\n"),
+         old="        return planar_fit.compiled_fit_planes() if USE_COMPILED_FIT else planar_fit.fit_planes\n",
+         new="        return planar_fit.fit_planes\n"),
     dict(id="M22", func="planar_fit.compiled_fit_planes", file=PLANAR_FIT,
          why="the wrapper never calls the compiled function (silent eager path)",
          old="                return compiled(grid, z, rcond)\n",
@@ -148,6 +150,22 @@ MUTANTS = [
          old="    px = (z3 - z3[:, :1, :]).mean(2)  # [n, s], one value per x\n"
              "    px = px - px.mean(1, keepdim=True)\n",
          new="    px = (z3 - zbar[:, None, None]).mean(2)  # [n, s], one value per x\n"),
+    dict(id="M23", func="batched_splits.plane_fit_for", file=BATCHED,
+         why="automatic choice inverted: closed form below the threshold",
+         old="                and grid.shape[0] >= threshold:\n",
+         new="                and grid.shape[0] < threshold:\n"),
+    dict(id="M24", func="batched_splits.plane_fit_for", file=BATCHED,
+         why="the automatic switch is ignored: always gelsd",
+         old="    if USE_AUTO_PLANE_FIT:\n        if USE_CLOSED_FORM_FIT or USE_COMPILED_FIT:\n",
+         new="    if False:\n        if USE_CLOSED_FORM_FIT or USE_COMPILED_FIT:\n"),
+    dict(id="M25", func="batched_splits.AUTO_PLANE_FIT_THRESHOLD", file=BATCHED,
+         why="the thresholds of the two dtypes swapped",
+         old="AUTO_PLANE_FIT_THRESHOLD = {torch.float64: 512, torch.float32: 640}\n",
+         new="AUTO_PLANE_FIT_THRESHOLD = {torch.float64: 640, torch.float32: 512}\n"),
+    dict(id="M26", func="batched_splits.plane_fit_for", file=BATCHED,
+         why="the automatic choice uses the compiled closed form",
+         old="            return planar_fit.fit_planes\n        return pt.lin_reg_tensor_batched\n",
+         new="            return planar_fit.compiled_fit_planes()\n        return pt.lin_reg_tensor_batched\n"),
 ]
 
 
