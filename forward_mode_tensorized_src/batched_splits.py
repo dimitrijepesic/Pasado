@@ -29,7 +29,8 @@ The planes are fitted with gelsd on the CPU, as in the sequential code. With
 USE_CLOSED_FORM_FIT they are fitted on the device by planar_fit.fit_planes
 instead; the bounds then differ from the sequential code by about 1e-13 relative
 (results/lstsq_comparison_cuda_2026-10-27/README.md). USE_COMPILED_FIT adds
-TorchInductor on top (opt-in, see below).
+TorchInductor on top (opt-in, see below). USE_AUTO_PLANE_FIT picks gelsd or the eager
+closed form for every call by its number of boxes (opt-in, CUDA only, see plane_fit_for).
 """
 import os
 
@@ -48,6 +49,46 @@ USE_CLOSED_FORM_FIT = os.environ.get("PASADO_CLOSED_FORM_FIT", "0") != "0"
 # (planar_fit.compiled_fit_planes). Opt-in: the first calls compile for several
 # seconds, which a short run does not win back (results/inductor_dispatch_a3_2026-10-27).
 USE_COMPILED_FIT = os.environ.get("PASADO_COMPILED_FIT", "0") != "0"
+
+# Choose per call: gelsd below a number of boxes, the eager closed form from it on.
+# Opt-in. The thresholds are the A100 crossover of the v3 code
+# (results/plane_fit_crossover_2026-10-28): from there on the closed form is at least
+# 1.2x faster than gelsd, and it is not slower at any larger size measured. They hold
+# on CUDA only; on other devices the choice stays gelsd until measured there.
+# PASADO_PLANE_FIT_THRESHOLD overrides the threshold of every dtype.
+USE_AUTO_PLANE_FIT = os.environ.get("PASADO_AUTO_PLANE_FIT", "0") != "0"
+AUTO_PLANE_FIT_THRESHOLD = {torch.float64: 512, torch.float32: 640}
+AUTO_PLANE_FIT_DEVICES = ("cuda",)
+_override = os.environ.get("PASADO_PLANE_FIT_THRESHOLD")
+PLANE_FIT_THRESHOLD_OVERRIDE = int(_override) if _override else None
+
+
+def plane_fit_for(grid):
+    """The plane fit for one call, from the switches above.
+
+    no switch                 gelsd (lin_reg_tensor_batched)
+    USE_CLOSED_FORM_FIT       planar_fit.fit_planes, eager
+    ... and USE_COMPILED_FIT  planar_fit.compiled_fit_planes()
+    USE_AUTO_PLANE_FIT        on CUDA: gelsd below the threshold of the dtype, the eager
+                              closed form at or above it; elsewhere, or for a dtype
+                              without a threshold, gelsd
+    The automatic choice cannot be combined with the other two switches. It reads only
+    the shape of the grid: no host sync.
+    """
+    if USE_AUTO_PLANE_FIT:
+        if USE_CLOSED_FORM_FIT or USE_COMPILED_FIT:
+            raise ValueError("PASADO_AUTO_PLANE_FIT cannot be combined with "
+                             "PASADO_CLOSED_FORM_FIT or PASADO_COMPILED_FIT")
+        threshold = AUTO_PLANE_FIT_THRESHOLD.get(grid.dtype)
+        if PLANE_FIT_THRESHOLD_OVERRIDE is not None:
+            threshold = PLANE_FIT_THRESHOLD_OVERRIDE
+        if grid.device.type in AUTO_PLANE_FIT_DEVICES and threshold is not None \
+                and grid.shape[0] >= threshold:
+            return planar_fit.fit_planes
+        return pt.lin_reg_tensor_batched
+    if USE_CLOSED_FORM_FIT:
+        return planar_fit.compiled_fit_planes() if USE_COMPILED_FIT else planar_fit.fit_planes
+    return pt.lin_reg_tensor_batched
 
 
 class BatchedDualZonotope:
@@ -144,11 +185,7 @@ def precise_sigmoid(z, seed):
     grid = pt.get_linspace_batched(lx_f, ux_f, ly_f, uy_f)  # [S*N, 25, 2]
     gx, gy = grid[..., 0], grid[..., 1]
     targets = (1.0 - torch.sigmoid(gx)) * (torch.sigmoid(gx) * gy)
-    if USE_CLOSED_FORM_FIT:
-        fit = planar_fit.compiled_fit_planes() if USE_COMPILED_FIT else planar_fit.fit_planes
-    else:
-        fit = pt.lin_reg_tensor_batched
-    coef = fit(grid, targets)  # [S*N, 3], intercept first
+    coef = plane_fit_for(grid)(grid, targets)  # [S*N, 3], intercept first
     As = coef[:, 1] + _perturbation(S, N, seed, dtype, device).reshape(-1)
     Bs = coef[:, 2]
     Cs = coef[:, 0]
