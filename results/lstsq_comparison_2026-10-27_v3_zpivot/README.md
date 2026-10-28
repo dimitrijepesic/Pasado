@@ -25,11 +25,15 @@ the fix 169 (eager) and 247 (compiled) of 1195 checked boxes were outside, by up
 | R1 (180 network cases) | tie, 1.97e-13 | tie, 1.97e-13 |
 | R2a | G, A2, H 1.00; A1, A3 1.25 | the same |
 | R3 | G 7; A1, A2, H -7; A3 -4 | the same |
-| Result | A2 and H tied, undecided at R4 | **A2 and H tied, undecided at R4** |
+| R4 (A100, float64, n = 65536) | measured on 2026-10-27 for the v2 code | A2 3.83 ms, H 3.89 ms: same 20% step |
+| Result | A2 (with the A100 timing; R5) | **A2 (R5, no host sync)** |
 
-R4 has to be measured again on the A100: the A2 code changed, so the timing of
-2026-10-27 (`../lstsq_comparison_cuda_2026-10-27/timing_cuda.csv`) belongs to the old
-code. With it, v2 picked A2 (R5, no host sync).
+The A2 code changed in v3, so R4 was measured again on 2026-10-28 on an A100-SXM4-40GB
+(`timing_cuda.csv`, `timing_cuda_meta.json`, `timing_level.log`, copied from
+`../v3_compiled_cuda_2026-10-28/`; code `832323a`, whose `fit_planes` and candidates are
+those of `500ae16`). `decide.log` applies the rule with it: **Winner: A2 (decided by R5
+simplicity)**. `decide_before_cuda.log` is the earlier output without the timing
+(undecided at R4).
 
 ## What the fix changes in the numbers
 

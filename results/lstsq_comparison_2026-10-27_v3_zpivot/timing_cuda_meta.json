@@ -1,0 +1,23 @@
+{
+  "torch": "2.11.0+cu130",
+  "numpy": "2.1.3",
+  "python": "3.13.16",
+  "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+  "device": "cuda",
+  "device_name": "NVIDIA A100-SXM4-40GB",
+  "cuda": "13.0",
+  "commit": "832323af1dc8ab4773a5aa8ed45ea5cab5bbd3a7",
+  "code_sha256": "78c6f96ea31600f55ec9590354c6676d39aac65c9ce18456a1fcc7e72357cb4d",
+  "time": "2026-10-28 15:33:12",
+  "config": {
+    "sizes": [
+      1024,
+      8192,
+      32768,
+      65536
+    ],
+    "warmup": 3,
+    "repeats": 10
+  },
+  "smoke": false
+}

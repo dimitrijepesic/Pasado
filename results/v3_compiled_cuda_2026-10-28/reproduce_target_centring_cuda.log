@@ -1,0 +1,11 @@
+float64  offset_narrow  | before, eager: worst  2.2e+10,   8/64 over | after, eager: worst  4.2e-01,   0/64 over | before, compiled: worst  1.9e+11,  31/64 over | after, compiled: worst  4.4e-01,   0/64 over
+float64  cutoff_band_x  | before, eager: worst  5.1e+11,  45/142 over | after, eager: worst  3.9e-01,   0/142 over | before, compiled: worst  2.7e+11,  53/142 over | after, compiled: worst  2.8e-01,   0/142 over
+float64  cutoff_band_y  | before, eager: worst  1.3e+11,  47/156 over | after, eager: worst  8.5e-01,   0/156 over | before, compiled: worst  1.3e+11,  60/156 over | after, compiled: worst  1.8e+00,   0/156 over
+float64  mixed_scale    | before, eager: worst  6.7e+06,  35/173 over | after, eager: worst  1.7e+00,   0/173 over | before, compiled: worst  1.5e+07,  67/173 over | after, compiled: worst  1.7e+00,   0/173 over
+float32  offset_narrow  | before, eager: worst  4.1e+01,   1/64 over | after, eager: worst  4.8e-01,   0/64 over | before, compiled: worst  8.7e+01,   3/64 over | after, compiled: worst  7.3e-01,   0/64 over
+float32  cutoff_band_x  | before, eager: worst  5.8e+02,   4/142 over | after, eager: worst  1.1e+00,   0/142 over | before, compiled: worst  3.2e+03,  13/142 over | after, compiled: worst  5.4e-01,   0/142 over
+float32  cutoff_band_y  | before, eager: worst  3.8e+02,  15/156 over | after, eager: worst  1.9e+00,   0/156 over | before, compiled: worst  2.6e+02,  20/156 over | after, compiled: worst  1.3e+00,   0/156 over
+float32  mixed_scale    no box keeps its exact rank
+
+boxes over the bound 32 eps (1 + max|x| + max|y|): {'before, eager': 155, 'after, eager': 0, 'before, compiled': 247, 'after, compiled': 0}
+REPRODUCED: the mean-centred targets exceed the bound, the pivot-centred ones do not

@@ -1,0 +1,8 @@
+{
+  "first_output_overwritten": true,
+  "first_output_now_equals_second": true,
+  "bound_gelsd": 1720.9228984802205,
+  "bound_eager_closed_form": 1720.9228984802198,
+  "bound_reduce_overhead_no_copy": 1720.9228984802198,
+  "rel_diff_no_copy_vs_eager": 0.0
+}
