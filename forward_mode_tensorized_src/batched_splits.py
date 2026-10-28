@@ -164,10 +164,16 @@ def _perturbation(S, N, seed, dtype, device):
     return values
 
 
-def precise_sigmoid(z, seed):
-    """PreciseSigmoidDualZonotope for S splits at once. Adds 2N noise symbols."""
+def precise_sigmoid(z, noise):
+    """PreciseSigmoidDualZonotope for S splits at once. Adds 2N noise symbols.
+
+    noise is the perturbation of coefficient A, [S, N], drawn by the caller
+    (_perturbation): with no NumPy call in here, a compiled version of this function
+    reproduces the seeded stream. Returns the new zonotope and a 0-dim bool tensor,
+    true when every perturbed A is nonzero; the caller checks it, so this function
+    does not sync with the host.
+    """
     S, G0, N = z.rg.shape
-    dtype, device = z.rc.dtype, z.rc.device
 
     lx, ux = _bounds(z.rc, z.rg)
     ly, uy = _bounds(z.dc, z.dg)
@@ -186,10 +192,10 @@ def precise_sigmoid(z, seed):
     gx, gy = grid[..., 0], grid[..., 1]
     targets = (1.0 - torch.sigmoid(gx)) * (torch.sigmoid(gx) * gy)
     coef = plane_fit_for(grid)(grid, targets)  # [S*N, 3], intercept first
-    As = coef[:, 1] + _perturbation(S, N, seed, dtype, device).reshape(-1)
+    As = coef[:, 1] + noise.reshape(-1)
     Bs = coef[:, 2]
     Cs = coef[:, 0]
-    assert bool(((As > 0) | (As < 0)).all())
+    a_nonzero = ((As > 0) | (As < 0)).all()
 
     # worst-case approximation error, same three checks as compute_max_error
     abc = torch.stack((As, Bs, Cs), dim=1)
@@ -210,15 +216,22 @@ def precise_sigmoid(z, seed):
     new_dg[:, :G0, :] = As.unsqueeze(1) * z.rg + Bs.unsqueeze(1) * z.dg
     new_dg[:, G0 + N:, :].diagonal(dim1=1, dim2=2).copy_(errors)
 
-    return BatchedDualZonotope(sig_c, new_rg, dual_c, new_dg)
+    return BatchedDualZonotope(sig_c, new_rg, dual_c, new_dg), a_nonzero
 
 
 def _forward_chunk(layers, img, lows, highs, seed):
     z = hazed_input(img, lows, highs)
     if seed is not None:
         np.random.seed(seed)
+    nonzero = []
     for weight_t, bias in layers[:-1]:
-        z = precise_sigmoid(affine(z, weight_t, bias), seed)
+        # one draw per layer, in the order of the sequential code
+        noise = _perturbation(lows.shape[0], weight_t.shape[1], seed, z.rc.dtype, z.rc.device)
+        z, ok = precise_sigmoid(affine(z, weight_t, bias), noise)
+        nonzero.append(ok)
+    # every perturbed A must be nonzero; one host sync per chunk instead of per layer.
+    # A failing chunk now stops after its last layer, not in the failing one.
+    assert bool(torch.stack(nonzero).all())
     weight_t, bias = layers[-1]
     z = affine(z, weight_t, bias)
     lb, ub = _bounds(z.dc, z.dg)
