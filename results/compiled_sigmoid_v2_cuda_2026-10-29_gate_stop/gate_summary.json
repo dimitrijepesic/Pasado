@@ -1,0 +1,187 @@
+{
+  "checks": 908,
+  "failed": 16,
+  "failed_checks": [
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "3layer",
+      "S": 64,
+      "image": 0,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 2,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "3layer",
+      "S": 64,
+      "image": 1,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 2,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "3layer",
+      "S": 64,
+      "image": 2,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 2,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: worst compiled shortfall / W <= 10 * max(1e-12, worst eager shortfall / W)",
+      "network": "3layer",
+      "S": 64,
+      "eps_idx": 8,
+      "value": NaN,
+      "limit": 1e-11,
+      "ok": false,
+      "detail": "eager 0.000e+00; 0 boxes, 0 not converged; worst absolute nan, over D nan"
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "4layer",
+      "S": 64,
+      "image": 0,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 3,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "4layer",
+      "S": 64,
+      "image": 1,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 3,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "4layer",
+      "S": 64,
+      "image": 2,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 3,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: worst compiled shortfall / W <= 10 * max(1e-12, worst eager shortfall / W)",
+      "network": "4layer",
+      "S": 64,
+      "eps_idx": 8,
+      "value": NaN,
+      "limit": 1e-11,
+      "ok": false,
+      "detail": "eager 0.000e+00; 0 boxes, 0 not converged; worst absolute nan, over D nan"
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "5layer",
+      "S": 64,
+      "image": 0,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 4,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "5layer",
+      "S": 64,
+      "image": 1,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 4,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "5layer",
+      "S": 64,
+      "image": 2,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 4,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: worst compiled shortfall / W <= 10 * max(1e-12, worst eager shortfall / W)",
+      "network": "5layer",
+      "S": 64,
+      "eps_idx": 8,
+      "value": NaN,
+      "limit": 1e-11,
+      "ok": false,
+      "detail": "eager 0.000e+00; 0 boxes, 0 not converged; worst absolute nan, over D nan"
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "big",
+      "S": 64,
+      "image": 0,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 4,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "big",
+      "S": 64,
+      "image": 1,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 4,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: diagnostic graph bit-identical to the production compiled graph",
+      "network": "big",
+      "S": 64,
+      "image": 2,
+      "eps_idx": 8,
+      "value": 0,
+      "limit": 4,
+      "ok": false,
+      "detail": ""
+    },
+    {
+      "check": "G5 D: worst compiled shortfall / W <= 10 * max(1e-12, worst eager shortfall / W)",
+      "network": "big",
+      "S": 64,
+      "eps_idx": 8,
+      "value": NaN,
+      "limit": 1e-11,
+      "ok": false,
+      "detail": "eager 0.000e+00; 0 boxes, 0 not converged; worst absolute nan, over D nan"
+    }
+  ],
+  "worst": {
+    "per_split_vs_eager_A2": 9.967471840959072e-15,
+    "final_vs_sequential_G": 2.1245738538483659e-13,
+    "tensors": 5.795839809306759e-13,
+    "dg_D_normwise_recorded": 4.9333807394646913e-11,
+    "d_contract_boxes": 0,
+    "d_contract_compiled_over_W": null,
+    "d_contract_eager_over_W": null
+  }
+}
