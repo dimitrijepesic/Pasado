@@ -1,0 +1,1 @@
+RESULT 5layer S=64 batched_compiled_sigmoid cold: e2e 17.51 s, overhead 17.48 s, first pass 17487.5 ms, steady 4.76 ms, graphs 1, fallback none

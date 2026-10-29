@@ -1,0 +1,1 @@
+RESULT 5layer S=64 batched_A2_compiled_fit warm: e2e 2.27 s, overhead 2.16 s, first pass 2182.8 ms, steady 17.51 ms, graphs 1, fallback none

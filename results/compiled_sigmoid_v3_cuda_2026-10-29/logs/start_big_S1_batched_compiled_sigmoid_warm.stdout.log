@@ -1,0 +1,1 @@
+RESULT big S=1 batched_compiled_sigmoid warm: e2e 4.82 s, overhead 4.77 s, first pass 4774.2 ms, steady 7.84 ms, graphs 1, fallback none

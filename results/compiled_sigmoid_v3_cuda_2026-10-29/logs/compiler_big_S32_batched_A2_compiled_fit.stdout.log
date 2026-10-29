@@ -1,0 +1,1 @@
+{"config": "big_S32_batched_A2_compiled_fit", "graphs": 1, "events": [{"mode": "batched_A2_compiled_fit", "call": 0, "S_chunk": 32, "G0": 2, "N": 1024, "new_graphs": 1, "host_s": 15.292031176999899}], "code_files": 4, "fallback": {}}

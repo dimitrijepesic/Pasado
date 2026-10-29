@@ -1,0 +1,193 @@
+check,network,S,mode,cache,value,limit,ok
+no compiled-fit fallback,3layer,1,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,3layer,1,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,3layer,1,batched_A2_compiled_fit,cold,1.530531274239175e-14,1e-10,True
+no compiled-fit fallback,3layer,1,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,3layer,1,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,3layer,1,batched_A2_compiled_fit,warm,1.530531274239175e-14,1e-10,True
+no compiled-fit fallback,3layer,1,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,3layer,1,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,3layer,1,batched_compiled_sigmoid,cold,1.546813521837464e-14,1e-10,True
+no compiled-fit fallback,3layer,1,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,3layer,1,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,3layer,1,batched_compiled_sigmoid,warm,1.546813521837464e-14,1e-10,True
+no compiled-fit fallback,3layer,32,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,3layer,32,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,3layer,32,batched_A2_compiled_fit,cold,9.822126349219799e-15,1e-10,True
+no compiled-fit fallback,3layer,32,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,3layer,32,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,3layer,32,batched_A2_compiled_fit,warm,9.822126349219799e-15,1e-10,True
+no compiled-fit fallback,3layer,32,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,3layer,32,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,3layer,32,batched_compiled_sigmoid,cold,9.331020031758809e-15,1e-10,True
+no compiled-fit fallback,3layer,32,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,3layer,32,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,3layer,32,batched_compiled_sigmoid,warm,9.331020031758809e-15,1e-10,True
+no compiled-fit fallback,3layer,64,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,3layer,64,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,3layer,64,batched_A2_compiled_fit,cold,5.3244574932175007e-14,1e-10,True
+no compiled-fit fallback,3layer,64,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,3layer,64,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,3layer,64,batched_A2_compiled_fit,warm,5.3244574932175007e-14,1e-10,True
+no compiled-fit fallback,3layer,64,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,3layer,64,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,3layer,64,batched_compiled_sigmoid,cold,5.305025166599919e-14,1e-10,True
+no compiled-fit fallback,3layer,64,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,3layer,64,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,3layer,64,batched_compiled_sigmoid,warm,5.305025166599919e-14,1e-10,True
+no compiled-fit fallback,3layer,8,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,3layer,8,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,3layer,8,batched_A2_compiled_fit,cold,5.74547451853441e-14,1e-10,True
+no compiled-fit fallback,3layer,8,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,3layer,8,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,3layer,8,batched_A2_compiled_fit,warm,5.74547451853441e-14,1e-10,True
+no compiled-fit fallback,3layer,8,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,3layer,8,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,3layer,8,batched_compiled_sigmoid,cold,5.709263544678102e-14,1e-10,True
+no compiled-fit fallback,3layer,8,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,3layer,8,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,3layer,8,batched_compiled_sigmoid,warm,5.709263544678102e-14,1e-10,True
+no compiled-fit fallback,4layer,1,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,4layer,1,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,4layer,1,batched_A2_compiled_fit,cold,2.4675874165723637e-14,1e-10,True
+no compiled-fit fallback,4layer,1,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,4layer,1,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,4layer,1,batched_A2_compiled_fit,warm,2.4675874165723637e-14,1e-10,True
+no compiled-fit fallback,4layer,1,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,4layer,1,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,4layer,1,batched_compiled_sigmoid,cold,2.4675874165723637e-14,1e-10,True
+no compiled-fit fallback,4layer,1,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,4layer,1,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,4layer,1,batched_compiled_sigmoid,warm,2.4675874165723637e-14,1e-10,True
+no compiled-fit fallback,4layer,32,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,4layer,32,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,4layer,32,batched_A2_compiled_fit,cold,6.437777270772142e-15,1e-10,True
+no compiled-fit fallback,4layer,32,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,4layer,32,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,4layer,32,batched_A2_compiled_fit,warm,6.437777270772142e-15,1e-10,True
+no compiled-fit fallback,4layer,32,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,4layer,32,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,4layer,32,batched_compiled_sigmoid,cold,6.602848482843222e-15,1e-10,True
+no compiled-fit fallback,4layer,32,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,4layer,32,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,4layer,32,batched_compiled_sigmoid,warm,6.602848482843222e-15,1e-10,True
+no compiled-fit fallback,4layer,64,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,4layer,64,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,4layer,64,batched_A2_compiled_fit,cold,1.198930867194955e-13,1e-10,True
+no compiled-fit fallback,4layer,64,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,4layer,64,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,4layer,64,batched_A2_compiled_fit,warm,1.198930867194955e-13,1e-10,True
+no compiled-fit fallback,4layer,64,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,4layer,64,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,4layer,64,batched_compiled_sigmoid,cold,1.1977780490534212e-13,1e-10,True
+no compiled-fit fallback,4layer,64,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,4layer,64,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,4layer,64,batched_compiled_sigmoid,warm,1.1977780490534212e-13,1e-10,True
+no compiled-fit fallback,4layer,8,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,4layer,8,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,4layer,8,batched_A2_compiled_fit,cold,7.767554001544938e-14,1e-10,True
+no compiled-fit fallback,4layer,8,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,4layer,8,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,4layer,8,batched_A2_compiled_fit,warm,7.767554001544938e-14,1e-10,True
+no compiled-fit fallback,4layer,8,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,4layer,8,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,4layer,8,batched_compiled_sigmoid,cold,7.741618929753469e-14,1e-10,True
+no compiled-fit fallback,4layer,8,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,4layer,8,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,4layer,8,batched_compiled_sigmoid,warm,7.741618929753469e-14,1e-10,True
+no compiled-fit fallback,5layer,1,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,5layer,1,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,5layer,1,batched_A2_compiled_fit,cold,2.0485561560305548e-14,1e-10,True
+no compiled-fit fallback,5layer,1,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,5layer,1,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,5layer,1,batched_A2_compiled_fit,warm,2.0485561560305548e-14,1e-10,True
+no compiled-fit fallback,5layer,1,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,5layer,1,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,5layer,1,batched_compiled_sigmoid,cold,2.0485561560305548e-14,1e-10,True
+no compiled-fit fallback,5layer,1,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,5layer,1,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,5layer,1,batched_compiled_sigmoid,warm,2.0485561560305548e-14,1e-10,True
+no compiled-fit fallback,5layer,32,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,5layer,32,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,5layer,32,batched_A2_compiled_fit,cold,9.533125385846455e-15,1e-10,True
+no compiled-fit fallback,5layer,32,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,5layer,32,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,5layer,32,batched_A2_compiled_fit,warm,9.533125385846455e-15,1e-10,True
+no compiled-fit fallback,5layer,32,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,5layer,32,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,5layer,32,batched_compiled_sigmoid,cold,9.914450401280314e-15,1e-10,True
+no compiled-fit fallback,5layer,32,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,5layer,32,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,5layer,32,batched_compiled_sigmoid,warm,9.914450401280314e-15,1e-10,True
+no compiled-fit fallback,5layer,64,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,5layer,64,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,5layer,64,batched_A2_compiled_fit,cold,2.1282968220502029e-13,1e-10,True
+no compiled-fit fallback,5layer,64,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,5layer,64,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,5layer,64,batched_A2_compiled_fit,warm,2.1282968220502029e-13,1e-10,True
+no compiled-fit fallback,5layer,64,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,5layer,64,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,5layer,64,batched_compiled_sigmoid,cold,2.1270558326495904e-13,1e-10,True
+no compiled-fit fallback,5layer,64,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,5layer,64,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,5layer,64,batched_compiled_sigmoid,warm,2.1270558326495904e-13,1e-10,True
+no compiled-fit fallback,5layer,8,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,5layer,8,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,5layer,8,batched_A2_compiled_fit,cold,1.7648838018509562e-13,1e-10,True
+no compiled-fit fallback,5layer,8,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,5layer,8,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,5layer,8,batched_A2_compiled_fit,warm,1.7648838018509562e-13,1e-10,True
+no compiled-fit fallback,5layer,8,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,5layer,8,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,5layer,8,batched_compiled_sigmoid,cold,1.763767493310886e-13,1e-10,True
+no compiled-fit fallback,5layer,8,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,5layer,8,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,5layer,8,batched_compiled_sigmoid,warm,1.763767493310886e-13,1e-10,True
+no compiled-fit fallback,big,1,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,big,1,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,big,1,batched_A2_compiled_fit,cold,1.407583114124741e-14,1e-10,True
+no compiled-fit fallback,big,1,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,big,1,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,big,1,batched_A2_compiled_fit,warm,1.407583114124741e-14,1e-10,True
+no compiled-fit fallback,big,1,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,big,1,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,big,1,batched_compiled_sigmoid,cold,1.4235783767852495e-14,1e-10,True
+no compiled-fit fallback,big,1,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,big,1,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,big,1,batched_compiled_sigmoid,warm,1.4235783767852495e-14,1e-10,True
+no compiled-fit fallback,big,32,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,big,32,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,big,32,batched_A2_compiled_fit,cold,5.088290126998311e-15,1e-10,True
+no compiled-fit fallback,big,32,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,big,32,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,big,32,batched_A2_compiled_fit,warm,5.088290126998311e-15,1e-10,True
+no compiled-fit fallback,big,32,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,big,32,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,big,32,batched_compiled_sigmoid,cold,4.867060121476646e-15,1e-10,True
+no compiled-fit fallback,big,32,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,big,32,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,big,32,batched_compiled_sigmoid,warm,4.867060121476646e-15,1e-10,True
+no compiled-fit fallback,big,64,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,big,64,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,big,64,batched_A2_compiled_fit,cold,1.1369871843942155e-13,1e-10,True
+no compiled-fit fallback,big,64,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,big,64,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,big,64,batched_A2_compiled_fit,warm,1.1369871843942155e-13,1e-10,True
+no compiled-fit fallback,big,64,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,big,64,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,big,64,batched_compiled_sigmoid,cold,1.138499135437293e-13,1e-10,True
+no compiled-fit fallback,big,64,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,big,64,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,big,64,batched_compiled_sigmoid,warm,1.138499135437293e-13,1e-10,True
+no compiled-fit fallback,big,8,batched_A2_compiled_fit,cold,{},{},True
+at least one graph compiled,big,8,batched_A2_compiled_fit,cold,1,1,True
+bounds vs sequential G,big,8,batched_A2_compiled_fit,cold,1.3813213880132218e-13,1e-10,True
+no compiled-fit fallback,big,8,batched_A2_compiled_fit,warm,{},{},True
+at least one graph compiled,big,8,batched_A2_compiled_fit,warm,1,1,True
+bounds vs sequential G,big,8,batched_A2_compiled_fit,warm,1.3813213880132218e-13,1e-10,True
+no compiled-fit fallback,big,8,batched_compiled_sigmoid,cold,{},{},True
+at least one graph compiled,big,8,batched_compiled_sigmoid,cold,1,1,True
+bounds vs sequential G,big,8,batched_compiled_sigmoid,cold,1.3813213880132218e-13,1e-10,True
+no compiled-fit fallback,big,8,batched_compiled_sigmoid,warm,{},{},True
+at least one graph compiled,big,8,batched_compiled_sigmoid,warm,1,1,True
+bounds vs sequential G,big,8,batched_compiled_sigmoid,warm,1.3813213880132218e-13,1e-10,True

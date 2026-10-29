@@ -1,0 +1,1 @@
+RESULT 5layer S=32 batched_compiled_sigmoid warm: e2e 4.94 s, overhead 4.91 s, first pass 4913.6 ms, steady 4.35 ms, graphs 1, fallback none

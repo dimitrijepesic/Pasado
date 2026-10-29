@@ -1,0 +1,14 @@
+{
+  "checks": 1088,
+  "failed": 0,
+  "failed_checks": [],
+  "worst": {
+    "per_split_vs_eager_A2": 7.752478098523723e-15,
+    "final_vs_sequential_G": 2.1270558326495904e-13,
+    "tensors": 5.795839809306759e-13,
+    "dg_D_normwise_recorded": 4.905648868563124e-11,
+    "d_contract_boxes": 4992,
+    "d_contract_compiled_over_W": 3.8635751903698146e-09,
+    "d_contract_eager_over_W": 3.437041416050687e-09
+  }
+}

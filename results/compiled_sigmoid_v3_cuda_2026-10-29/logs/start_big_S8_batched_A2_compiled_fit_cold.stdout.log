@@ -1,0 +1,1 @@
+RESULT big S=8 batched_A2_compiled_fit cold: e2e 14.79 s, overhead 14.54 s, first pass 14580.5 ms, steady 40.81 ms, graphs 1, fallback none

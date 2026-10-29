@@ -1,0 +1,281 @@
+check,network,S,mode,formal,value,limit,ok
+final bound vs sequential G,3layer,1,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,3layer,1,batched_G,True,0.0,1e-10,True
+final bound vs sequential G,3layer,1,batched_A2_eager,True,1.530531274239175e-14,1e-10,True
+final bound vs sequential G,3layer,1,batched_A2_compiled_fit,True,1.530531274239175e-14,1e-10,True
+final bound vs sequential G,3layer,1,batched_compiled_sigmoid,True,1.530531274239175e-14,1e-10,True
+final bound vs sequential G,3layer,1,batched_compiled_sigmoid_uninstrumented,False,1.546813521837464e-14,1e-10,True
+compiled regions per pass,3layer,1,sequential_G,True,0,0,True
+lstsq used iff gelsd mode,3layer,1,sequential_G,True,4,>0,True
+compiled regions per pass,3layer,1,batched_G,True,0,0,True
+lstsq used iff gelsd mode,3layer,1,batched_G,True,4,>0,True
+compiled regions per pass,3layer,1,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,3layer,1,batched_A2_eager,True,0,0,True
+compiled regions per pass,3layer,1,batched_A2_compiled_fit,True,2,2,True
+lstsq used iff gelsd mode,3layer,1,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,3layer,1,batched_compiled_sigmoid,True,2,2,True
+lstsq used iff gelsd mode,3layer,1,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,3layer,1,batched_compiled_sigmoid_uninstrumented,False,2,2,True
+lstsq used iff gelsd mode,3layer,1,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,3layer,1,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,3layer,8,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,3layer,8,batched_G,True,4.103910370381722e-15,1e-10,True
+final bound vs sequential G,3layer,8,batched_A2_eager,True,5.73340419391564e-14,1e-10,True
+final bound vs sequential G,3layer,8,batched_A2_compiled_fit,True,5.74547451853441e-14,1e-10,True
+final bound vs sequential G,3layer,8,batched_compiled_sigmoid,True,5.709263544678102e-14,1e-10,True
+final bound vs sequential G,3layer,8,batched_compiled_sigmoid_uninstrumented,False,5.73340419391564e-14,1e-10,True
+compiled regions per pass,3layer,8,batched_G,True,0,0,True
+lstsq used iff gelsd mode,3layer,8,batched_G,True,4,>0,True
+compiled regions per pass,3layer,8,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,3layer,8,batched_A2_eager,True,0,0,True
+compiled regions per pass,3layer,8,batched_A2_compiled_fit,True,2,2,True
+lstsq used iff gelsd mode,3layer,8,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,3layer,8,batched_compiled_sigmoid,True,2,2,True
+lstsq used iff gelsd mode,3layer,8,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,3layer,8,batched_compiled_sigmoid_uninstrumented,False,2,2,True
+lstsq used iff gelsd mode,3layer,8,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,3layer,8,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,3layer,32,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,3layer,32,batched_G,True,1.8109879834984512e-15,1e-10,True
+final bound vs sequential G,3layer,32,batched_A2_eager,True,9.331020031758809e-15,1e-10,True
+final bound vs sequential G,3layer,32,batched_A2_compiled_fit,True,9.822126349219799e-15,1e-10,True
+final bound vs sequential G,3layer,32,batched_compiled_sigmoid,True,9.331020031758809e-15,1e-10,True
+final bound vs sequential G,3layer,32,batched_compiled_sigmoid_uninstrumented,False,9.167317925938479e-15,1e-10,True
+compiled regions per pass,3layer,32,batched_G,True,0,0,True
+lstsq used iff gelsd mode,3layer,32,batched_G,True,4,>0,True
+compiled regions per pass,3layer,32,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,3layer,32,batched_A2_eager,True,0,0,True
+compiled regions per pass,3layer,32,batched_A2_compiled_fit,True,2,2,True
+lstsq used iff gelsd mode,3layer,32,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,3layer,32,batched_compiled_sigmoid,True,2,2,True
+lstsq used iff gelsd mode,3layer,32,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,3layer,32,batched_compiled_sigmoid_uninstrumented,False,2,2,True
+lstsq used iff gelsd mode,3layer,32,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,3layer,32,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,3layer,64,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,3layer,64,batched_G,True,4.9500929105228186e-15,1e-10,True
+final bound vs sequential G,3layer,64,batched_A2_eager,True,5.3244574932175007e-14,1e-10,True
+final bound vs sequential G,3layer,64,batched_A2_compiled_fit,True,5.3244574932175007e-14,1e-10,True
+final bound vs sequential G,3layer,64,batched_compiled_sigmoid,True,5.3244574932175007e-14,1e-10,True
+final bound vs sequential G,3layer,64,batched_compiled_sigmoid_uninstrumented,False,5.3244574932175007e-14,1e-10,True
+compiled regions per pass,3layer,64,batched_G,True,0,0,True
+lstsq used iff gelsd mode,3layer,64,batched_G,True,4,>0,True
+compiled regions per pass,3layer,64,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,3layer,64,batched_A2_eager,True,0,0,True
+compiled regions per pass,3layer,64,batched_A2_compiled_fit,True,2,2,True
+lstsq used iff gelsd mode,3layer,64,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,3layer,64,batched_compiled_sigmoid,True,2,2,True
+lstsq used iff gelsd mode,3layer,64,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,3layer,64,batched_compiled_sigmoid_uninstrumented,False,2,2,True
+lstsq used iff gelsd mode,3layer,64,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,3layer,64,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,4layer,1,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,4layer,1,batched_G,True,0.0,1e-10,True
+final bound vs sequential G,4layer,1,batched_A2_eager,True,2.4675874165723637e-14,1e-10,True
+final bound vs sequential G,4layer,1,batched_A2_compiled_fit,True,2.4675874165723637e-14,1e-10,True
+final bound vs sequential G,4layer,1,batched_compiled_sigmoid,True,2.4801132410219696e-14,1e-10,True
+final bound vs sequential G,4layer,1,batched_compiled_sigmoid_uninstrumented,False,2.4801132410219696e-14,1e-10,True
+compiled regions per pass,4layer,1,sequential_G,True,0,0,True
+lstsq used iff gelsd mode,4layer,1,sequential_G,True,6,>0,True
+compiled regions per pass,4layer,1,batched_G,True,0,0,True
+lstsq used iff gelsd mode,4layer,1,batched_G,True,6,>0,True
+compiled regions per pass,4layer,1,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,4layer,1,batched_A2_eager,True,0,0,True
+compiled regions per pass,4layer,1,batched_A2_compiled_fit,True,3,3,True
+lstsq used iff gelsd mode,4layer,1,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,4layer,1,batched_compiled_sigmoid,True,3,3,True
+lstsq used iff gelsd mode,4layer,1,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,4layer,1,batched_compiled_sigmoid_uninstrumented,False,3,3,True
+lstsq used iff gelsd mode,4layer,1,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,4layer,1,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,4layer,8,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,4layer,8,batched_G,True,3.135802915725726e-15,1e-10,True
+final bound vs sequential G,4layer,8,batched_A2_eager,True,7.767554001544938e-14,1e-10,True
+final bound vs sequential G,4layer,8,batched_A2_compiled_fit,True,7.767554001544938e-14,1e-10,True
+final bound vs sequential G,4layer,8,batched_compiled_sigmoid,True,7.741618929753469e-14,1e-10,True
+final bound vs sequential G,4layer,8,batched_compiled_sigmoid_uninstrumented,False,7.728651393857735e-14,1e-10,True
+compiled regions per pass,4layer,8,batched_G,True,0,0,True
+lstsq used iff gelsd mode,4layer,8,batched_G,True,6,>0,True
+compiled regions per pass,4layer,8,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,4layer,8,batched_A2_eager,True,0,0,True
+compiled regions per pass,4layer,8,batched_A2_compiled_fit,True,3,3,True
+lstsq used iff gelsd mode,4layer,8,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,4layer,8,batched_compiled_sigmoid,True,3,3,True
+lstsq used iff gelsd mode,4layer,8,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,4layer,8,batched_compiled_sigmoid_uninstrumented,False,3,3,True
+lstsq used iff gelsd mode,4layer,8,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,4layer,8,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,4layer,32,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,4layer,32,batched_G,True,4.896877722562117e-15,1e-10,True
+final bound vs sequential G,4layer,32,batched_A2_eager,True,6.602848482843222e-15,1e-10,True
+final bound vs sequential G,4layer,32,batched_A2_compiled_fit,True,6.437777270772142e-15,1e-10,True
+final bound vs sequential G,4layer,32,batched_compiled_sigmoid,True,6.602848482843222e-15,1e-10,True
+final bound vs sequential G,4layer,32,batched_compiled_sigmoid_uninstrumented,False,6.437777270772142e-15,1e-10,True
+compiled regions per pass,4layer,32,batched_G,True,0,0,True
+lstsq used iff gelsd mode,4layer,32,batched_G,True,6,>0,True
+compiled regions per pass,4layer,32,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,4layer,32,batched_A2_eager,True,0,0,True
+compiled regions per pass,4layer,32,batched_A2_compiled_fit,True,3,3,True
+lstsq used iff gelsd mode,4layer,32,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,4layer,32,batched_compiled_sigmoid,True,3,3,True
+lstsq used iff gelsd mode,4layer,32,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,4layer,32,batched_compiled_sigmoid_uninstrumented,False,3,3,True
+lstsq used iff gelsd mode,4layer,32,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,4layer,32,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,4layer,64,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,4layer,64,batched_G,True,6.933056287987707e-15,1e-10,True
+final bound vs sequential G,4layer,64,batched_A2_eager,True,1.1966252309118876e-13,1e-10,True
+final bound vs sequential G,4layer,64,batched_A2_compiled_fit,True,1.198930867194955e-13,1e-10,True
+final bound vs sequential G,4layer,64,batched_compiled_sigmoid,True,1.1977780490534212e-13,1e-10,True
+final bound vs sequential G,4layer,64,batched_compiled_sigmoid_uninstrumented,False,1.1977780490534212e-13,1e-10,True
+compiled regions per pass,4layer,64,batched_G,True,0,0,True
+lstsq used iff gelsd mode,4layer,64,batched_G,True,6,>0,True
+compiled regions per pass,4layer,64,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,4layer,64,batched_A2_eager,True,0,0,True
+compiled regions per pass,4layer,64,batched_A2_compiled_fit,True,3,3,True
+lstsq used iff gelsd mode,4layer,64,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,4layer,64,batched_compiled_sigmoid,True,3,3,True
+lstsq used iff gelsd mode,4layer,64,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,4layer,64,batched_compiled_sigmoid_uninstrumented,False,3,3,True
+lstsq used iff gelsd mode,4layer,64,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,4layer,64,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,5layer,1,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,5layer,1,batched_G,True,0.0,1e-10,True
+final bound vs sequential G,5layer,1,batched_A2_eager,True,2.026992407019707e-14,1e-10,True
+final bound vs sequential G,5layer,1,batched_A2_compiled_fit,True,2.0485561560305548e-14,1e-10,True
+final bound vs sequential G,5layer,1,batched_compiled_sigmoid,True,2.0485561560305548e-14,1e-10,True
+final bound vs sequential G,5layer,1,batched_compiled_sigmoid_uninstrumented,False,2.0485561560305548e-14,1e-10,True
+compiled regions per pass,5layer,1,sequential_G,True,0,0,True
+lstsq used iff gelsd mode,5layer,1,sequential_G,True,8,>0,True
+compiled regions per pass,5layer,1,batched_G,True,0,0,True
+lstsq used iff gelsd mode,5layer,1,batched_G,True,8,>0,True
+compiled regions per pass,5layer,1,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,5layer,1,batched_A2_eager,True,0,0,True
+compiled regions per pass,5layer,1,batched_A2_compiled_fit,True,4,4,True
+lstsq used iff gelsd mode,5layer,1,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,5layer,1,batched_compiled_sigmoid,True,4,4,True
+lstsq used iff gelsd mode,5layer,1,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,5layer,1,batched_compiled_sigmoid_uninstrumented,False,4,4,True
+lstsq used iff gelsd mode,5layer,1,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,5layer,1,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,5layer,8,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,5layer,8,batched_G,True,6.856260517606282e-15,1e-10,True
+final bound vs sequential G,5layer,8,batched_A2_eager,True,1.7648838018509562e-13,1e-10,True
+final bound vs sequential G,5layer,8,batched_A2_compiled_fit,True,1.7648838018509562e-13,1e-10,True
+final bound vs sequential G,5layer,8,batched_compiled_sigmoid,True,1.763767493310886e-13,1e-10,True
+final bound vs sequential G,5layer,8,batched_compiled_sigmoid_uninstrumented,False,1.763767493310886e-13,1e-10,True
+compiled regions per pass,5layer,8,batched_G,True,0,0,True
+lstsq used iff gelsd mode,5layer,8,batched_G,True,8,>0,True
+compiled regions per pass,5layer,8,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,5layer,8,batched_A2_eager,True,0,0,True
+compiled regions per pass,5layer,8,batched_A2_compiled_fit,True,4,4,True
+lstsq used iff gelsd mode,5layer,8,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,5layer,8,batched_compiled_sigmoid,True,4,4,True
+lstsq used iff gelsd mode,5layer,8,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,5layer,8,batched_compiled_sigmoid_uninstrumented,False,4,4,True
+lstsq used iff gelsd mode,5layer,8,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,5layer,8,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,5layer,32,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,5layer,32,batched_G,True,5.191924695554543e-15,1e-10,True
+final bound vs sequential G,5layer,32,batched_A2_eager,True,9.342462878129527e-15,1e-10,True
+final bound vs sequential G,5layer,32,batched_A2_compiled_fit,True,9.533125385846455e-15,1e-10,True
+final bound vs sequential G,5layer,32,batched_compiled_sigmoid,True,9.914450401280314e-15,1e-10,True
+final bound vs sequential G,5layer,32,batched_compiled_sigmoid_uninstrumented,False,9.914450401280314e-15,1e-10,True
+compiled regions per pass,5layer,32,batched_G,True,0,0,True
+lstsq used iff gelsd mode,5layer,32,batched_G,True,8,>0,True
+compiled regions per pass,5layer,32,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,5layer,32,batched_A2_eager,True,0,0,True
+compiled regions per pass,5layer,32,batched_A2_compiled_fit,True,4,4,True
+lstsq used iff gelsd mode,5layer,32,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,5layer,32,batched_compiled_sigmoid,True,4,4,True
+lstsq used iff gelsd mode,5layer,32,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,5layer,32,batched_compiled_sigmoid_uninstrumented,False,4,4,True
+lstsq used iff gelsd mode,5layer,32,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,5layer,32,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,5layer,64,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,5layer,64,batched_G,True,7.464001218028008e-15,1e-10,True
+final bound vs sequential G,5layer,64,batched_A2_eager,True,2.122091875047141e-13,1e-10,True
+final bound vs sequential G,5layer,64,batched_A2_compiled_fit,True,2.1282968220502029e-13,1e-10,True
+final bound vs sequential G,5layer,64,batched_compiled_sigmoid,True,2.1270558326495904e-13,1e-10,True
+final bound vs sequential G,5layer,64,batched_compiled_sigmoid_uninstrumented,False,2.1245738538483659e-13,1e-10,True
+compiled regions per pass,5layer,64,batched_G,True,0,0,True
+lstsq used iff gelsd mode,5layer,64,batched_G,True,8,>0,True
+compiled regions per pass,5layer,64,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,5layer,64,batched_A2_eager,True,0,0,True
+compiled regions per pass,5layer,64,batched_A2_compiled_fit,True,4,4,True
+lstsq used iff gelsd mode,5layer,64,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,5layer,64,batched_compiled_sigmoid,True,4,4,True
+lstsq used iff gelsd mode,5layer,64,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,5layer,64,batched_compiled_sigmoid_uninstrumented,False,4,4,True
+lstsq used iff gelsd mode,5layer,64,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,5layer,64,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,big,1,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,big,1,batched_G,True,1.1219078336263257e-15,1e-10,True
+final bound vs sequential G,big,1,batched_A2_eager,True,1.407583114124741e-14,1e-10,True
+final bound vs sequential G,big,1,batched_A2_compiled_fit,True,1.407583114124741e-14,1e-10,True
+final bound vs sequential G,big,1,batched_compiled_sigmoid,True,1.407583114124741e-14,1e-10,True
+final bound vs sequential G,big,1,batched_compiled_sigmoid_uninstrumented,False,1.407583114124741e-14,1e-10,True
+compiled regions per pass,big,1,sequential_G,True,0,0,True
+lstsq used iff gelsd mode,big,1,sequential_G,True,8,>0,True
+compiled regions per pass,big,1,batched_G,True,0,0,True
+lstsq used iff gelsd mode,big,1,batched_G,True,8,>0,True
+compiled regions per pass,big,1,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,big,1,batched_A2_eager,True,0,0,True
+compiled regions per pass,big,1,batched_A2_compiled_fit,True,4,4,True
+lstsq used iff gelsd mode,big,1,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,big,1,batched_compiled_sigmoid,True,4,4,True
+lstsq used iff gelsd mode,big,1,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,big,1,batched_compiled_sigmoid_uninstrumented,False,4,4,True
+lstsq used iff gelsd mode,big,1,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,big,1,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,big,8,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,big,8,batched_G,True,1.106026368702315e-15,1e-10,True
+final bound vs sequential G,big,8,batched_A2_eager,True,1.3796631390480197e-13,1e-10,True
+final bound vs sequential G,big,8,batched_A2_compiled_fit,True,1.3813213880132218e-13,1e-10,True
+final bound vs sequential G,big,8,batched_compiled_sigmoid,True,1.3796631390480197e-13,1e-10,True
+final bound vs sequential G,big,8,batched_compiled_sigmoid_uninstrumented,False,1.3813213880132218e-13,1e-10,True
+compiled regions per pass,big,8,batched_G,True,0,0,True
+lstsq used iff gelsd mode,big,8,batched_G,True,8,>0,True
+compiled regions per pass,big,8,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,big,8,batched_A2_eager,True,0,0,True
+compiled regions per pass,big,8,batched_A2_compiled_fit,True,4,4,True
+lstsq used iff gelsd mode,big,8,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,big,8,batched_compiled_sigmoid,True,4,4,True
+lstsq used iff gelsd mode,big,8,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,big,8,batched_compiled_sigmoid_uninstrumented,False,4,4,True
+lstsq used iff gelsd mode,big,8,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,big,8,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,big,32,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,big,32,batched_G,True,1.5486100386516601e-15,1e-10,True
+final bound vs sequential G,big,32,batched_A2_eager,True,4.867060121476646e-15,1e-10,True
+final bound vs sequential G,big,32,batched_A2_compiled_fit,True,5.088290126998311e-15,1e-10,True
+final bound vs sequential G,big,32,batched_compiled_sigmoid,True,4.867060121476646e-15,1e-10,True
+final bound vs sequential G,big,32,batched_compiled_sigmoid_uninstrumented,False,5.088290126998311e-15,1e-10,True
+compiled regions per pass,big,32,batched_G,True,0,0,True
+lstsq used iff gelsd mode,big,32,batched_G,True,8,>0,True
+compiled regions per pass,big,32,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,big,32,batched_A2_eager,True,0,0,True
+compiled regions per pass,big,32,batched_A2_compiled_fit,True,4,4,True
+lstsq used iff gelsd mode,big,32,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,big,32,batched_compiled_sigmoid,True,4,4,True
+lstsq used iff gelsd mode,big,32,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,big,32,batched_compiled_sigmoid_uninstrumented,False,4,4,True
+lstsq used iff gelsd mode,big,32,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,big,32,batched_A2_compiled_fit,,{},{},True
+final bound vs sequential G,big,64,sequential_G,True,0.0,1e-10,True
+final bound vs sequential G,big,64,batched_G,True,1.7487862552722466e-15,1e-10,True
+final bound vs sequential G,big,64,batched_A2_eager,True,1.138499135437293e-13,1e-10,True
+final bound vs sequential G,big,64,batched_A2_compiled_fit,True,1.1369871843942155e-13,1e-10,True
+final bound vs sequential G,big,64,batched_compiled_sigmoid,True,1.138499135437293e-13,1e-10,True
+final bound vs sequential G,big,64,batched_compiled_sigmoid_uninstrumented,False,1.138499135437293e-13,1e-10,True
+compiled regions per pass,big,64,batched_G,True,0,0,True
+lstsq used iff gelsd mode,big,64,batched_G,True,8,>0,True
+compiled regions per pass,big,64,batched_A2_eager,True,0,0,True
+lstsq used iff gelsd mode,big,64,batched_A2_eager,True,0,0,True
+compiled regions per pass,big,64,batched_A2_compiled_fit,True,4,4,True
+lstsq used iff gelsd mode,big,64,batched_A2_compiled_fit,True,0,0,True
+compiled regions per pass,big,64,batched_compiled_sigmoid,True,4,4,True
+lstsq used iff gelsd mode,big,64,batched_compiled_sigmoid,True,0,0,True
+compiled regions per pass,big,64,batched_compiled_sigmoid_uninstrumented,False,4,4,True
+lstsq used iff gelsd mode,big,64,batched_compiled_sigmoid_uninstrumented,False,0,0,True
+planar_fit.compile_fallback empty,big,64,batched_A2_compiled_fit,,{},{},True

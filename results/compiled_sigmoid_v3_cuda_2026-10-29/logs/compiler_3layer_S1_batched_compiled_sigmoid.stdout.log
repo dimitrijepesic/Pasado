@@ -1,0 +1,1 @@
+{"config": "3layer_S1_batched_compiled_sigmoid", "graphs": 1, "events": [{"mode": "batched_compiled_sigmoid", "call": 0, "S_chunk": 1, "G0": 2, "N": 100, "new_graphs": 1, "host_s": 17.494373946999985}], "code_files": 12, "fallback": {}}

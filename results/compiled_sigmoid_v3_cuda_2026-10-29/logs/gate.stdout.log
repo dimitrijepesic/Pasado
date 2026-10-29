@@ -1,0 +1,139 @@
+gate: 3layer S=1
+  3layer S=1 image 0 eps_idx 0: per-split 1.12e-16, final vs sequential 0.00e+00, tensors 1.62e-15
+  3layer S=1 image 0 eps_idx 8: per-split 1.66e-16, final vs sequential 9.15e-15, tensors 6.11e-16
+  3layer S=1 image 1 eps_idx 0: per-split 0.00e+00, final vs sequential 1.14e-16, tensors 1.63e-15
+  3layer S=1 image 1 eps_idx 8: per-split 0.00e+00, final vs sequential 1.53e-14, tensors 1.61e-15
+  3layer S=1 image 2 eps_idx 0: per-split 0.00e+00, final vs sequential 1.58e-16, tensors 1.99e-15
+  3layer S=1 image 2 eps_idx 8: per-split 1.19e-16, final vs sequential 5.95e-15, tensors 6.92e-16
+gate: 3layer S=8
+  3layer S=8 image 0 eps_idx 0: per-split 1.28e-15, final vs sequential 1.58e-16, tensors 1.38e-15
+  3layer S=8 image 0 eps_idx 8: per-split 3.87e-16, final vs sequential 1.80e-14, tensors 9.55e-15
+  3layer S=8 image 1 eps_idx 0: per-split 6.10e-16, final vs sequential 4.30e-16, tensors 2.52e-15
+  3layer S=8 image 1 eps_idx 8: per-split 3.34e-16, final vs sequential 6.22e-15, tensors 1.39e-14
+  3layer S=8 image 2 eps_idx 0: per-split 1.73e-15, final vs sequential 4.61e-16, tensors 1.25e-15
+  3layer S=8 image 2 eps_idx 8: per-split 2.41e-16, final vs sequential 5.71e-14, tensors 5.77e-15
+gate: 3layer S=32
+  3layer S=32 image 0 eps_idx 0: per-split 1.10e-15, final vs sequential 7.84e-15, tensors 1.49e-15
+  3layer S=32 image 0 eps_idx 8: per-split 3.98e-16, final vs sequential 2.36e-15, tensors 4.10e-14
+  3layer S=32 image 1 eps_idx 0: per-split 1.88e-15, final vs sequential 2.66e-15, tensors 2.38e-15
+  3layer S=32 image 1 eps_idx 8: per-split 5.03e-16, final vs sequential 9.33e-15, tensors 6.91e-14
+  3layer S=32 image 2 eps_idx 0: per-split 2.09e-15, final vs sequential 4.37e-15, tensors 1.56e-15
+  3layer S=32 image 2 eps_idx 8: per-split 4.10e-16, final vs sequential 0.00e+00, tensors 7.29e-14
+gate: 3layer S=64
+  3layer S=64 image 0 eps_idx 0: per-split 1.53e-15, final vs sequential 1.84e-14, tensors 1.07e-15
+  D contract 3layer image 0: 256 boxes, 2.8 s
+  3layer S=64 image 0 eps_idx 8: per-split 6.05e-16, final vs sequential 3.70e-15, tensors 4.88e-14
+  3layer S=64 image 1 eps_idx 0: per-split 1.64e-15, final vs sequential 5.17e-15, tensors 2.28e-15
+  D contract 3layer image 1: 256 boxes, 2.8 s
+  3layer S=64 image 1 eps_idx 8: per-split 7.57e-16, final vs sequential 2.62e-15, tensors 1.61e-13
+  3layer S=64 image 2 eps_idx 0: per-split 3.50e-15, final vs sequential 5.32e-14, tensors 1.51e-15
+  D contract 3layer image 2: 256 boxes, 2.8 s
+  3layer S=64 image 2 eps_idx 8: per-split 7.67e-16, final vs sequential 2.29e-15, tensors 1.13e-13
+gate: 4layer S=1
+  4layer S=1 image 0 eps_idx 0: per-split 0.00e+00, final vs sequential 0.00e+00, tensors 3.93e-15
+  4layer S=1 image 0 eps_idx 8: per-split 0.00e+00, final vs sequential 6.77e-15, tensors 1.26e-15
+  4layer S=1 image 1 eps_idx 0: per-split 2.01e-16, final vs sequential 6.03e-16, tensors 3.04e-15
+  4layer S=1 image 1 eps_idx 8: per-split 4.89e-16, final vs sequential 1.06e-14, tensors 2.52e-15
+  4layer S=1 image 2 eps_idx 0: per-split 2.32e-16, final vs sequential 1.16e-16, tensors 6.50e-15
+  4layer S=1 image 2 eps_idx 8: per-split 1.25e-16, final vs sequential 2.48e-14, tensors 2.29e-15
+gate: 4layer S=8
+  4layer S=8 image 0 eps_idx 0: per-split 1.86e-15, final vs sequential 9.00e-16, tensors 1.82e-15
+  4layer S=8 image 0 eps_idx 8: per-split 3.35e-16, final vs sequential 5.68e-14, tensors 1.07e-14
+  4layer S=8 image 1 eps_idx 0: per-split 6.99e-16, final vs sequential 1.31e-15, tensors 2.15e-15
+  4layer S=8 image 1 eps_idx 8: per-split 6.87e-16, final vs sequential 3.07e-14, tensors 1.04e-14
+  4layer S=8 image 2 eps_idx 0: per-split 3.07e-15, final vs sequential 1.81e-15, tensors 1.49e-15
+  4layer S=8 image 2 eps_idx 8: per-split 2.59e-16, final vs sequential 7.74e-14, tensors 9.67e-15
+gate: 4layer S=32
+  4layer S=32 image 0 eps_idx 0: per-split 4.17e-15, final vs sequential 3.31e-15, tensors 3.00e-15
+  4layer S=32 image 0 eps_idx 8: per-split 6.70e-16, final vs sequential 2.89e-15, tensors 5.81e-14
+  4layer S=32 image 1 eps_idx 0: per-split 1.33e-15, final vs sequential 3.46e-15, tensors 1.96e-15
+  4layer S=32 image 1 eps_idx 8: per-split 7.28e-16, final vs sequential 6.60e-15, tensors 9.18e-14
+  4layer S=32 image 2 eps_idx 0: per-split 4.83e-15, final vs sequential 5.01e-15, tensors 2.26e-15
+  4layer S=32 image 2 eps_idx 8: per-split 3.99e-16, final vs sequential 1.30e-15, tensors 5.95e-14
+gate: 4layer S=64
+  4layer S=64 image 0 eps_idx 0: per-split 3.57e-15, final vs sequential 3.01e-14, tensors 3.46e-15
+  D contract 4layer image 0: 384 boxes, 4.2 s
+  4layer S=64 image 0 eps_idx 8: per-split 5.06e-16, final vs sequential 1.92e-15, tensors 2.18e-13
+  4layer S=64 image 1 eps_idx 0: per-split 1.17e-15, final vs sequential 1.76e-14, tensors 4.68e-15
+  D contract 4layer image 1: 384 boxes, 4.1 s
+  4layer S=64 image 1 eps_idx 8: per-split 8.43e-16, final vs sequential 6.27e-15, tensors 2.31e-13
+  4layer S=64 image 2 eps_idx 0: per-split 7.36e-15, final vs sequential 1.20e-13, tensors 1.80e-15
+  D contract 4layer image 2: 384 boxes, 4.1 s
+  4layer S=64 image 2 eps_idx 8: per-split 4.80e-16, final vs sequential 2.47e-15, tensors 1.18e-13
+gate: 5layer S=1
+  5layer S=1 image 0 eps_idx 0: per-split 0.00e+00, final vs sequential 4.37e-16, tensors 1.59e-14
+  5layer S=1 image 0 eps_idx 8: per-split 2.16e-16, final vs sequential 2.05e-14, tensors 2.97e-15
+  5layer S=1 image 1 eps_idx 0: per-split 0.00e+00, final vs sequential 2.02e-16, tensors 5.76e-15
+  5layer S=1 image 1 eps_idx 8: per-split 8.45e-16, final vs sequential 1.23e-14, tensors 3.94e-15
+  5layer S=1 image 2 eps_idx 0: per-split 4.41e-16, final vs sequential 4.41e-16, tensors 2.04e-14
+  5layer S=1 image 2 eps_idx 8: per-split 1.47e-16, final vs sequential 1.72e-14, tensors 2.61e-15
+gate: 5layer S=8
+  5layer S=8 image 0 eps_idx 0: per-split 2.51e-15, final vs sequential 8.88e-16, tensors 3.68e-15
+  5layer S=8 image 0 eps_idx 8: per-split 4.18e-16, final vs sequential 1.76e-13, tensors 5.28e-14
+  5layer S=8 image 1 eps_idx 0: per-split 7.72e-16, final vs sequential 1.19e-15, tensors 3.37e-15
+  5layer S=8 image 1 eps_idx 8: per-split 1.97e-15, final vs sequential 2.36e-15, tensors 2.37e-14
+  5layer S=8 image 2 eps_idx 0: per-split 1.67e-15, final vs sequential 6.66e-16, tensors 1.99e-15
+  5layer S=8 image 2 eps_idx 8: per-split 6.07e-16, final vs sequential 1.65e-13, tensors 2.61e-14
+gate: 5layer S=32
+  5layer S=32 image 0 eps_idx 0: per-split 3.10e-15, final vs sequential 3.15e-15, tensors 2.17e-15
+  5layer S=32 image 0 eps_idx 8: per-split 6.13e-16, final vs sequential 8.38e-15, tensors 8.20e-14
+  5layer S=32 image 1 eps_idx 0: per-split 1.42e-15, final vs sequential 1.88e-16, tensors 3.54e-15
+  5layer S=32 image 1 eps_idx 8: per-split 4.15e-15, final vs sequential 2.36e-15, tensors 1.99e-13
+  5layer S=32 image 2 eps_idx 0: per-split 7.75e-15, final vs sequential 9.91e-15, tensors 1.83e-15
+  5layer S=32 image 2 eps_idx 8: per-split 1.20e-15, final vs sequential 7.63e-15, tensors 4.15e-14
+gate: 5layer S=64
+  5layer S=64 image 0 eps_idx 0: per-split 4.40e-15, final vs sequential 8.99e-14, tensors 3.24e-15
+  D contract 5layer image 0: 512 boxes, 5.6 s
+  5layer S=64 image 0 eps_idx 8: per-split 8.67e-16, final vs sequential 5.36e-15, tensors 2.97e-13
+  5layer S=64 image 1 eps_idx 0: per-split 1.40e-15, final vs sequential 4.07e-16, tensors 5.80e-15
+  D contract 5layer image 1: 512 boxes, 5.5 s
+  5layer S=64 image 1 eps_idx 8: per-split 2.25e-15, final vs sequential 8.36e-15, tensors 3.15e-13
+  5layer S=64 image 2 eps_idx 0: per-split 6.33e-15, final vs sequential 2.13e-13, tensors 3.45e-15
+  D contract 5layer image 2: 512 boxes, 5.5 s
+  5layer S=64 image 2 eps_idx 8: per-split 1.01e-15, final vs sequential 4.87e-16, tensors 1.00e-13
+gate: big S=1
+  big S=1 image 0 eps_idx 0: per-split 0.00e+00, final vs sequential 3.70e-16, tensors 7.05e-14
+  big S=1 image 0 eps_idx 8: per-split 1.12e-16, final vs sequential 5.72e-15, tensors 4.72e-15
+  big S=1 image 1 eps_idx 0: per-split 0.00e+00, final vs sequential 1.67e-16, tensors 6.46e-14
+  big S=1 image 1 eps_idx 8: per-split 2.19e-16, final vs sequential 6.80e-15, tensors 7.18e-15
+  big S=1 image 2 eps_idx 0: per-split 1.25e-16, final vs sequential 0.00e+00, tensors 1.19e-13
+  big S=1 image 2 eps_idx 8: per-split 0.00e+00, final vs sequential 1.41e-14, tensors 3.85e-15
+gate: big S=8
+  big S=8 image 0 eps_idx 0: per-split 3.55e-16, final vs sequential 7.93e-16, tensors 3.33e-15
+  big S=8 image 0 eps_idx 8: per-split 3.44e-16, final vs sequential 9.46e-14, tensors 2.37e-14
+  big S=8 image 1 eps_idx 0: per-split 4.75e-16, final vs sequential 1.05e-15, tensors 3.71e-15
+  big S=8 image 1 eps_idx 8: per-split 2.27e-16, final vs sequential 4.98e-14, tensors 7.17e-14
+  big S=8 image 2 eps_idx 0: per-split 3.05e-16, final vs sequential 0.00e+00, tensors 2.89e-15
+  big S=8 image 2 eps_idx 8: per-split 1.70e-16, final vs sequential 1.38e-13, tensors 2.20e-14
+gate: big S=32
+  big S=32 image 0 eps_idx 0: per-split 4.70e-16, final vs sequential 3.61e-16, tensors 5.05e-15
+  big S=32 image 0 eps_idx 8: per-split 3.47e-16, final vs sequential 4.47e-15, tensors 1.05e-13
+  big S=32 image 1 eps_idx 0: per-split 4.99e-16, final vs sequential 1.40e-15, tensors 5.08e-15
+  big S=32 image 1 eps_idx 8: per-split 4.85e-16, final vs sequential 4.87e-15, tensors 2.81e-13
+  big S=32 image 2 eps_idx 0: per-split 6.03e-16, final vs sequential 4.63e-15, tensors 2.94e-15
+  big S=32 image 2 eps_idx 8: per-split 6.64e-16, final vs sequential 2.16e-15, tensors 9.16e-14
+gate: big S=64
+  big S=64 image 0 eps_idx 0: per-split 7.21e-16, final vs sequential 8.45e-14, tensors 4.99e-15
+  D contract big image 0: 512 boxes, 5.5 s
+  big S=64 image 0 eps_idx 8: per-split 5.75e-16, final vs sequential 4.58e-16, tensors 2.10e-13
+  big S=64 image 1 eps_idx 0: per-split 7.61e-16, final vs sequential 3.26e-14, tensors 8.50e-15
+  D contract big image 1: 512 boxes, 5.5 s
+  big S=64 image 1 eps_idx 8: per-split 7.34e-16, final vs sequential 4.87e-15, tensors 5.80e-13
+  big S=64 image 2 eps_idx 0: per-split 5.50e-16, final vs sequential 1.14e-13, tensors 4.73e-15
+  D contract big image 2: 512 boxes, 5.5 s
+  big S=64 image 2 eps_idx 8: per-split 6.73e-16, final vs sequential 1.49e-15, tensors 1.64e-13
+{
+  "checks": 1088,
+  "failed": 0,
+  "failed_checks": [],
+  "worst": {
+    "per_split_vs_eager_A2": 7.752478098523723e-15,
+    "final_vs_sequential_G": 2.1270558326495904e-13,
+    "tensors": 5.795839809306759e-13,
+    "dg_D_normwise_recorded": 4.905648868563124e-11,
+    "d_contract_boxes": 4992,
+    "d_contract_compiled_over_W": 3.8635751903698146e-09,
+    "d_contract_eager_over_W": 3.437041416050687e-09
+  }
+}
+GATE PASSED

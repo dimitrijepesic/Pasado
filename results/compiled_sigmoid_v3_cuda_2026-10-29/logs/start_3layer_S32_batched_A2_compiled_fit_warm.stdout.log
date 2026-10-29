@@ -1,0 +1,1 @@
+RESULT 3layer S=32 batched_A2_compiled_fit warm: e2e 2.23 s, overhead 2.18 s, first pass 2188.3 ms, steady 9.03 ms, graphs 1, fallback none

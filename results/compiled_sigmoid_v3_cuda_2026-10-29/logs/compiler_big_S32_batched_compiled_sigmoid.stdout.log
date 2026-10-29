@@ -1,0 +1,1 @@
+{"config": "big_S32_batched_compiled_sigmoid", "graphs": 1, "events": [{"mode": "batched_compiled_sigmoid", "call": 0, "S_chunk": 32, "G0": 2, "N": 1024, "new_graphs": 1, "host_s": 19.699292475999755}], "code_files": 14, "fallback": {}}

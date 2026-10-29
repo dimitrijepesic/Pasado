@@ -1,0 +1,7 @@
+round,network,S,mode,call,S_chunk,G0,N,new_graphs,host_s
+1,3layer,1,batched_compiled_sigmoid,0,1,2,100,1,4.767272551000019
+1,3layer,8,batched_compiled_sigmoid,2,8,2,100,1,18.530914848000066
+1,big,1,batched_compiled_sigmoid,36,1,2,1024,1,18.249919505000094
+1,big,8,batched_compiled_sigmoid,40,8,2,1024,1,18.816446069999984
+1,3layer,1,batched_A2_compiled_fit,0,1,2,100,1,12.37582868100003
+1,3layer,8,batched_A2_compiled_fit,2,8,2,100,1,14.294938107000007

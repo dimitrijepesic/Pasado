@@ -1,0 +1,2 @@
+/usr/local/lib/python3.13/dist-packages/torch/_inductor/lowering.py:1960: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(

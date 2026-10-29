@@ -1,0 +1,17 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "vram_gib": 80.0,
+  "driver": "580.82.07",
+  "python": "3.13.16",
+  "commit": "a57b560d8cd18761b9bcd745d51478358837f119",
+  "harness_sha256": "898980d93b74822f3ea31b2674653762b511da052c91a5ed31c9bb7225907bec",
+  "big_chunk": 64,
+  "wall_minutes": 53.2,
+  "torch": "2.11.0+cu130",
+  "cuda": "13.0",
+  "triton": "3.6.0",
+  "start_failures": [],
+  "shared_rc": 0,
+  "steady_rc": 0,
+  "outcome": "opt-in"
+}
