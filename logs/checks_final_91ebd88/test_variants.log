@@ -1,0 +1,13 @@
+ok   original             clean shell     sees (0, 0, 0, 0, 0)  expected (0, 0, 0, 0, 0)
+ok   original             flags exported  sees (0, 0, 0, 0, 0)  expected (0, 0, 0, 0, 0)
+ok   vec_corners          clean shell     sees (1, 0, 0, 0, 0)  expected (1, 0, 0, 0, 0)
+ok   vec_corners          flags exported  sees (1, 0, 0, 0, 0)  expected (1, 0, 0, 0, 0)
+ok   vec_both             clean shell     sees (1, 1, 0, 0, 0)  expected (1, 1, 0, 0, 0)
+ok   vec_both             flags exported  sees (1, 1, 0, 0, 0)  expected (1, 1, 0, 0, 0)
+ok   vec_both_batched     clean shell     sees (1, 1, 1, 0, 0)  expected (1, 1, 1, 0, 0)
+ok   vec_both_batched     flags exported  sees (1, 1, 1, 0, 0)  expected (1, 1, 1, 0, 0)
+ok   vec_batched_grid     clean shell     sees (1, 1, 1, 1, 0)  expected (1, 1, 1, 1, 0)
+ok   vec_batched_grid     flags exported  sees (1, 1, 1, 1, 0)  expected (1, 1, 1, 1, 0)
+ok   vec_grid_realcubic   clean shell     sees (1, 1, 1, 1, 1)  expected (1, 1, 1, 1, 1)
+ok   vec_grid_realcubic   flags exported  sees (1, 1, 1, 1, 1)  expected (1, 1, 1, 1, 1)
+ALL PASS

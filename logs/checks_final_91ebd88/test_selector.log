@@ -1,0 +1,14 @@
+default USE_VECTORIZED_PRECISE=True (env PASADO_VECTORIZED_PRECISE, '1' if unset)
+  n=1 old-vs-new: max|dc|=0.000e+00  max|dg|=0.000e+00  OK
+  n=1 old-vs-corners-only: max|dc|=0.000e+00  max|dg|=0.000e+00  OK
+  n=1 degenerate old-vs-new: max|dc|=0.000e+00  max|dg|=0.000e+00  OK
+  n=1 degenerate old-vs-corners-only: max|dc|=0.000e+00  max|dg|=0.000e+00  OK
+  n=5 old-vs-new: max|dc|=0.000e+00  max|dg|=0.000e+00  OK
+  n=5 old-vs-corners-only: max|dc|=0.000e+00  max|dg|=0.000e+00  OK
+  n=5 degenerate old-vs-new: max|dc|=0.000e+00  max|dg|=0.000e+00  OK
+  n=5 degenerate old-vs-corners-only: max|dc|=0.000e+00  max|dg|=0.000e+00  OK
+  n=100 old-vs-new: max|dc|=0.000e+00  max|dg|=1.665e-16  OK
+  n=100 old-vs-corners-only: max|dc|=0.000e+00  max|dg|=1.665e-16  OK
+  n=100 degenerate old-vs-new: max|dc|=0.000e+00  max|dg|=1.665e-16  OK
+  n=100 degenerate old-vs-corners-only: max|dc|=0.000e+00  max|dg|=1.665e-16  OK
+ALL SELECTOR PATH TESTS PASSED

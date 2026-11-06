@@ -1,0 +1,38 @@
+[PASS] off == 1d754c9 bit for bit 3layer S=1 img=0 eps=0 
+[PASS] on >= off 3layer S=1 img=0 eps=0 (max rel increase 5.14e-15)
+[PASS] off == 1d754c9 bit for bit 3layer S=1 img=0 eps=8 
+[PASS] on >= off 3layer S=1 img=0 eps=8 (max rel increase 8.48e-15)
+[PASS] off == 1d754c9 bit for bit 3layer S=1 img=1 eps=0 
+[PASS] on >= off 3layer S=1 img=1 eps=0 (max rel increase 7.17e-15)
+[PASS] off == 1d754c9 bit for bit 3layer S=1 img=1 eps=8 
+[PASS] on >= off 3layer S=1 img=1 eps=8 (max rel increase 1.17e-14)
+[PASS] on >= sampled max 3layer S=1 (508.446 vs 198.718)
+[PASS] off == 1d754c9 bit for bit 3layer S=8 img=0 eps=0 
+[PASS] on >= off 3layer S=8 img=0 eps=0 (max rel increase 2.93e-13)
+[PASS] off == 1d754c9 bit for bit 3layer S=8 img=0 eps=8 
+[PASS] on >= off 3layer S=8 img=0 eps=8 (max rel increase 1.33e-14)
+[PASS] off == 1d754c9 bit for bit 3layer S=8 img=1 eps=0 
+[PASS] on >= off 3layer S=8 img=1 eps=0 (max rel increase 2.76e-13)
+[PASS] off == 1d754c9 bit for bit 3layer S=8 img=1 eps=8 
+[PASS] on >= off 3layer S=8 img=1 eps=8 (max rel increase 1.33e-14)
+[PASS] on >= sampled max 3layer S=8 (360.339 vs 198.718)
+[PASS] off == 1d754c9 bit for bit 5layer S=4 img=0 eps=0 
+[PASS] on >= off 5layer S=4 img=0 eps=0 (max rel increase 1.16e-12)
+[PASS] off == 1d754c9 bit for bit 5layer S=4 img=0 eps=8 
+[PASS] on >= off 5layer S=4 img=0 eps=8 (max rel increase 2.02e-14)
+[PASS] off == 1d754c9 bit for bit 5layer S=4 img=1 eps=0 
+[PASS] on >= off 5layer S=4 img=1 eps=0 (max rel increase 3.00e-13)
+[PASS] off == 1d754c9 bit for bit 5layer S=4 img=1 eps=8 
+[PASS] on >= off 5layer S=4 img=1 eps=8 (max rel increase 1.24e-13)
+[PASS] on >= sampled max 5layer S=4 (2146.41 vs 311.945)
+[PASS] off == 1d754c9 bit for bit big S=2 img=0 eps=0 
+[PASS] on >= off big S=2 img=0 eps=0 (max rel increase 6.44e-14)
+[PASS] off == 1d754c9 bit for bit big S=2 img=0 eps=8 
+[PASS] on >= off big S=2 img=0 eps=8 (max rel increase 2.52e-14)
+[PASS] off == 1d754c9 bit for bit big S=2 img=1 eps=0 
+[PASS] on >= off big S=2 img=1 eps=0 (max rel increase 7.64e-14)
+[PASS] off == 1d754c9 bit for bit big S=2 img=1 eps=8 
+[PASS] on >= off big S=2 img=1 eps=8 (max rel increase 3.11e-14)
+[PASS] on >= sampled max big S=2 (6782.38 vs 248.028)
+[PASS] coverage: D_out >= exact maximum on every archived box (below before: 2560 of 4992, after: 0; median D_out/D - 1: 2.39e-10)
+ALL PASS

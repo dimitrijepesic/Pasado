@@ -1,0 +1,9 @@
+[PASS] n=    1 seed=0  max_abs_diff=0.000e+00
+[PASS] n=    2 seed=1  max_abs_diff=0.000e+00
+[PASS] n=    5 seed=2  max_abs_diff=0.000e+00
+[PASS] n=   17 seed=3  max_abs_diff=0.000e+00
+[PASS] n=  100 seed=4  max_abs_diff=0.000e+00
+[PASS] n= 1000 seed=5  max_abs_diff=2.384e-07
+[PASS] degenerate box (lx==ux, ly==uy)
+
+ALL PASS

@@ -1,0 +1,45 @@
+--- dtype=torch.float64 ---
+  [realistic grid n=1                ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [realistic grid n=10               ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [realistic grid n=100              ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [realistic grid n=1024             ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [random points n=1                 ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [random points n=10                ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [random points n=100               ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [degenerate_x n=16                 ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [point n=16                        ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [near_degenerate n=16              ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [saturated n=16                    ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [mixed_scale n=16                  ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [mixed healthy+degenerate n=16     ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  SKIP mps with float64: the device has no float64
+--- dtype=torch.float32 ---
+  [realistic grid n=1                ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [realistic grid n=10               ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [realistic grid n=100              ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [realistic grid n=1024             ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [random points n=1                 ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [random points n=10                ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [random points n=100               ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [degenerate_x n=16                 ] bitwise=YES max|dcoef|=0.000e+00 max_rel=nan planar_err_diff=0.000e+00  PASS
+  [point n=16                        ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [near_degenerate n=16              ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  [saturated n=16                    ] bitwise=YES max|dcoef|=0.000e+00 max_rel=nan planar_err_diff=0.000e+00  PASS
+  [mixed_scale n=16                  ] bitwise=YES max|dcoef|=0.000e+00 max_rel=nan planar_err_diff=0.000e+00  PASS
+  [mixed healthy+degenerate n=16     ] bitwise=YES max|dcoef|=0.000e+00 max_rel=0.000e+00 planar_err_diff=0.000e+00  PASS
+  --- inputs on mps ---
+  [realistic grid n=1                ] on mps: identical to the CPU solve  PASS
+  [realistic grid n=10               ] on mps: identical to the CPU solve  PASS
+  [realistic grid n=100              ] on mps: identical to the CPU solve  PASS
+  [realistic grid n=1024             ] on mps: identical to the CPU solve  PASS
+  [random points n=1                 ] on mps: identical to the CPU solve  PASS
+  [random points n=10                ] on mps: identical to the CPU solve  PASS
+  [random points n=100               ] on mps: identical to the CPU solve  PASS
+  [degenerate_x n=16                 ] on mps: identical to the CPU solve  PASS
+  [point n=16                        ] on mps: identical to the CPU solve  PASS
+  [near_degenerate n=16              ] on mps: identical to the CPU solve  PASS
+  [saturated n=16                    ] on mps: identical to the CPU solve  PASS
+  [mixed_scale n=16                  ] on mps: identical to the CPU solve  PASS
+  [mixed healthy+degenerate n=16     ] on mps: identical to the CPU solve  PASS
+
+ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES

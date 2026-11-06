@@ -1,0 +1,16 @@
+grid forward_mode_tensorized_src/test_batched_grid.py 
+selector forward_mode_tensorized_src/test_selector_paths.py 
+corners forward_mode_tensorized_src/test_check_corners_tensor.py 
+boundary forward_mode_tensorized_src/test_check_nonlinear_boundary_tensor.py 
+max_error forward_mode_tensorized_src/test_compute_max_error_tensor.py 
+lin_reg experiments/test_batched_lin_reg.py 
+variants experiments/test_benchmark_variants.py 
+cli experiments/test_get_lipschitz_cli.py 
+e2e experiments/correctness_e2e.py 
+soundness experiments/test_soundness.py 
+planar_fit experiments/test_planar_fit.py 
+batched experiments/test_batched_splits.py --quick
+batched_cf experiments/test_batched_splits.py --quick --closed-form
+planar_cc experiments/test_planar_fit.py --compiled
+batched_cc experiments/test_batched_splits.py --quick --compiled
+auto experiments/test_auto_plane_fit.py 

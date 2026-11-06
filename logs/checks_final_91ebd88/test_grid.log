@@ -1,0 +1,29 @@
+=== get_linspace_batched vs get_linspace ===
+  random boxes                               STEPS=3  strict  bit-exact
+  random boxes                               STEPS=5  strict  bit-exact
+  random boxes                               STEPS=7  info    known non-bit-exact on arm64  max|diff|=8.882e-16  (within 4 ULP)
+  random boxes                               STEPS=9  info    known non-bit-exact on arm64  max|diff|=8.882e-16  (within 4 ULP)
+  point box (lx==ux, ly==uy)                 STEPS=5  strict  bit-exact
+  lx==ux only                                STEPS=5  strict  bit-exact
+  width 1e-12                                STEPS=5  strict  bit-exact
+  magnitude 1e6                              STEPS=5  strict  bit-exact
+  -> strict cases bit-exact, info cases within bound: True
+
+=== sigmoid_prime_product_tensor across selector combinations ===
+  baseline (all original): centers (60,), generators (120, 60)
+  vec=0 bnd=0 lstsq=0 grid=0  max|dcenters|=0.000e+00  max|dgen|=0.000e+00  ok=True
+  vec=0 bnd=0 lstsq=0 grid=1  max|dcenters|=0.000e+00  max|dgen|=0.000e+00  ok=True
+  vec=0 bnd=0 lstsq=1 grid=0  max|dcenters|=0.000e+00  max|dgen|=0.000e+00  ok=True
+  vec=0 bnd=0 lstsq=1 grid=1  max|dcenters|=0.000e+00  max|dgen|=0.000e+00  ok=True
+  vec=1 bnd=0 lstsq=0 grid=0  max|dcenters|=0.000e+00  max|dgen|=1.388e-17  ok=True
+  vec=1 bnd=0 lstsq=0 grid=1  max|dcenters|=0.000e+00  max|dgen|=1.388e-17  ok=True
+  vec=1 bnd=0 lstsq=1 grid=0  max|dcenters|=0.000e+00  max|dgen|=1.388e-17  ok=True
+  vec=1 bnd=0 lstsq=1 grid=1  max|dcenters|=0.000e+00  max|dgen|=1.388e-17  ok=True
+  vec=1 bnd=1 lstsq=0 grid=0  max|dcenters|=0.000e+00  max|dgen|=1.388e-17  ok=True
+  vec=1 bnd=1 lstsq=0 grid=1  max|dcenters|=0.000e+00  max|dgen|=1.388e-17  ok=True
+  vec=1 bnd=1 lstsq=1 grid=0  max|dcenters|=0.000e+00  max|dgen|=1.388e-17  ok=True
+  vec=1 bnd=1 lstsq=1 grid=1  max|dcenters|=0.000e+00  max|dgen|=1.388e-17  ok=True
+  -> worst deviation across all combinations: 1.388e-17
+  -> all within tolerance: True
+
+PASS
