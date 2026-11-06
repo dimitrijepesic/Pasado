@@ -1,0 +1,4 @@
+logs/checks_baseline_1d754c9/sweep_fp64.csv: rows=180 min lc/sampled_max=1.000041 below=0
+logs/checks_baseline_1d754c9/sweep_fp64_to64.csv: rows=84 min lc/sampled_max=1.012815 below=0
+Wrote 264 rows to logs/checks_baseline_1d754c9/soundness_check.csv
+ALL SOUND

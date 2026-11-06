@@ -1,0 +1,24 @@
+ok   seeded run exits with 0
+ok   same seed twice gives identical lc_precise
+ok   a different seed gives a different lc_precise
+ok   --device cpu gives the same result as the default
+ok   --precise-only gives the same lc_precise as the full run
+ok   --precise-only does not print lc_zonos
+ok   the full run calls the zonotope, interval and precise analyses
+ok   --precise-only runs only the precise analysis
+ok   --num-images other than 30 prints a warning
+ok   image_ids lists the images that were used
+ok   the run prints its configuration
+ok   a non-default full run saves exactly six files
+ok   non-default image/epsilon/seed/selectors are encoded in every filename
+ok   a precise-only run saves exactly two files
+ok   precise-only files cannot overwrite default results
+ok   invalid --num-images 0 is rejected during argument validation
+ok   invalid --n-splits 0 is rejected during argument validation
+ok   invalid --eps-indices 0 0 is rejected during argument validation
+ok   invalid --eps-indices 16 is rejected during argument validation
+ok   invalid --seed -1 is rejected during argument validation
+ok   invalid --device not-a-device is rejected during argument validation
+ok   --device cuda without CUDA stops with a clear message
+ok   the real get_lipschitz MPS CLI path runs within float32 tolerance
+ALL PASS

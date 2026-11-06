@@ -1,5 +1,14 @@
 # BATCHED_LSTSQ_RESULTS - batched per-neuron regression, integration + validation
 
+> **Measured before the soundness fixes of 2026-10-21/22 (`b526762`); marked 2026-11-06.**
+> Every number here comes from the code before `Zonotope.__neg__` / `DualZonotope.__neg__`
+> negated the generators and before the boundary checks bounded `|E|` instead of `E`.
+> Speedups, call counts and profiles compare two implementations of that same pre-fix
+> code; the fixes add one elementwise `abs` per boundary check and a sign flip, so the
+> ratios are not expected to move, but they have **not been re-measured**. Lipschitz bound
+> values quoted here are **not valid** after the fix. Hardware measurements (GFLOP/s,
+> `gels` against `gelsd`) do not depend on Pasado's code. Current state: `CHECKPOINT.md`.
+
 Selector: `PASADO_BATCHED_LSTSQ=1` enables `lin_reg_tensor_batched` inside
 `sigmoid_prime_product_tensor` (default **OFF**; the loop path is untouched and
 remains the default until this document's validation is accepted). Driver stays

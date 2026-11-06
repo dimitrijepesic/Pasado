@@ -62,6 +62,25 @@ AUTO_PLANE_FIT_DEVICES = ("cuda",)
 _override = os.environ.get("PASADO_PLANE_FIT_THRESHOLD")
 PLANE_FIT_THRESHOLD_OVERRIDE = int(_override) if _override else None
 
+# PRELIMINARY prototype, off by default: inflate the error term D of every box by
+# OUTWARD_D_EPS * eps * T and round the sum up, T being the size of the terms D is computed
+# from. It covers the shortfall measured in results/d_shortfall_verification_2026-11/
+# (at most 2.36 eps T) with a margin; it is a heuristic, not a proof of floating-point
+# soundness. Protocol and measurements: results/outward_rounding_prototype_2026-11/.
+USE_OUTWARD_D = os.environ.get("PASADO_OUTWARD_D", "0") != "0"
+OUTWARD_D_EPS = 4.0
+
+
+def outward_error(errors, abc, lx, ux, ly, uy):
+    """nextafter(D + OUTWARD_D_EPS * eps * T, +inf), T = max over the corners of
+    0.25|y| + |A x| + |B y| + |C|. All arguments are flat [n] tensors (abc is [n, 3])."""
+    A, B, C = abc[:, 0].abs(), abc[:, 1].abs(), abc[:, 2].abs()
+    ax = torch.maximum(A * lx.abs(), A * ux.abs())
+    y = torch.maximum(ly.abs(), uy.abs())
+    T = 0.25 * y + ax + B * y + C
+    eps = torch.finfo(errors.dtype).eps
+    return torch.nextafter(errors + OUTWARD_D_EPS * eps * T, torch.full_like(errors, float("inf")))
+
 
 def plane_fit_for(grid):
     """The plane fit for one call, from the switches above.
@@ -201,7 +220,10 @@ def precise_sigmoid(z, noise):
     abc = torch.stack((As, Bs, Cs), dim=1)
     corners = pt.check_corners_tensor(abc, lx_f, ux_f, ly_f, uy_f)
     err_ly, err_uy = pt.check_nonlinear_boundary_tensor(lx_f, ux_f, ly_f, uy_f, abc)
-    errors = torch.maximum(torch.maximum(corners, err_ly), err_uy).reshape(S, N)
+    errors = torch.maximum(torch.maximum(corners, err_ly), err_uy)
+    if USE_OUTWARD_D:
+        errors = outward_error(errors, abc, lx_f, ux_f, ly_f, uy_f)
+    errors = errors.reshape(S, N)
 
     As, Bs, Cs = As.reshape(S, N), Bs.reshape(S, N), Cs.reshape(S, N)
     dual_c = As * z.rc + Bs * z.dc + Cs

@@ -1,0 +1,5 @@
+Baseline run started on a clean checkout of 1d754c9 (plus experiments/run_all_checks.sh).
+While it ran, documentation files under results/optimization_section_5_4/ were edited and
+Section_5_4/get_lipschitz.py gained the output-only --per-image-csv option, so the later
+steps (from about test_cli on) ran against that working tree, not the pure commit. The
+final check run on the checkpoint commit is the one that counts.

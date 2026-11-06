@@ -1,0 +1,21 @@
+--- negation ---
+[PASS] Zonotope: Z + (-Z) has zero generators               max|gen|=0.000e+00
+[PASS] DualZonotope: DZ + (-DZ) has zero generators         max|gen|=0.000e+00
+[PASS] hazed input endpoints, t in [0.0, 0.3]               max|err|=2.220e-16
+[PASS] hazed input endpoints, t in [0.2, 0.4]               max|err|=1.110e-16
+--- approximation error over the box ---
+[PASS] max error >= brute force, vectorized, seed 0         neurons below=0/400 worst shortfall=3.730e-15
+[PASS] max error >= brute force, original, seed 0           neurons below=0/400 worst shortfall=2.418e-14
+[PASS] max error >= brute force, vectorized, seed 1         neurons below=0/400 worst shortfall=2.816e-15
+[PASS] max error >= brute force, original, seed 1           neurons below=0/400 worst shortfall=4.328e-14
+[PASS] max error >= brute force, vectorized, seed 2         neurons below=0/400 worst shortfall=1.271e-15
+[PASS] max error >= brute force, original, seed 2           neurons below=0/400 worst shortfall=1.271e-15
+--- lc_precise against sampled autograd derivative ---
+[PASS] 3layer img 0 eps_idx 8 n_splits 8 vectorized         lc/sampled_max=1.000331
+[PASS] 3layer img 2 eps_idx 8 n_splits 16 vectorized        lc/sampled_max=1.000099
+[PASS] 4layer img 0 eps_idx 8 n_splits 4 vectorized         lc/sampled_max=1.001243
+[PASS] 4layer img 2 eps_idx 15 n_splits 1 vectorized        lc/sampled_max=1.000068
+[PASS] big img 1 eps_idx 8 n_splits 4 vectorized            lc/sampled_max=1.001455
+[PASS] 3layer img 0 eps_idx 8 n_splits 8 original           lc/sampled_max=1.000331
+
+ALL PASS

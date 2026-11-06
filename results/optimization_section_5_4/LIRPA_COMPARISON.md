@@ -1,5 +1,21 @@
 # Poreenje sa auto_LiRPA - baseline koji Pasado rad nema
 
+> **PRE-FIX - ne prikazivati kao vazeci rezultat (oznaceno 2026-11-06).**
+> Sve Pasado vrednosti u ovom dokumentu - a time i svi odnosi `lirpa / precise`,
+> BaB presek na K~7 i tabela cene po podproblemu - izracunate su kodom **pre** dve
+> soundness ispravke od 21-22.10.2026 (`b526762`: `Zonotope.__neg__` /
+> `DualZonotope.__neg__` nisu negirali generatore; provere granice su
+> maksimizovale `E` umesto `|E|`). Na CPU split sweep-u posle ispravke
+> (`results/soundness_fix_2026-10-22/`) ispravka spusta Pasado granicu pri
+> `n_splits = 1` za 17-37 % i blago je podize pri finim podelama, pa se odnosi i
+> presek mogu pomeriti u oba smera. **auto_LiRPA vrednosti ne zavise od Pasado
+> koda** i ostaju kako su izmerene (auto_LiRPA 0.7.2, torch 2.11, uredjaj naveden
+> uz svaku tabelu). Pasado vremena u ovom dokumentu su takodje sa koda pre ispravke,
+> sa nepinovanog laptop CPU-a (verovatno i5-12450H; sirovi CSV-ovi su u
+> `lipschitz-comparison/`, van repoa). Ponovno merenje na ispravljenom kodu,
+> sa Pasadom na istom A100 kao auto_LiRPA: `results/lirpa_postfix_2026-11/PROTOCOL.md`,
+> sveska `colab/01_postfix_rerun.ipynb` (sekcija C).
+
 ## Zasto ovo poreenje
 
 Pasado (OOPSLA 2023) u Section 5.4 poredi lokalne Lipsicove konstante samo
@@ -61,6 +77,8 @@ projektu.
 
 Odnos `lirpa / precise` - vrednost > 1 znaci da je Pasado tesnji.
 
+> **PRE-FIX** (Pasado strana i odnosi) - v. napomenu na vrhu.
+
 | eps | 3layer | 4layer | 5layer | big |
 |---|---:|---:|---:|---:|
 | 0.632 | 1.006 | 1.289 | 1.748 | 2.248 |
@@ -75,6 +93,8 @@ Odnos `lirpa / precise` - vrednost > 1 znaci da je Pasado tesnji.
 | 0.000112 | 1.000 | 1.002 | 0.9995 | 1.085 |
 
 Arhitekture, jer je za tumacenje presudno razlikovati dubinu od sirine:
+
+> **PRE-FIX** (Pasado strana i odnosi) - v. napomenu na vrhu.
 
 | mreza | broj sigmoid slojeva | sirina | vrhunac odnosa |
 |---|---:|---:|---:|
@@ -151,6 +171,8 @@ greska u postavci, ne nalaz.
 5layer, eps = 0.2, prosek preko istih 30 slika, isti budzet na obe strane
 (`lipschitz-comparison/bab_experiment.py`, best-first bisekcija):
 
+> **PRE-FIX** (Pasado strana i odnosi) - v. napomenu na vrhu.
+
 | podproblema | Pasado (`n_splits=k`) | auto_LiRPA + BaB | odnos |
 |---:|---:|---:|---:|
 | 1 | 1288.40 | 3640.73 | **2.83x** Pasado tesnji |
@@ -177,6 +199,8 @@ A100 brojevi za 5layer/eps=0.2 identicni su CPU eksperimentu iznad
 
 Odnos `lirpa / pasado` pri jednakom budzetu (>1 znaci da je Pasado tesnji);
 "presek" je linearno interpolisan K na kome odnos pada na 1:
+
+> **PRE-FIX** (Pasado strana i odnosi) - v. napomenu na vrhu.
 
 | mreza | eps | K=1 | K=3 | K=5 | K=7 | K=9 | presek |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -232,6 +256,8 @@ staje posle 13-19 iteracija pa cena po solve-u varira, ali ne za red velicine).
 
 Na budzetu izjednacenja K=7, po slici po epsilonu (Pasado vremena su prosek
 eps indeksa 0-4 iz `pasado_splits.csv`):
+
+> **PRE-FIX** (Pasado strana i odnosi) - v. napomenu na vrhu.
 
 | mreza | Pasado, CPU, k=7 | auto_LiRPA, A100, 7 podpr. | odnos |
 |---|---:|---:|---:|

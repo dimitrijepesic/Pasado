@@ -1,0 +1,13 @@
+[PASS] random n=1                                    max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] random n=2                                    max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] random n=5                                    max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] random n=17                                   max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] random n=100                                  max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] random n=500                                  max_diff_ly=1.192e-07 max_diff_uy=0.000e+00
+[PASS] ly/uy containing zero                         max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] roots outside [lx,ux]                         max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] degenerate lx==ux                             max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] degenerate lx==ux and ly==uy                  max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+[PASS] A sweeping through 0, mixed sign              max_diff_ly=0.000e+00 max_diff_uy=0.000e+00
+
+ALL PASS

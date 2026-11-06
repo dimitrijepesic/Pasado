@@ -1,5 +1,38 @@
 # NEXT_RESEARCH_DIRECTIONS - Section 5.4 precise transformer
 
+> **Measured before the soundness fixes of 2026-10-21/22 (`b526762`); marked 2026-11-06.**
+> Every number here comes from the code before `Zonotope.__neg__` / `DualZonotope.__neg__`
+> negated the generators and before the boundary checks bounded `|E|` instead of `E`.
+> Speedups, call counts and profiles compare two implementations of that same pre-fix
+> code; the fixes add one elementwise `abs` per boundary check and a sign flip, so the
+> ratios are not expected to move, but they have **not been re-measured**. Lipschitz bound
+> values quoted here are **not valid** after the fix. Hardware measurements (GFLOP/s,
+> `gels` against `gelsd`) do not depend on Pasado's code. Current state: `CHECKPOINT.md`.
+
+## Status of every direction on 2026-11-06
+
+This list was written at the end of the July 2026 CPU sprint. What has happened to each item
+since then (details in `FORMAL_SUMMARY.md` and the dated folders under `results/`):
+
+| Item | Status | Where |
+|---|---|---|
+| 1.1 batch `get_linspace` | **done** (2026-08-12), bit-identical, `PASADO_BATCHED_GRID`; the ~1 ULP caveat below was wrong (artifact of the naive formula) | `FORMAL_SUMMARY.md` |
+| 1.2 `unbind` round-trip in `compute_max_error` | not done on the sequential path; the batched path (`batched_splits.precise_sigmoid`) combines the three checks with `torch.maximum` and has no round-trip | `forward_mode_tensorized_src/batched_splits.py` |
+| 1.3 re-measure `big` | **done** (2026-08-06): 1.650x, interleaved, pinned, n = 3 | `FORMAL_SUMMARY.md` |
+| 2.1 fewer noise symbols | open (changes the analysis; needs a decision) | - |
+| 2.2 GPU execution | **done in large part**: device plumbing, CPU `gelsd` bridge, real cubic (the complex64 path is wrong on CUDA), batched splits, closed-form A2 plane fit chosen by a pre-registered rule, automatic gelsd/A2 choice (opt-in). Results before 2026-10-22 are pre-fix | `GPU_READINESS.md`, `results/gpu_hybrid_*`, `results/lstsq_comparison_*`, `results/planar_fit_cuda_2026-10-27/` |
+| 2.3 `torch.compile` | **done on CUDA**: compiled `fit_planes` (opt-in), compiled whole `precise_sigmoid` (experiment, outcome opt-in); CPU/MSVC path still not tried | `results/v3_compiled_cuda_2026-10-28/`, `results/compiled_sigmoid_v3_cuda_2026-10-29/` |
+| 2.4 float32 / mixed precision | partly: float32 CPU/CUDA agreement 8.3e-7 (pre-fix), known float32 max-error shortfall near sigmoid roots (`experiments/reproduce_f32_root_shortfall.py`); no study of per-stage precision | `results/gpu_hybrid_verification_2026-10-08/` |
+| 3.1 Triton | Inductor now generates Triton kernels for the compiled paths (archived in `results/compiled_sigmoid_v3_cuda_2026-10-29/kernel_code/`); no hand-written kernel | - |
+| 3.2 Inductor graph analysis | in progress: part of the compiler comparison of the November checkpoint | `results/compilers_2026-11/PROTOCOL.md` |
+| 3.3 JAX frontend | in progress: isolated kernels ported for the compiler comparison | `results/compilers_2026-11/PROTOCOL.md` |
+| 3.4 Neptune | static analysis of whether its patterns exist in Pasado | `docs/NEPTUNE_ANALYSIS.md` |
+| 3.5 cross-hardware study | open (T4, A100 and Apple CPU/MPS measured separately; no common protocol) | - |
+| rejected: closed form | still rejected on the CPU; **chosen on CUDA** (A2), where `gelsd` does not exist | `results/lstsq_comparison_2026-10-27_v3_zpivot/` |
+| rejected: `torch.compile` | still rejected on the Windows CPU; **works on CUDA** (opt-in) | see 2.3 |
+
+---
+
 Ranked by how directly the sprint's measurements support them. A deliberate
 distinction is kept throughout between **implementation optimization** (same
 analysis, less time) and a **publishable research contribution** (new analysis

@@ -1,0 +1,8 @@
+{
+ "device": "cpu",
+ "torch": "2.12.1",
+ "threads": 8,
+ "rounds": 30,
+ "plane_fit_in_cost": "closed form A2 (eager fit_planes) in both eager and compiled variants",
+ "plane_fit_in_effect": "gelsd (default)"
+}

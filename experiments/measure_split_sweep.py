@@ -60,6 +60,7 @@ CSV_COLUMNS = [
     "peak_vram_mb",
     "split_mode",
     "split_chunk",
+    "plane_fit",
 ]
 
 
@@ -153,6 +154,13 @@ def parse_args():
         type=positive_int,
         default=None,
         help="batched mode only: sub-intervals per forward pass; default: all at once",
+    )
+    ap.add_argument(
+        "--plane-fit",
+        choices=["gelsd", "auto"],
+        default="gelsd",
+        help="batched mode only: gelsd on the CPU (default) or the automatic choice "
+             "between gelsd and the closed form (PASADO_AUTO_PLANE_FIT)",
     )
     ap.add_argument(
         "--real-cubic",
@@ -327,6 +335,9 @@ def main():
     pt.USE_BATCHED_LSTSQ = True
     pt.USE_BATCHED_GRID = True
     pt.USE_REAL_CUBIC = args.real_cubic
+    if args.plane_fit != "gelsd" and args.split_mode != "batched":
+        raise SystemExit("--plane-fit auto needs --split-mode batched")
+    batched_splits.USE_AUTO_PLANE_FIT = args.plane_fit == "auto"
 
     eps_schedule = [10 ** (-k / 4) * 2 for k in range(2, 18)]
     all_rows = []
@@ -335,7 +346,7 @@ def main():
         f"Split sweep | device={device} | dtype={dtype_name} | real_cubic={args.real_cubic} | "
         f"splits={args.splits} | num_images={args.num_images} | eps_indices={args.eps_indices} | "
         f"warmup={args.warmup} | repeats={args.repeats} | split_mode={args.split_mode} | "
-        f"split_chunk={args.split_chunk}"
+        f"split_chunk={args.split_chunk} | plane_fit={args.plane_fit}"
     )
 
     for network_name in args.networks:
@@ -425,6 +436,7 @@ def main():
                             "peak_vram_mb": peak_mb,
                             "split_mode": args.split_mode,
                             "split_chunk": args.split_chunk if args.split_chunk else "",
+                            "plane_fit": args.plane_fit,
                         }
                     )
 

@@ -1,0 +1,41 @@
+3layer largest relative increase 1.2120278227857627e-14
+4layer largest relative increase 3.1954721924798566e-14
+5layer largest relative increase 1.2067886832849435e-13
+big largest relative increase 3.246614130115757e-14
+torch._subclasses.fake_tensor.DynamicOutputShapeException: aten.linalg_lstsq.default
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/dpesic/Desktop/Pasado/experiments/measure_outward_d.py", line 107, in <module>
+    main()
+    ~~~~^^
+  File "/Users/dpesic/Desktop/Pasado/experiments/measure_outward_d.py", line 103, in main
+    cost(dev, args.out, args.rounds)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dpesic/Desktop/Pasado/experiments/measure_outward_d.py", line 61, in cost
+    t0 = time.perf_counter(); run(); sync()
+                              ~~~^^
+  File "/Users/dpesic/Desktop/Pasado/experiments/measure_outward_d.py", line 60, in run
+    return f(*inputs)
+  File "/Users/dpesic/Desktop/Pasado/.venv/lib/python3.13/site-packages/torch/_dynamo/eval_frame.py", line 1058, in compile_wrapper
+    raise e.with_traceback(None) from e.__cause__  # User compiler error
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch._dynamo.exc.Unsupported: Dynamic shape operator
+  Explanation: Operator `aten.linalg_lstsq.default`'s output shape depends on input Tensor data.
+  Hint: Enable tracing of dynamic shape operators with `torch._dynamo.config.capture_dynamic_output_shape_ops = True`
+
+  Developer debug context: aten.linalg_lstsq.default
+
+ For more details about this graph break, please visit: https://meta-pytorch.github.io/compile-graph-break-site/gb/gb0036.html
+
+from user code:
+   File "/Users/dpesic/Desktop/Pasado/experiments/compilers/kernels_torch.py", line 61, in sigmoid
+    out, _ = bs.precise_sigmoid(bs.BatchedDualZonotope(rc, rg, dc, dg), noise)
+  File "/Users/dpesic/Desktop/Pasado/forward_mode_tensorized_src/batched_splits.py", line 213, in precise_sigmoid
+    coef = plane_fit_for(grid)(grid, targets)  # [S*N, 3], intercept first
+  File "/Users/dpesic/Desktop/Pasado/forward_mode_tensorized_src/precise_transformer.py", line 162, in lin_reg_tensor_batched
+    R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsd').solution  # [n, 3, 1]
+
+Set TORCHDYNAMO_VERBOSE=1 for the internal stack trace (please do this especially if you're reporting a bug to PyTorch). For even more developer context, set TORCH_LOGS="+dynamo"
+

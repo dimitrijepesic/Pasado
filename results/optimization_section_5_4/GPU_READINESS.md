@@ -1,5 +1,14 @@
 # GPU_READINESS - audit of the tensorized precise-transformer path (Phase 10)
 
+> **Measured before the soundness fixes of 2026-10-21/22 (`b526762`); marked 2026-11-06.**
+> Every number here comes from the code before `Zonotope.__neg__` / `DualZonotope.__neg__`
+> negated the generators and before the boundary checks bounded `|E|` instead of `E`.
+> Speedups, call counts and profiles compare two implementations of that same pre-fix
+> code; the fixes add one elementwise `abs` per boundary check and a sign flip, so the
+> ratios are not expected to move, but they have **not been re-measured**. Lipschitz bound
+> values quoted here are **not valid** after the fix. Hardware measurements (GFLOP/s,
+> `gels` against `gelsd`) do not depend on Pasado's code. Current state: `CHECKPOINT.md`.
+
 Static audit of `forward_mode_tensorized_src/` (precise_transformer.py,
 SimpleZono.py, Duals.py, HyperDuals.py) and `Section_5_4/get_lipschitz.py`.
 No GPU is available on the primary development machine (torch 2.12.1+cpu,
@@ -231,6 +240,11 @@ The separate CNN compatibility issue (`np.product` in `conv.py`) remains
 outside this FFNN GPU remediation.
 
 ## Phase 15: full A100 correctness matrix
+
+> **PRE-FIX.** This matrix ran on commit `c2a2c65`, before the soundness fixes of
+> 2026-10-21/22. CPU and CUDA ran the same pre-fix code, so the agreement is internally
+> consistent, but it has to be re-run on the fixed code (`colab/01_postfix_rerun.ipynb`,
+> section A).
 
 The final matrix ran on an NVIDIA A100-SXM4-80GB on 2026-10-08. It covered
 3layer, 4layer, 5layer and big; all 30 selected images; and all 16 epsilon

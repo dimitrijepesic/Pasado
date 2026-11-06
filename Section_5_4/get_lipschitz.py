@@ -56,6 +56,11 @@ parser.add_argument("--num-images", type=positive_int, default=30,
                     help="number of correctly classified test images; default: 30")
 parser.add_argument("--precise-only", action="store_true",
                     help="skip the plain zonotope and interval analyses")
+# Writes one row per (epsilon, image) with the per-image bounds and times, so device
+# comparisons can report the largest per-image difference instead of 30-image averages.
+# Output only: the analysis and the printed averages are unchanged.
+parser.add_argument("--per-image-csv", default=None,
+                    help="optional CSV path for per-image bounds and times")
 args = parser.parse_args()
 
 if args.eps_indices is not None:
@@ -211,8 +216,10 @@ test_range = [10 ** (-k / 4) * 2 for k in range(2, 18)]
 if args.eps_indices is not None:
     test_range = [test_range[i] for i in args.eps_indices]
 pbar_total = tqdm(total=len(test_range), position=0)
+eps_ids = args.eps_indices if args.eps_indices is not None else list(range(16))
+per_image_rows = []
 
-for epsilon in test_range:  # change back to 2,18
+for eps_pos, epsilon in enumerate(test_range):  # change back to 2,18
     print(f'Running epsilon={epsilon}')
     lc_zono_total = 0
     lc_zono_precise_total = 0
@@ -292,6 +299,14 @@ for epsilon in test_range:  # change back to 2,18
                     time_interval_total += end - start
                     lc_interval_total += lc_interval
 
+                if args.per_image_csv is not None:
+                    per_image_rows.append(dict(
+                        network=network, device=str(device), dtype=dtype_name,
+                        n_splits=n_splits, seed=args.seed, eps_index=eps_ids[eps_pos],
+                        epsilon=epsilon, image_id=img_index, lc_precise=lc_zono_precise,
+                        lc_zono=None if args.precise_only else lc_zono,
+                        lc_interval=None if args.precise_only else lc_interval,
+                        time_precise_s=time_precise_total))
                 correct_images += 1
                 used_ids.append(img_index)
                 pbar_eps.update(1)
@@ -325,6 +340,20 @@ if not args.precise_only:
     print('lc_intervals', lc_intervals)
 print('time_precise', time_precise)
 print('image_ids', used_ids)
+
+if args.per_image_csv is not None:
+    import csv
+    # time_precise_s above is cumulative within an epsilon; store the per-image time
+    previous = {}
+    for row in per_image_rows:
+        key = row['eps_index']
+        row['time_precise_s'], previous[key] = (row['time_precise_s'] - previous.get(key, 0.0),
+                                               row['time_precise_s'])
+    with open(args.per_image_csv, 'w', newline='') as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(per_image_rows[0]))
+        writer.writeheader()
+        writer.writerows(per_image_rows)
+    print('per_image_csv', args.per_image_csv, len(per_image_rows))
 
 if not args.no_save:
     os.makedirs(args.results_dir, exist_ok=True)

@@ -1,5 +1,16 @@
 # Equal-time poreenje: pri jednakom vremenu Pasado dominira u celom merenom opsegu
 
+> **PRE-FIX - ne prikazivati kao vazeci rezultat (oznaceno 2026-11-06).**
+> Pasado vrednosti i vremena u obe tabele izmereni su kodom **pre** soundness
+> ispravki od 21-22.10.2026 (`b526762`, v. `LIRPA_COMPARISON.md`), na nepinovanom
+> laptop CPU-u (verovatno Windows i5-12450H iz julskog sprinta; sirovi CSV sa
+> oznakom uredjaja je u `lipschitz-comparison/`, van repoa), dok je auto_LiRPA
+> strana izvedena iz A100 sweep-a. Ispravka menja Pasado granice (pri `n_splits = 1` nize za 17-37 %, pri
+> finim podelama blago vise), pa se izbor k* i odnosi tesnoce mogu promeniti.
+> auto_LiRPA granice ne zavise od Pasado koda. Napomena i o postavci: ovo je
+> poredjenje razlicitog hardvera (Pasado CPU, auto_LiRPA A100). Ponovno merenje na
+> ispravljenom kodu, obe strane na istom A100: `results/lirpa_postfix_2026-11/PROTOCOL.md`.
+
 ## Zasto ovo merenje
 
 Equal-budget poreenje (`LIRPA_COMPARISON.md`, presek na K~7) izjednacava
@@ -31,6 +42,8 @@ pri jednakom wall-clock budzetu Pasado dominira. Sada je izmereno: dominira.
 **Tabela A - najmanji Pasado k koji tuce auto_LiRPA-in najveci mereni budzet
 (K=9):**
 
+> **PRE-FIX** (Pasado strana, vremena i odnosi) - v. napomenu na vrhu.
+
 | mreza | eps | auto_LiRPA K=9 | @ vreme | Pasado k* | vrednost | @ vreme | vremenska prednost |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 3layer | 0.632 | 185.1 | 5.2 s | 16 | 181.1 | 0.37 s | 14x |
@@ -51,6 +64,8 @@ pri jednakom wall-clock budzetu Pasado dominira. Sada je izmereno: dominira.
 
 **Tabela B - head-to-head pri auto_LiRPA-inom K=9 vremenskom budzetu**
 (najveci Pasado k cije izmereno vreme staje u taj budzet):
+
+> **PRE-FIX** (Pasado strana, vremena i odnosi) - v. napomenu na vrhu.
 
 | mreza | eps | auto_LiRPA K=9 | Pasado (k u budzetu) | odnos tesnoce |
 |---|---:|---:|---:|---:|

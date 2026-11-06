@@ -1,0 +1,33 @@
+batched plane fit: planar_fit compiled
+batched == sequential, per split
+  [PASS] 3layer: all per-split bounds (max rel diff 8.36e-14, splits [1, 4], eps [0, 8], 1 images)
+chunking does not change the result
+  [PASS] chunk=1 (7.45e-16)
+  [PASS] chunk=3 (4.96e-16)
+  [PASS] chunk=8 (0.00e+00)
+  [PASS] chunk=100 (0.00e+00)
+n_splits=1 equals one sequential forward pass
+  [PASS] single split 
+per-split bound is independent of the other splits in the batch
+  [PASS] 16 splits vs 4 chunks of 4 
+unseeded noise: bound stays above the sampled autograd maximum
+  [PASS] image 0 eps_idx 0 n=1 (lc=508.4182, sampled=198.7162)
+  [PASS] image 0 eps_idx 0 n=16 (lc=243.0204, sampled=198.7162)
+  [PASS] image 0 eps_idx 8 n=1 (lc=170.8867, sampled=168.9099)
+  [PASS] image 0 eps_idx 8 n=16 (lc=168.9322, sampled=168.9099)
+  [PASS] image 1 eps_idx 0 n=1 (lc=249.7742, sampled=86.7925)
+  [PASS] image 1 eps_idx 0 n=16 (lc=99.6081, sampled=86.7925)
+  [PASS] image 1 eps_idx 8 n=1 (lc=87.2968, sampled=86.7925)
+  [PASS] image 1 eps_idx 8 n=16 (lc=86.8185, sampled=86.7925)
+noise on A: NumPy draws and seeds
+  [PASS] seeded, chunk=None: generator state after the pass 
+  [PASS] seeded, chunk=None: same seed, same bits 
+  [PASS] seeded, chunk=2: generator state after the pass 
+  [PASS] seeded, chunk=2: same seed, same bits 
+  [PASS] unseeded: generator state after the pass 
+a perturbed A of 0 stops the pass
+  [PASS] AssertionError 
+  [PASS] the selected plane fit was used (78 closed-form calls)
+  [PASS] compiled, not the eager fallback (2 graph(s) compiled)
+
+ALL CHECKS PASSED

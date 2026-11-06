@@ -1,0 +1,16 @@
+{
+ "time_utc": "2026-11-06T14:18:26Z",
+ "host": "Dimitrije-Pesic's-Mac",
+ "python": "3.13.18",
+ "machine": "arm64",
+ "commit": "1d754c9128dcc88363491fcf60c3219c7c76b93a",
+ "dirty": true,
+ "cpu": "Apple M1 Pro",
+ "cpu_count": 10,
+ "nvidia_smi": "",
+ "torch": "2.12.1",
+ "cuda": null,
+ "cuda_available": false,
+ "threads": 8,
+ "jax": "0.12.0.1"
+}

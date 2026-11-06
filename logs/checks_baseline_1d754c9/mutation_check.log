@@ -1,0 +1,864 @@
+=== baseline: all tests on the unmodified copy ===
+  grid       exit=0  PASS
+  selector   exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    exit=0  ALL PASS
+  boundary   exit=0  ALL PASS
+  max_error  exit=0  ALL PASS
+  lin_reg    exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   exit=0  ALL PASS
+  cli        exit=0  ALL PASS
+  e2e        exit=0  ALL PASS
+  soundness  exit=0  ALL PASS
+  planar_fit exit=0  ALL CHECKS PASSED
+  batched    exit=0  ALL CHECKS PASSED
+  batched_cf exit=0  ALL CHECKS PASSED
+  planar_cc  exit=0  ALL CHECKS PASSED
+  batched_cc exit=0  ALL CHECKS PASSED
+  auto       exit=0  ALL CHECKS PASSED
+
+=== M1  _linspace_rows: wrong step size in the batched sampling grid ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -47,5 +47,5 @@
+     """
+     t = torch.arange(STEPS, dtype=lo.dtype, device=lo.device)
+-    step = (hi - lo) / (STEPS - 1)
++    step = (hi - lo) / STEPS
+     out = lo.unsqueeze(1) + t * step.unsqueeze(1)
+     # A slice, not a boolean mask: a mask goes through nonzero, whose shape depends
+
+  grid       KILLED   exit=1  FAIL
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M2  check_corners_tensor: forget the negated side of the error (only F, not -F) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -356,5 +356,5 @@
+     row_min = torch.min(evaluation, dim=1).values
+ 
+-    return torch.max(row_max, -row_min)  # [n]
++    return row_max  # [n]
+ 
+ 
+
+  grid       KILLED   exit=1  FAIL
+  selector   KILLED   exit=1  Greatest relative difference: 0.24069688112641147 at index (7, 2) (up to 1e-09 allowed)
+  corners    KILLED   exit=1  SOME FAILED
+  boundary   survived exit=0  ALL PASS
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        KILLED   exit=1  SOME FAILED
+  soundness  KILLED   exit=1  SOME FAILED
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M3  check_corners_tensor: use a wrong corner (lower-x corner twice, upper-x corner dropped) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -343,5 +343,5 @@
+ 
+     # corners in the same order as check_corners: (lx,ly), (lx,uy), (ux,ly), (ux,uy)
+-    xs = torch.stack((lx, lx, ux, ux), dim=1)
++    xs = torch.stack((lx, lx, lx, ux), dim=1)
+     ys = torch.stack((ly, uy, ly, uy), dim=1)
+ 
+
+  grid       KILLED   exit=1  FAIL
+  selector   KILLED   exit=1  Greatest relative difference: 0.3789392535111775 at index (183, 83) (up to 1e-09 allowed)
+  corners    KILLED   exit=1  SOME FAILED
+  boundary   survived exit=0  ALL PASS
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        KILLED   exit=1  SOME FAILED
+  soundness  KILLED   exit=1  SOME FAILED
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M4  check_nonlinear_boundary_tensor: the uy branch divides by ly instead of uy ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -463,5 +463,5 @@
+ 
+     A_by_ly = A / ly
+-    A_by_uy = A / uy
++    A_by_uy = A / ly
+     A_by_ly = inf_to_nan(A_by_ly)  # Checks the case ly=0 (meaning A/ly is undefined)
+     A_by_uy = inf_to_nan(A_by_uy)
+
+  grid       survived exit=0  PASS
+  selector   KILLED   exit=1  Greatest relative difference: 0.21266400396305665 at index (139, 39) (up to 1e-09 allowed)
+  corners    survived exit=0  ALL PASS
+  boundary   KILLED   exit=1  SOME FAILED
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        KILLED   exit=1  SOME FAILED
+  soundness  KILLED   exit=1  SOME FAILED
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M5  _max_objective_over_x_candidates: filtered-out roots count as 0 instead of -inf, so they can win the max ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -451,5 +451,5 @@
+     planar = A.unsqueeze(1) * xs + B.unsqueeze(1) * ys + C.unsqueeze(1)
+     evaluation = (sigmoid_prime_y - planar).abs()
+-    evaluation = torch.nan_to_num(evaluation, -float("Inf"))
++    evaluation = torch.nan_to_num(evaluation, 0.0)
+     return torch.max(evaluation, dim=1).values
+ 
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   KILLED   exit=1  SOME FAILED
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M6  check_nonlinear_boundary_tensor: roots are left in float32 instead of promoted to the input dtype (a mistake that was actually made once during development) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -484,5 +484,5 @@
+     # which promotes them to the common dtype before sigmoid, so promote explicitly
+     # to get the same result.
+-    roots_x = torch.stack((root1, root2, root3), dim=1).to(ly.dtype)  # [n, 3]
++    roots_x = torch.stack((root1, root2, root3), dim=1)  # [n, 3]
+     roots_y = ly.unsqueeze(1)  # [n, 1], broadcasts against roots_x
+ 
+
+  grid       survived exit=0  PASS
+  selector   KILLED   exit=1  Greatest relative difference: 4.221256472477718e-08 at index (157, 57) (up to 1e-09 allowe
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        KILLED   exit=1  SOME FAILED
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M7  compute_max_error: drop the uy boundary term from the combined maximum ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -594,5 +594,5 @@
+         errors = check_corners_tensor(ABCs_tensor, lx, ux, ly, uy)
+         errors2_ly, errors2_uy = check_nonlinear_boundary_tensor(lx, ux, ly, uy, ABCs_tensor)
+-        return torch.maximum(torch.maximum(errors, errors2_ly), errors2_uy)
++        return torch.maximum(errors, errors2_ly)
+ 
+     # checks along the linear function boundaries (by just checking the corners)
+
+  grid       survived exit=0  PASS
+  selector   KILLED   exit=1  Greatest relative difference: 0.21266400396305665 at index (139, 39) (up to 1e-09 allowed)
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        KILLED   exit=1  SOME FAILED
+  soundness  KILLED   exit=1  SOME FAILED
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  batched_cf KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  auto       KILLED   exit=1  FAILED: 5 check(s): ['3layer n_splits=4 chunk=None (400 boxes per call): per-split bounds 
+
+=== M8  sigmoid_prime_product_tensor: selector inverted: vectorized path used exactly when it is switched off ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -683,5 +683,5 @@
+     # [n, 3] tensor form of ABCs for the vectorized checks; None selects the
+     # original per-neuron path.
+-    ABCs_tensor = torch.stack((As, Bs, Cs), dim=1) if USE_VECTORIZED_PRECISE else None
++    ABCs_tensor = torch.stack((As, Bs, Cs), dim=1) if not USE_VECTORIZED_PRECISE else None
+ 
+     # Everything up to this point works (the linear regression and the lower and upper bounds of the input Zonotopes)
+
+  grid       KILLED   exit=1  TypeError: 'NoneType' object is not subscriptable
+  selector   KILLED   exit=1  AssertionError: n=1 [old]: check_corners was not called ({'check_corners': 0, 'check_corne
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        KILLED   exit=1  AssertionError: no 'lc_precise' line in the output
+  e2e        survived exit=0  ALL PASS
+  soundness  KILLED   exit=1  TypeError: 'NoneType' object is not subscriptable
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    KILLED   exit=1  TypeError: 'NoneType' object is not subscriptable
+  batched_cf KILLED   exit=1  TypeError: 'NoneType' object is not subscriptable
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc KILLED   exit=1  TypeError: 'NoneType' object is not subscriptable
+  auto       KILLED   exit=1  TypeError: 'NoneType' object is not subscriptable
+
+=== M9  lin_reg_tensor_batched: design matrix columns in the wrong order (intercept last) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -159,5 +159,5 @@
+     ones = torch.ones(x_batch.shape[0], x_batch.shape[1], 1,
+                       dtype=x_batch.dtype, device=x_batch.device)
+-    xplusone = torch.cat((ones, x_batch), dim=2)  # [n, m, 3], intercept-first
++    xplusone = torch.cat((x_batch, ones), dim=2)  # [n, m, 3], intercept-last
+     R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsd').solution  # [n, 3, 1]
+     return R.squeeze(-1).to(device)  # [n, 3]
+
+  grid       KILLED   exit=1  FAIL
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    KILLED   exit=1  Greatest relative difference: 2.3816602656046677 at index (0, 1) (up to 1e-12 allowed)
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit KILLED   exit=1  FAILED: 8 check(s): ['well_conditioned', 'degenerate_x', 'degenerate_y', 'point', 'well_co
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  planar_cc  KILLED   exit=1  FAILED: 8 check(s): ['well_conditioned', 'degenerate_x', 'degenerate_y', 'point', 'well_co
+  batched_cc KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  auto       KILLED   exit=1  FAILED: 3 check(s): ['3layer n_splits=8 chunk=None (800 boxes per call): per-split bounds 
+
+=== M10  lin_reg_tensor_batched: different LAPACK driver (gelsy instead of gelsd): same answer up to rounding, not bit-identical ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -160,5 +160,5 @@
+                       dtype=x_batch.dtype, device=x_batch.device)
+     xplusone = torch.cat((ones, x_batch), dim=2)  # [n, m, 3], intercept-first
+-    R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsd').solution  # [n, 3, 1]
++    R = torch.linalg.lstsq(xplusone, zs_batch, driver='gelsy').solution  # [n, 3, 1]
+     return R.squeeze(-1).to(device)  # [n, 3]
+ 
+
+  grid       KILLED   exit=1  FAIL
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    KILLED   exit=1  Greatest relative difference: 4.374090903533728e-12 at index (787, 0) (up to 1e-12 allowed
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit KILLED   exit=1  FAILED: 2 check(s): ['degenerate_x', 'degenerate_x']
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  KILLED   exit=1  FAILED: 2 check(s): ['degenerate_x', 'degenerate_x']
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M11  Zonotope.__neg__: negate the center only, keeping the generators (the upstream bug) ===
+--- a/forward_mode_tensorized_src/SimpleZono.py
++++ b/forward_mode_tensorized_src/SimpleZono.py
+@@ -115,5 +115,5 @@
+     # tested - works
+     def __neg__(self):
+-        return Zonotope(-self.centers, -self.generators)
++        return Zonotope(-self.centers, self.generators)
+ 
+         # tested - works
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  KILLED   exit=1  SOME FAILED
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M12  DualZonotope.__neg__: negate the centers only, keeping the generators (the upstream bug) ===
+--- a/forward_mode_tensorized_src/SimpleZono.py
++++ b/forward_mode_tensorized_src/SimpleZono.py
+@@ -368,5 +368,5 @@
+ 
+     def __neg__(self):
+-        return DualZonotope(-self.real.centers, -self.real.generators, -self.dual.centers, -self.dual.generators)
++        return DualZonotope(-self.real.centers, self.real.generators, -self.dual.centers, self.dual.generators)
+ 
+     def __mul__(self, other):
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  KILLED   exit=1  SOME FAILED
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  batched_cf KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  auto       KILLED   exit=1  FAILED: 5 check(s): ['3layer n_splits=4 chunk=None (400 boxes per call): per-split bounds 
+
+=== M13  _max_objective_over_x_candidates: maximize E instead of |E| at the boundary roots (the upstream bug) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -450,5 +450,5 @@
+     sigmoid_prime_y = (1.0 - sig) * (sig * ys)
+     planar = A.unsqueeze(1) * xs + B.unsqueeze(1) * ys + C.unsqueeze(1)
+-    evaluation = (sigmoid_prime_y - planar).abs()
++    evaluation = sigmoid_prime_y - planar
+     evaluation = torch.nan_to_num(evaluation, -float("Inf"))
+     return torch.max(evaluation, dim=1).values
+
+  grid       survived exit=0  PASS
+  selector   KILLED   exit=1  Greatest relative difference: 0.16285013134964488 at index (163, 63) (up to 1e-09 allowed)
+  corners    survived exit=0  ALL PASS
+  boundary   KILLED   exit=1  SOME FAILED
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        KILLED   exit=1  SOME FAILED
+  soundness  KILLED   exit=1  SOME FAILED
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M14  check_nonlinear_boundary: maximize E instead of |E| on the ly edge of the original path (the upstream bug) ===
+--- a/forward_mode_tensorized_src/precise_transformer.py
++++ b/forward_mode_tensorized_src/precise_transformer.py
+@@ -413,5 +413,5 @@
+     for i in range(lx.size()[0]):
+ 
+-        evaluation = objective_fn(ABCs[i][0], ABCs[i][1], ABCs[i][2], roots_paired_stacked[i]).abs()
++        evaluation = objective_fn(ABCs[i][0], ABCs[i][1], ABCs[i][2], roots_paired_stacked[i])
+         evaluation = torch.nan_to_num(evaluation, -float("Inf"))
+         maxs.append((torch.max(evaluation)))
+
+  grid       survived exit=0  PASS
+  selector   KILLED   exit=1  Greatest relative difference: 0.1400439548995323 at index (163, 63) (up to 1e-09 allowed)
+  corners    survived exit=0  ALL PASS
+  boundary   KILLED   exit=1  SOME FAILED
+  max_error  KILLED   exit=1  SOME FAILED
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        KILLED   exit=1  SOME FAILED
+  soundness  KILLED   exit=1  SOME FAILED
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M15  planar_fit._fit_targets: slope A with the wrong sign ===
+--- a/forward_mode_tensorized_src/planar_fit.py
++++ b/forward_mode_tensorized_src/planar_fit.py
+@@ -144,5 +144,5 @@
+     # Elementwise products and sums, not matmul: no TF32 on CUDA in float32. The
+     # scaled slope is multiplied by sx and divided by ax in two exact steps.
+-    a0 = torch.where(xdeg, zero, (st.dxn * (px / sx[:, None])).sum(1)
++    a0 = torch.where(xdeg, zero, -(st.dxn * (px / sx[:, None])).sum(1)
+                      / _safe(st.nxx, xdeg) * sx / _safe(st.ax, xdeg))
+     b0 = torch.where(ydeg, zero, (st.dyn * (py / sy[:, None])).sum(1)
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit KILLED   exit=1  FAILED: 54 check(s): ['normal', 'degenerate_y', 'near_degenerate', 'saturated', 'mixed_sca
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  planar_cc  KILLED   exit=1  FAILED: 35 check(s): ['normal', 'degenerate_y', 'near_degenerate', 'saturated', 'mixed_sca
+  batched_cc KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  auto       KILLED   exit=1  FAILED: 3 check(s): ['3layer n_splits=8 chunk=None (800 boxes per call): per-split bounds 
+
+=== M16  planar_fit._min_norm: the intercept is not split on a degenerate axis (C = k) ===
+--- a/forward_mode_tensorized_src/planar_fit.py
++++ b/forward_mode_tensorized_src/planar_fit.py
+@@ -117,5 +117,5 @@
+     denom = inv * inv + un * un + vn * vn
+     km = k / m
+-    C = km * inv / denom
++    C = k
+     A = torch.where(xdeg, km * un / denom, a0)
+     B = torch.where(ydeg, km * vn / denom, b0)
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit KILLED   exit=1  FAILED: 50 check(s): ['degenerate_x', 'degenerate_y', 'point', 'mixed_scale', 'cutoff_band
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  planar_cc  KILLED   exit=1  FAILED: 29 check(s): ['degenerate_x', 'degenerate_y', 'point', 'large_magnitude', 'offset_
+  batched_cc KILLED   exit=1  FAILED: 2 check(s): ['3layer: all per-split bounds', 'single split']
+  auto       KILLED   exit=1  FAILED: 3 check(s): ['3layer n_splits=8 chunk=None (800 boxes per call): per-split bounds 
+
+=== M17  planar_fit._centred: centre on the computed mean instead of a data point ===
+--- a/forward_mode_tensorized_src/planar_fit.py
++++ b/forward_mode_tensorized_src/planar_fit.py
+@@ -53,7 +53,6 @@
+     eps * |mean| into every point (Chan, Golub and LeVeque 1983).
+     """
+-    r = v - v[:, :1]
+-    rm = r.mean(dim=1, keepdim=True)
+-    return r - rm, v[:, 0] + rm[:, 0]
++    m = v.mean(dim=1, keepdim=True)
++    return v - m, m[:, 0]
+ 
+ 
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit KILLED   exit=1  FAILED: 29 check(s): ['normal', 'degenerate_x', 'degenerate_y', 'point', 'near_degenerate'
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  KILLED   exit=1  FAILED: 11 check(s): ['near_degenerate', 'cutoff_band_x', 'cutoff_band_y', 'offset_narrow'
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M18  planar_fit.gelsd_cutoff_axes: cutoff compared with eigenvalues without squaring rcond ===
+--- a/forward_mode_tensorized_src/planar_fit.py
++++ b/forward_mode_tensorized_src/planar_fit.py
+@@ -201,5 +201,5 @@
+     """
+     l1, l2, l3, tx, ty = gram_eigenvalues(st.xbar, st.ybar, *_spreads(st))
+-    r2 = rcond * rcond
++    r2 = rcond
+     drop2 = l2 <= r2 * l1
+     drop3 = l3 <= r2 * l1
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit KILLED   exit=1  FAILED: 28 check(s): ['near_degenerate', 'mixed_scale', 'cutoff_band_x', 'cutoff_band_y', 
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  KILLED   exit=1  FAILED: 13 check(s): ['near_degenerate', 'mixed_scale', 'cutoff_band_x', 'cutoff_band_y', 
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M19  batched_splits.precise_sigmoid: switch inverted: closed form used exactly when it is off ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -87,5 +87,5 @@
+             return planar_fit.fit_planes
+         return pt.lin_reg_tensor_batched
+-    if USE_CLOSED_FORM_FIT:
++    if not USE_CLOSED_FORM_FIT:
+         return planar_fit.compiled_fit_planes() if USE_COMPILED_FIT else planar_fit.fit_planes
+     return pt.lin_reg_tensor_batched
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit KILLED   exit=1  ValueError: torch.cat(): expected a non-empty list of Tensors
+  batched    KILLED   exit=1  FAILED: 1 check(s): ['the selected plane fit was used']
+  batched_cf KILLED   exit=1  FAILED: 1 check(s): ['the selected plane fit was used']
+  planar_cc  KILLED   exit=1  ValueError: torch.cat(): expected a non-empty list of Tensors
+  batched_cc KILLED   exit=1  FAILED: 2 check(s): ['the selected plane fit was used', 'compiled, not the eager fallback'
+  auto       KILLED   exit=1  FAILED: 4 check(s): ['3layer n_splits=4 chunk=None (400 boxes per call): same bits as the 
+
+=== M20  batched_splits.precise_sigmoid: the compiled switch is ignored: always the eager closed form ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -88,5 +88,5 @@
+         return pt.lin_reg_tensor_batched
+     if USE_CLOSED_FORM_FIT:
+-        return planar_fit.compiled_fit_planes() if USE_COMPILED_FIT else planar_fit.fit_planes
++        return planar_fit.fit_planes
+     return pt.lin_reg_tensor_batched
+ 
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc KILLED   exit=1  FAILED: 2 check(s): ['the selected plane fit was used', 'compiled, not the eager fallback'
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M22  planar_fit.compiled_fit_planes: the wrapper never calls the compiled function (silent eager path) ===
+--- a/forward_mode_tensorized_src/planar_fit.py
++++ b/forward_mode_tensorized_src/planar_fit.py
+@@ -247,5 +247,5 @@
+                 return fit_planes(grid, z, rcond)
+             try:
+-                return compiled(grid, z, rcond)
++                return fit_planes(grid, z, rcond)
+             except Exception as e:  # compilation runs inside the first call of a shape
+                 compile_fallback[mode] = f"{type(e).__name__}: {str(e).splitlines()[0][:200]}"
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  KILLED   exit=1  FAILED: 1 check(s): ['compiled, not the eager fallback']
+  batched_cc KILLED   exit=1  FAILED: 1 check(s): ['compiled, not the eager fallback']
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M21  planar_fit._fit_targets: x slope from the targets centred on their computed mean (the bug fixed by pivot-centring z): depends on the order of summation on narrow boxes ===
+--- a/forward_mode_tensorized_src/planar_fit.py
++++ b/forward_mode_tensorized_src/planar_fit.py
+@@ -136,6 +136,5 @@
+     z3 = z.reshape(n, s, s)  # [n, x index, y index]
+     zbar = z.mean(1)
+-    px = (z3 - z3[:, :1, :]).mean(2)  # [n, s], one value per x
+-    px = px - px.mean(1, keepdim=True)
++    px = (z3 - zbar[:, None, None]).mean(2)  # [n, s], one value per x
+     py = (z3 - z3[:, :, :1]).mean(1)  # [n, s], one value per y
+     py = py - py.mean(1, keepdim=True)
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit KILLED   exit=1  FAILED: 21 check(s): ['normal', 'degenerate_y', 'near_degenerate', 'saturated', 'mixed_sca
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  KILLED   exit=1  FAILED: 12 check(s): ['mixed_scale', 'cutoff_band_x', 'offset_narrow', 'normal', 'mixed_sc
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M23  batched_splits.plane_fit_for: automatic choice inverted: closed form below the threshold ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -84,5 +84,5 @@
+             threshold = PLANE_FIT_THRESHOLD_OVERRIDE
+         if grid.device.type in AUTO_PLANE_FIT_DEVICES and threshold is not None \
+-                and grid.shape[0] >= threshold:
++                and grid.shape[0] < threshold:
+             return planar_fit.fit_planes
+         return pt.lin_reg_tensor_batched
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       KILLED   exit=1  FAILED: 19 check(s): ['float64 n=511', 'float64 n=512', 'float64 n=513', 'float32 n=639', 
+
+=== M24  batched_splits.plane_fit_for: the automatic switch is ignored: always gelsd ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -76,5 +76,5 @@
+     the shape of the grid: no host sync.
+     """
+-    if USE_AUTO_PLANE_FIT:
++    if False:
+         if USE_CLOSED_FORM_FIT or USE_COMPILED_FIT:
+             raise ValueError("PASADO_AUTO_PLANE_FIT cannot be combined with "
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       KILLED   exit=1  FAILED: 14 check(s): ['float64 n=512', 'float64 n=513', 'float32 n=640', 'float32 n=641', 
+
+=== M25  batched_splits.AUTO_PLANE_FIT_THRESHOLD: the thresholds of the two dtypes swapped ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -58,5 +58,5 @@
+ # PASADO_PLANE_FIT_THRESHOLD overrides the threshold of every dtype.
+ USE_AUTO_PLANE_FIT = os.environ.get("PASADO_AUTO_PLANE_FIT", "0") != "0"
+-AUTO_PLANE_FIT_THRESHOLD = {torch.float64: 512, torch.float32: 640}
++AUTO_PLANE_FIT_THRESHOLD = {torch.float64: 640, torch.float32: 512}
+ AUTO_PLANE_FIT_DEVICES = ("cuda",)
+ _override = os.environ.get("PASADO_PLANE_FIT_THRESHOLD")
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       KILLED   exit=1  FAILED: 4 check(s): ['batched_splits.AUTO_PLANE_FIT_THRESHOLD', 'float64 n=512', 'float64 
+
+=== M26  batched_splits.plane_fit_for: the automatic choice uses the compiled closed form ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -85,5 +85,5 @@
+         if grid.device.type in AUTO_PLANE_FIT_DEVICES and threshold is not None \
+                 and grid.shape[0] >= threshold:
+-            return planar_fit.fit_planes
++            return planar_fit.compiled_fit_planes()
+         return pt.lin_reg_tensor_batched
+     if USE_CLOSED_FORM_FIT:
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    survived exit=0  ALL CHECKS PASSED
+  batched_cf survived exit=0  ALL CHECKS PASSED
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc survived exit=0  ALL CHECKS PASSED
+  auto       KILLED   exit=1  FAILED: 3 check(s): ['3layer n_splits=8 chunk=None (800 boxes per call): same bits as the 
+
+=== M27  batched_splits._forward_chunk: the nonzero-A flags are computed but never checked ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -232,5 +232,5 @@
+     # every perturbed A must be nonzero; one host sync per chunk instead of per layer.
+     # A failing chunk now stops after its last layer, not in the failing one.
+-    assert bool(torch.stack(nonzero).all())
++    torch.stack(nonzero).all()
+     weight_t, bias = layers[-1]
+     z = affine(z, weight_t, bias)
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    KILLED   exit=1  FAILED: 1 check(s): ['AssertionError']
+  batched_cf KILLED   exit=1  FAILED: 1 check(s): ['AssertionError']
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc KILLED   exit=1  FAILED: 1 check(s): ['AssertionError']
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== M28  batched_splits._forward_chunk: the generator is reseeded before every layer: a different noise stream ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -227,4 +227,5 @@
+     for weight_t, bias in layers[:-1]:
+         # one draw per layer, in the order of the sequential code
++        np.random.seed(seed) if seed is not None else None
+         noise = _perturbation(lows.shape[0], weight_t.shape[1], seed, z.rc.dtype, z.rc.device)
+         z, ok = precise_sigmoid(affine(z, weight_t, bias), noise)
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    KILLED   exit=1  FAILED: 4 check(s): ['3layer: all per-split bounds', 'single split', 'seeded, chunk=None: 
+  batched_cf KILLED   exit=1  FAILED: 4 check(s): ['3layer: all per-split bounds', 'single split', 'seeded, chunk=None: 
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc KILLED   exit=1  FAILED: 4 check(s): ['3layer: all per-split bounds', 'single split', 'seeded, chunk=None: 
+  auto       KILLED   exit=1  FAILED: 5 check(s): ['3layer n_splits=4 chunk=None (400 boxes per call): per-split bounds 
+
+=== M29  batched_splits.precise_sigmoid: the nonzero test lets A == 0 through ===
+--- a/forward_mode_tensorized_src/batched_splits.py
++++ b/forward_mode_tensorized_src/batched_splits.py
+@@ -196,5 +196,5 @@
+     Bs = coef[:, 2]
+     Cs = coef[:, 0]
+-    a_nonzero = ((As > 0) | (As < 0)).all()
++    a_nonzero = ((As >= 0) | (As < 0)).all()
+ 
+     # worst-case approximation error, same three checks as compute_max_error
+
+  grid       survived exit=0  PASS
+  selector   survived exit=0  ALL SELECTOR PATH TESTS PASSED
+  corners    survived exit=0  ALL PASS
+  boundary   survived exit=0  ALL PASS
+  max_error  survived exit=0  ALL PASS
+  lin_reg    survived exit=0  ALL PASS (assert_close, rtol/atol per dtype); bitwise-identical everywhere: YES
+  variants   survived exit=0  ALL PASS
+  cli        survived exit=0  ALL PASS
+  e2e        survived exit=0  ALL PASS
+  soundness  survived exit=0  ALL PASS
+  planar_fit survived exit=0  ALL CHECKS PASSED
+  batched    KILLED   exit=1  FAILED: 1 check(s): ['AssertionError']
+  batched_cf KILLED   exit=1  FAILED: 1 check(s): ['AssertionError']
+  planar_cc  survived exit=0  ALL CHECKS PASSED
+  batched_cc KILLED   exit=1  FAILED: 1 check(s): ['AssertionError']
+  auto       survived exit=0  ALL CHECKS PASSED
+
+=== summary (K = killed, . = survived, K* = survived with bitwise loss) ===
+            grid   selector    corners   boundary  max_error    lin_reg   variants        cli        e2e  soundness planar_fit    batched batched_cf  planar_cc batched_cc       auto   caught by any test?
+M1             K          .          .          .          .          .          .          .          .          .          .          .          .          .          .          .   yes
+M2             K          K          K          .          K          .          .          .          K          K          .          .          .          .          .          .   yes
+M3             K          K          K          .          K          .          .          .          K          K          .          .          .          .          .          .   yes
+M4             .          K          .          K          K          .          .          .          K          K          .          .          .          .          .          .   yes
+M5             .          .          .          K          .          .          .          .          .          .          .          .          .          .          .          .   yes
+M6             .          K          .          .          .          .          .          .          K          .          .          .          .          .          .          .   yes
+M7             .          K          .          .          K          .          .          .          K          K          .          K          K          .          K          K   yes
+M8             K          K          .          .          .          .          .          K          .          K          .          K          K          .          K          K   yes
+M9             K          .          .          .          .          K          .          .          .          .          K          .          K          K          K          K   yes
+M10            K          .          .          .          .          K          .          .          .          .          K          .          .          K          .          .   yes
+M11            .          .          .          .          .          .          .          .          .          K          .          .          .          .          .          .   yes
+M12            .          .          .          .          .          .          .          .          .          K          .          K          K          .          K          K   yes
+M13            .          K          .          K          K          .          .          .          K          K          .          .          .          .          .          .   yes
+M14            .          K          .          K          K          .          .          .          K          K          .          .          .          .          .          .   yes
+M15            .          .          .          .          .          .          .          .          .          .          K          .          K          K          K          K   yes
+M16            .          .          .          .          .          .          .          .          .          .          K          .          K          K          K          K   yes
+M17            .          .          .          .          .          .          .          .          .          .          K          .          .          K          .          .   yes
+M18            .          .          .          .          .          .          .          .          .          .          K          .          .          K          .          .   yes
+M19            .          .          .          .          .          .          .          .          .          .          K          K          K          K          K          K   yes
+M20            .          .          .          .          .          .          .          .          .          .          .          .          .          .          K          .   yes
+M22            .          .          .          .          .          .          .          .          .          .          .          .          .          K          K          .   yes
+M21            .          .          .          .          .          .          .          .          .          .          K          .          .          K          .          .   yes
+M23            .          .          .          .          .          .          .          .          .          .          .          .          .          .          .          K   yes
+M24            .          .          .          .          .          .          .          .          .          .          .          .          .          .          .          K   yes
+M25            .          .          .          .          .          .          .          .          .          .          .          .          .          .          .          K   yes
+M26            .          .          .          .          .          .          .          .          .          .          .          .          .          .          .          K   yes
+M27            .          .          .          .          .          .          .          .          .          .          .          K          K          .          K          .   yes
+M28            .          .          .          .          .          .          .          .          .          .          .          K          K          .          K          K   yes
+M29            .          .          .          .          .          .          .          .          .          .          .          K          K          .          K          .   yes

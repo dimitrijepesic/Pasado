@@ -1,0 +1,434 @@
+[
+ {
+  "network": "3layer",
+  "eps_index": 0,
+  "analysis": "precise",
+  "upstream": 528.9222729666122,
+  "branch": 526.1733446442403,
+  "post_complex": 416.5606515707407,
+  "post_real": 416.56468323639933
+ },
+ {
+  "network": "3layer",
+  "eps_index": 0,
+  "analysis": "zonotope",
+  "upstream": 5010.432745820667,
+  "branch": 4968.522094279642,
+  "post_complex": null,
+  "post_real": 1172.9128493343487
+ },
+ {
+  "network": "3layer",
+  "eps_index": 0,
+  "analysis": "interval",
+  "upstream": 26956.72064447478,
+  "branch": 26933.8697667374,
+  "post_complex": null,
+  "post_real": 26933.869766737404
+ },
+ {
+  "network": "3layer",
+  "eps_index": 4,
+  "analysis": "precise",
+  "upstream": 220.37169955040017,
+  "branch": 225.19886343349674,
+  "post_complex": 223.91855519709085,
+  "post_real": 223.91870019623562
+ },
+ {
+  "network": "3layer",
+  "eps_index": 4,
+  "analysis": "zonotope",
+  "upstream": 1273.7975241580284,
+  "branch": 1331.5601901391442,
+  "post_complex": null,
+  "post_real": 550.8817571973276
+ },
+ {
+  "network": "3layer",
+  "eps_index": 4,
+  "analysis": "interval",
+  "upstream": 10847.896230913673,
+  "branch": 10937.958543222298,
+  "post_complex": null,
+  "post_real": 10937.958543222296
+ },
+ {
+  "network": "3layer",
+  "eps_index": 8,
+  "analysis": "precise",
+  "upstream": 127.322265530412,
+  "branch": 124.53816106545959,
+  "post_complex": 124.61201656398765,
+  "post_real": 124.61202552408999
+ },
+ {
+  "network": "3layer",
+  "eps_index": 8,
+  "analysis": "zonotope",
+  "upstream": 133.53070101139346,
+  "branch": 130.4195285095464,
+  "post_complex": null,
+  "post_real": 127.50486649890027
+ },
+ {
+  "network": "3layer",
+  "eps_index": 8,
+  "analysis": "interval",
+  "upstream": 946.2522819939354,
+  "branch": 908.3483293159528,
+  "post_complex": null,
+  "post_real": 908.3483293159527
+ },
+ {
+  "network": "3layer",
+  "eps_index": 15,
+  "analysis": "precise",
+  "upstream": 119.53964123903418,
+  "branch": 115.34050962698842,
+  "post_complex": 115.34140686228682,
+  "post_real": 115.341407290417
+ },
+ {
+  "network": "3layer",
+  "eps_index": 15,
+  "analysis": "zonotope",
+  "upstream": 119.50908904981324,
+  "branch": 115.3072796497345,
+  "post_complex": null,
+  "post_real": 115.32581167691609
+ },
+ {
+  "network": "3layer",
+  "eps_index": 15,
+  "analysis": "interval",
+  "upstream": 128.18757252276615,
+  "branch": 123.42703614318836,
+  "post_complex": null,
+  "post_real": 123.4270361431884
+ },
+ {
+  "network": "4layer",
+  "eps_index": 0,
+  "analysis": "precise",
+  "upstream": 1483.4424181410661,
+  "branch": 1518.3491130373282,
+  "post_complex": 991.2231578951839,
+  "post_real": 991.2446210326293
+ },
+ {
+  "network": "4layer",
+  "eps_index": 0,
+  "analysis": "zonotope",
+  "upstream": 47794.631320350854,
+  "branch": 48969.836887897785,
+  "post_complex": null,
+  "post_real": 4426.838551893799
+ },
+ {
+  "network": "4layer",
+  "eps_index": 0,
+  "analysis": "interval",
+  "upstream": 391028.30787847616,
+  "branch": 394028.22812951845,
+  "post_complex": null,
+  "post_real": 394028.2281295184
+ },
+ {
+  "network": "4layer",
+  "eps_index": 4,
+  "analysis": "precise",
+  "upstream": 379.3071630478876,
+  "branch": 411.4467987213899,
+  "post_complex": 420.91625835337317,
+  "post_real": 420.91702679456284
+ },
+ {
+  "network": "4layer",
+  "eps_index": 4,
+  "analysis": "zonotope",
+  "upstream": 5741.693789977023,
+  "branch": 6483.9799729312645,
+  "post_complex": null,
+  "post_real": 1514.2572399174137
+ },
+ {
+  "network": "4layer",
+  "eps_index": 4,
+  "analysis": "interval",
+  "upstream": 107242.18243810427,
+  "branch": 110985.90806045625,
+  "post_complex": null,
+  "post_real": 110985.90806045623
+ },
+ {
+  "network": "4layer",
+  "eps_index": 8,
+  "analysis": "precise",
+  "upstream": 169.01765777738788,
+  "branch": 180.97870207141523,
+  "post_complex": 181.50588126086873,
+  "post_real": 181.50591211637072
+ },
+ {
+  "network": "4layer",
+  "eps_index": 8,
+  "analysis": "zonotope",
+  "upstream": 186.8783164972747,
+  "branch": 201.7871716488338,
+  "post_complex": null,
+  "post_real": 189.10808167942483
+ },
+ {
+  "network": "4layer",
+  "eps_index": 8,
+  "analysis": "interval",
+  "upstream": 5367.572056582917,
+  "branch": 5648.318424197654,
+  "post_complex": null,
+  "post_real": 5648.318424197654
+ },
+ {
+  "network": "4layer",
+  "eps_index": 15,
+  "analysis": "precise",
+  "upstream": 152.92374061581114,
+  "branch": 158.88802272506732,
+  "post_complex": 158.90132972667516,
+  "post_real": 158.90133106003722
+ },
+ {
+  "network": "4layer",
+  "eps_index": 15,
+  "analysis": "zonotope",
+  "upstream": 152.953394999757,
+  "branch": 158.94332682951955,
+  "post_complex": null,
+  "post_real": 158.86610699158462
+ },
+ {
+  "network": "4layer",
+  "eps_index": 15,
+  "analysis": "interval",
+  "upstream": 177.95980208062784,
+  "branch": 184.41195114591264,
+  "post_complex": null,
+  "post_real": 184.4119511459126
+ },
+ {
+  "network": "5layer",
+  "eps_index": 0,
+  "analysis": "precise",
+  "upstream": 3400.774155847004,
+  "branch": 3490.6808049257397,
+  "post_complex": 1954.8594223319176,
+  "post_real": 1954.8932653207742
+ },
+ {
+  "network": "5layer",
+  "eps_index": 0,
+  "analysis": "zonotope",
+  "upstream": 376722.2580703423,
+  "branch": 393212.84520388726,
+  "post_complex": null,
+  "post_real": 14341.581674761152
+ },
+ {
+  "network": "5layer",
+  "eps_index": 0,
+  "analysis": "interval",
+  "upstream": 4213764.526934514,
+  "branch": 4238476.00985759,
+  "post_complex": null,
+  "post_real": 4238476.009857589
+ },
+ {
+  "network": "5layer",
+  "eps_index": 4,
+  "analysis": "precise",
+  "upstream": 508.4609059231877,
+  "branch": 535.9649461773214,
+  "post_complex": 597.9021345482556,
+  "post_real": 597.9033126444175
+ },
+ {
+  "network": "5layer",
+  "eps_index": 4,
+  "analysis": "zonotope",
+  "upstream": 21941.86518069239,
+  "branch": 24798.987629749303,
+  "post_complex": null,
+  "post_real": 3137.2817149853927
+ },
+ {
+  "network": "5layer",
+  "eps_index": 4,
+  "analysis": "interval",
+  "upstream": 851839.7700789856,
+  "branch": 894814.1512152517,
+  "post_complex": null,
+  "post_real": 894814.1512152514
+ },
+ {
+  "network": "5layer",
+  "eps_index": 8,
+  "analysis": "precise",
+  "upstream": 123.72878850981087,
+  "branch": 124.29531857059182,
+  "post_complex": 124.48853464776765,
+  "post_real": 124.4885625011141
+ },
+ {
+  "network": "5layer",
+  "eps_index": 8,
+  "analysis": "zonotope",
+  "upstream": 145.40841583325212,
+  "branch": 141.79826355330155,
+  "post_complex": null,
+  "post_real": 131.48222430761706
+ },
+ {
+  "network": "5layer",
+  "eps_index": 8,
+  "analysis": "interval",
+  "upstream": 33161.76664742927,
+  "branch": 33986.886447520155,
+  "post_complex": null,
+  "post_real": 33986.886447520155
+ },
+ {
+  "network": "5layer",
+  "eps_index": 15,
+  "analysis": "precise",
+  "upstream": 107.31315673845114,
+  "branch": 103.25268891039016,
+  "post_complex": 103.26146193387528,
+  "post_real": 103.26146277331048
+ },
+ {
+  "network": "5layer",
+  "eps_index": 15,
+  "analysis": "zonotope",
+  "upstream": 107.28694263060848,
+  "branch": 103.21534285074189,
+  "post_complex": null,
+  "post_real": 103.19643095750799
+ },
+ {
+  "network": "5layer",
+  "eps_index": 15,
+  "analysis": "interval",
+  "upstream": 156.99430795299608,
+  "branch": 147.32705180073452,
+  "post_complex": null,
+  "post_real": 147.32705180073444
+ },
+ {
+  "network": "big",
+  "eps_index": 0,
+  "analysis": "precise",
+  "upstream": 12946.842542471579,
+  "branch": 13029.303733936938,
+  "post_complex": 8030.638714334005,
+  "post_real": 8030.64734602272
+ },
+ {
+  "network": "big",
+  "eps_index": 0,
+  "analysis": "zonotope",
+  "upstream": 2018183.278082007,
+  "branch": 2022601.3108158868,
+  "post_complex": null,
+  "post_real": 59949.678161723794
+ },
+ {
+  "network": "big",
+  "eps_index": 0,
+  "analysis": "interval",
+  "upstream": 16101504.802788222,
+  "branch": 16110750.582296401,
+  "post_complex": null,
+  "post_real": 16110750.582296403
+ },
+ {
+  "network": "big",
+  "eps_index": 4,
+  "analysis": "precise",
+  "upstream": 818.704621785225,
+  "branch": 835.2999275786184,
+  "post_complex": 910.9087402219291,
+  "post_real": 910.9087800431232
+ },
+ {
+  "network": "big",
+  "eps_index": 4,
+  "analysis": "zonotope",
+  "upstream": 47738.57704342369,
+  "branch": 50982.39485870012,
+  "post_complex": null,
+  "post_real": 4219.856813801443
+ },
+ {
+  "network": "big",
+  "eps_index": 4,
+  "analysis": "interval",
+  "upstream": 3731984.1979875565,
+  "branch": 3738427.6997679034,
+  "post_complex": null,
+  "post_real": 3738427.6997679034
+ },
+ {
+  "network": "big",
+  "eps_index": 8,
+  "analysis": "precise",
+  "upstream": 173.96399066378203,
+  "branch": 189.52208633245618,
+  "post_complex": 188.35461498196835,
+  "post_real": 188.35461907261146
+ },
+ {
+  "network": "big",
+  "eps_index": 8,
+  "analysis": "zonotope",
+  "upstream": 200.1116873332784,
+  "branch": 217.47257991328405,
+  "post_complex": null,
+  "post_real": 196.04674887513656
+ },
+ {
+  "network": "big",
+  "eps_index": 8,
+  "analysis": "interval",
+  "upstream": 201594.8690286985,
+  "branch": 204554.8413034504,
+  "post_complex": null,
+  "post_real": 204554.84130345046
+ },
+ {
+  "network": "big",
+  "eps_index": 15,
+  "analysis": "precise",
+  "upstream": 168.11008348125532,
+  "branch": 182.45744289771247,
+  "post_complex": 182.45296440658564,
+  "post_real": 182.45296496757547
+ },
+ {
+  "network": "big",
+  "eps_index": 15,
+  "analysis": "zonotope",
+  "upstream": 168.23254443804663,
+  "branch": 182.58983040577596,
+  "post_complex": null,
+  "post_real": 182.37751263756854
+ },
+ {
+  "network": "big",
+  "eps_index": 15,
+  "analysis": "interval",
+  "upstream": 516.5676102374814,
+  "branch": 560.3478932648999,
+  "post_complex": null,
+  "post_real": 560.3478932649
+ }
+]

@@ -1,5 +1,34 @@
 # RESULTS - Section 5.4 Lipschitz benchmark, profiling & optimization sprint
 
+> **Measured before the soundness fixes of 2026-10-21/22 (`b526762`); marked 2026-11-06.**
+> Every number here comes from the code before `Zonotope.__neg__` / `DualZonotope.__neg__`
+> negated the generators and before the boundary checks bounded `|E|` instead of `E`.
+> Speedups, call counts and profiles compare two implementations of that same pre-fix
+> code; the fixes add one elementwise `abs` per boundary check and a sign flip, so the
+> ratios are not expected to move, but they have **not been re-measured**. Lipschitz bound
+> values quoted here are **not valid** after the fix. Hardware measurements (GFLOP/s,
+> `gels` against `gelsd`) do not depend on Pasado's code. Current state: `CHECKPOINT.md`.
+
+
+## 0. Status on 2026-11-06 - read this first
+
+This file was the first write-up of the July 2026 sprint. `FORMAL_SUMMARY.md` was kept up to
+date afterwards and this file was not, so several statements below were superseded. The
+superseded statements are kept for the record and marked **[superseded]** where they occur.
+
+| Statement in this file | Current state | Source |
+|---|---|---|
+| Accepted optimizations are A, B, C | Two more selectors exist: D `PASADO_BATCHED_GRID` (batched sampling grid, **bit-identical**, default off) and E `PASADO_REAL_CUBIC` (real Viete cubic, **not** bit-identical: bounds move by <= 5.7e-5 relative, default off) | `FORMAL_SUMMARY.md`, `REAL_CUBIC.md` |
+| Headline speedups 3.135x / 3.145x / 3.334x (A+B+C) | With D added, measured directly on 2026-08-12 (interleaved, pinned to P-cores, n = 3 pairs): 3layer **3.24x** (3.21-3.30), 4layer **3.64x** (3.63-4.22), 5layer **3.37x** (2.79-3.63) | `FORMAL_SUMMARY.md`, `logs/benchmark_results.csv` |
+| `big`: no speedup claimed (section 4.4) | Measured on 2026-08-06, interleaved, pinned, n = 3, health 197-226 GFLOP/s: 1070.57 s -> 648.78 s = **1.650x** (A+B+C, without D; `big` with D not measured) | `FORMAL_SUMMARY.md`, `logs/benchmark_results.csv` |
+| batched `linspace` deferred, ~1 ULP in 14 % of cases (section 9) | Done and **bit-identical**: the ~1 ULP was an artifact of the naive affine formula; reproducing `torch.linspace`'s symmetric-halves scheme is exact | `FORMAL_SUMMARY.md` |
+| closed form instead of `lstsq` rejected (section 9) | Still rejected on the CPU. On CUDA, where `gelsd` does not exist, the pre-registered comparison of 2026-10-25/27 chose the closed form **A2** (`planar_fit.py`), behind `PASADO_CLOSED_FORM_FIT` / `PASADO_AUTO_PLANE_FIT` (both off by default) | `results/lstsq_comparison_2026-10-27_v3_zpivot/` |
+| `torch.compile` rejected (section 9) | Rejected on the Windows CPU (no MSVC). On CUDA it works: compiled `fit_planes` (opt-in `PASADO_COMPILED_FIT`) and a compiled whole `precise_sigmoid` (experiment only, outcome opt-in) | `results/v3_compiled_cuda_2026-10-28/`, `results/compiled_sigmoid_v3_cuda_2026-10-29/` |
+| GPU untested (section 10) | Tested on Colab T4 and A100 (2026-08 to 2026-10) | `GPU_READINESS.md`, `results/gpu_hybrid_*` |
+
+Every number in this file, and in the table above, was measured on the code **before** the
+soundness fixes of 2026-10-21/22; see the note at the top.
+
 ## 1. Workload
 
 `Section_5_4/get_lipschitz.py` computes local Lipschitz bounds for four MNIST
@@ -32,6 +61,8 @@ mobile), 8 torch threads, **CUDA unavailable**. All measurements CPU-only.
 | A | `check_corners_tensor` - batched corner evaluation replacing a per-neuron Python loop | `PASADO_VECTORIZED_PRECISE` | **on** | bit-identical |
 | B | `check_nonlinear_boundary_tensor` - batched boundary/root objective | `PASADO_VECTORIZED_PRECISE`, `PASADO_VEC_BOUNDARY` | **on** | bit-identical |
 | C | `lin_reg_tensor_batched` - one batched `lstsq` per layer instead of one per neuron | `PASADO_BATCHED_LSTSQ` | **off** | bit-identical |
+| D | `get_linspace_batched` - batched 5x5 sampling grid (added after this file; see section 0) | `PASADO_BATCHED_GRID` | **off** | bit-identical |
+| E | real Viete cubic root solve instead of `complex64` Cardano (added after this file) | `PASADO_REAL_CUBIC` | **off** | not bit-identical (<= 5.7e-5 relative) |
 
 All original implementations remain in the file and are reachable through the
 selectors. No mathematics, sampling, driver (`gelsd`) or bound computation was
@@ -113,7 +144,7 @@ All rows in `logs/benchmark_results.csv`; interleaved runs are those carrying a
 `health_gflops` value. Earlier rows (no health value) were taken before the
 P/E-core problem was understood and are superseded.
 
-### 4.4 big - NOT claimed
+### 4.4 big - NOT claimed **[superseded: 1.650x measured on 2026-08-06, see section 0]**
 
 | variant | time | status |
 |---|---|---|
@@ -226,13 +257,13 @@ masked by float32 defaults in the unit tests.
 | candidate | verdict | reason |
 |---|---|---|
 | caching grids / design matrices | rejected | measured **0 % exact-repeat rate** (400/400 distinct SHA-1); value-keyed cache can never hit |
-| closed-form / normal equations / pinv | rejected | unnecessary (batched gelsd already native and bit-exact), worse conditioning |
-| `torch.compile` | rejected | Inductor CPU backend unavailable (MSVC `cl.exe` missing); `linalg_lstsq` graph-breaks; complex ops unsupported; target kernels now < 1 ms |
-| batched `linspace` | deferred | **not** bit-exact (~1 ULP in 14 % of cases) - needs an explicit precision decision |
+| closed-form / normal equations / pinv | rejected on CPU **[on CUDA: A2 chosen, see section 0]** | unnecessary (batched gelsd already native and bit-exact), worse conditioning |
+| `torch.compile` | rejected on Windows CPU **[works on CUDA, see section 0]** | Inductor CPU backend unavailable (MSVC `cl.exe` missing); `linalg_lstsq` graph-breaks; complex ops unsupported; target kernels now < 1 ms |
+| batched `linspace` | deferred **[superseded: done, bit-identical]** | **not** bit-exact (~1 ULP in 14 % of cases) - needs an explicit precision decision |
 
 ## 10. Limitations
 
-1. **No clean `big` comparison.** The only optimized `big` measurement was
+1. **[superseded]** **No clean `big` comparison.** The only optimized `big` measurement was
    corrupted; no `big` speedup is claimed.
 2. **Wall-clock numbers were taken on a loaded machine.** Mitigated by
    interleaving and per-run health probes, but absolute seconds are ~2.6x
@@ -240,7 +271,7 @@ masked by float32 defaults in the unit tests.
 3. **Single-run big figures** carry no statistics.
 4. cProfile columns from different days/machines are compared only where noted;
    call counts (machine-independent) carry the structural argument.
-5. **GPU untested** - no CUDA device available. `GPU_READINESS.md` is a static
+5. **[superseded]** **GPU untested** - no CUDA device available. `GPU_READINESS.md` is a static
    audit, and `experiments/colab_gpu_profile.py` deliberately refuses to
    fabricate GPU numbers.
 6. The benchmark is **not deterministic across processes** (`np.random.normal`

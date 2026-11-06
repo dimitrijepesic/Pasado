@@ -1,0 +1,15 @@
+/Users/dpesic/Desktop/Pasado/.venv/lib/python3.13/site-packages/torch/_inductor/lowering.py:2158: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+/Users/dpesic/Desktop/Pasado/.venv/lib/python3.13/site-packages/torch/_inductor/lowering.py:2158: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+3layer_S1 {"eager_off": {"median_ms": 1.1188749995199032, "min_ms": 0.9937499999068677, "first_call_s": 0.0022209579910850152}, "compiled_off": {"median_ms": 0.2518125038477592, "min_ms": 0.19745899771805853, "first_call_s": 6.547462332993746}, "eager_on": {"median_ms": 1.132145494921133, "min_ms": 1.0250409977743402, "first_call_s": 0.002091000002110377}, "compiled_on": {"median_ms": 0.2503334981156513, "min_ms": 0.19095798779744655, "first_call_s": 3.295411375002004}, "compiled_vs_eager_on_max_rel": 4.539303344623865e-16}
+/Users/dpesic/Desktop/Pasado/.venv/lib/python3.13/site-packages/torch/_inductor/lowering.py:2158: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+/Users/dpesic/Desktop/Pasado/.venv/lib/python3.13/site-packages/torch/_inductor/lowering.py:2158: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+3layer_S64 {"eager_off": {"median_ms": 5.861563004145864, "min_ms": 5.505291002918966, "first_call_s": 0.007191791999503039}, "compiled_off": {"median_ms": 1.5609789988957345, "min_ms": 1.473333002650179, "first_call_s": 4.8601722919993335}, "eager_on": {"median_ms": 5.943771000602283, "min_ms": 5.590250002569519, "first_call_s": 0.006609749994822778}, "compiled_on": {"median_ms": 1.5919584984658286, "min_ms": 1.4858340000500903, "first_call_s": 4.923664874993847}, "compiled_vs_eager_on_max_rel": 1.9426063342762675e-15}
+/Users/dpesic/Desktop/Pasado/.venv/lib/python3.13/site-packages/torch/_inductor/lowering.py:2158: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+/Users/dpesic/Desktop/Pasado/.venv/lib/python3.13/site-packages/torch/_inductor/lowering.py:2158: FutureWarning: `torch._prims_common.check` is deprecated and will be removed in the future. Please use `torch._check*` functions instead.
+  check(
+big_S8 {"eager_off": {"median_ms": 10.365811998781282, "min_ms": 9.553790994687006, "first_call_s": 0.027738040997064672}, "compiled_off": {"median_ms": 4.24197949905647, "min_ms": 3.892208987963386, "first_call_s": 5.415109832989401}, "eager_on": {"median_ms": 10.26006250322098, "min_ms": 9.64262499473989, "first_call_s": 0.012448333000065759}, "compiled_on": {"median_ms": 4.33166650327621, "min_ms": 3.9650409889873117, "first_call_s": 5.094001625009696}, "compiled_vs_eager_on_max_rel": 1.1553875893258723e-15}

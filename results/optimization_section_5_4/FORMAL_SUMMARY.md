@@ -1,5 +1,15 @@
 # Optimizacija preciznog zonotopskog transformera (Pasado, Section 5.4)
 
+> **Izmereno pre soundness ispravki od 21-22.10.2026 (`b526762`); oznaceno 2026-11-06.**
+> Svi brojevi ovde potieu iz koda pre nego sto su `Zonotope.__neg__` /
+> `DualZonotope.__neg__` negirali generatore i pre nego sto su provere granice
+> ogranicavale `|E|` umesto `E`. Ubrzanja, broj poziva i profili porede dve
+> implementacije istog koda pre ispravke; ispravka dodaje jedan elementwise `abs` po
+> proveri granice i promenu znaka, pa se ne ocekuje da se odnosi pomere, ali **nisu
+> ponovo mereni**. Vrednosti Lipschitz granica navedene ovde **nisu vazece** posle
+> ispravke. Merenja hardvera (GFLOP/s, `gels` naspram `gelsd`) ne zavise od Pasado koda.
+> Trenutno stanje: `CHECKPOINT.md`.
+
 ## Cilj
 
 Utvrditi gde precizni transformer u `Section_5_4/get_lipschitz.py` trosi vreme,

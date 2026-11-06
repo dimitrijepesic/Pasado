@@ -1,0 +1,10 @@
+[PASS] img0 eps=largest  lc_old=508.4211737 lc_new=508.4211737 lc_absdiff=0.00e+00 gen_absdiff=3.55e-15 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+[PASS] img0 eps=middle   lc_old=170.8915739 lc_new=170.8915739 lc_absdiff=0.00e+00 gen_absdiff=1.77e-15 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+[PASS] img0 eps=smallest lc_old=140.7382268 lc_new=140.7382268 lc_absdiff=0.00e+00 gen_absdiff=2.72e-16 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+[PASS] img1 eps=largest  lc_old=249.7686681 lc_new=249.7686681 lc_absdiff=0.00e+00 gen_absdiff=2.66e-15 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+[PASS] img1 eps=middle   lc_old=87.28521859 lc_new=87.28521859 lc_absdiff=0.00e+00 gen_absdiff=1.17e-15 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+[PASS] img1 eps=smallest lc_old=86.8145618 lc_new=86.8145618 lc_absdiff=0.00e+00 gen_absdiff=1.63e-16 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+[PASS] img2 eps=largest  lc_old=718.3537506 lc_new=718.3537506 lc_absdiff=0.00e+00 gen_absdiff=0.00e+00 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+[PASS] img2 eps=middle   lc_old=239.008798 lc_new=239.008798 lc_absdiff=8.53e-14 gen_absdiff=9.17e-14 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+[PASS] img2 eps=smallest lc_old=201.2567906 lc_new=201.2567906 lc_absdiff=5.68e-14 gen_absdiff=4.34e-14 shapes=torch.Size([402, 10])==torch.Size([402, 10]) dtype=torch.float64 device=cpu naninf_pos_match=True nan=False/False
+ALL PASS
