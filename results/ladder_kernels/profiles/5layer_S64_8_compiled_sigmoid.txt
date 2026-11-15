@@ -1,0 +1,117 @@
+5layer, n_splits 64, step 8 compiled_sigmoid (whole precise_sigmoid compiled (fullgraph)), device cuda, image 0, eps index 0
+
+Stage breakdown of one instrumented pass (ms; device synchronized around every stage)
+  pass_ms                 7.114   100.0%
+  affine_ms               1.634    23.0%
+  sigmoid_ms              3.239    45.5%
+  other_ms                2.241    31.5%
+  calls: {'affine': 5, 'sigmoid': 4}
+  counts: {'operator_calls': 215, 'cuda_events': 125, 'cuda_memcpy': 15, 'cuda_kernels': 110}
+
+cProfile, sorted by cumulative
+         1256 function calls in 0.006 seconds
+
+   Ordered by: cumulative time
+   List reduced from 176 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.006    0.006 measure_speedup_ladder.py:237(run)
+        1    0.000    0.000    0.006    0.006 batched_splits.py:286(lipschitz_bound)
+        1    0.000    0.000    0.006    0.006 batched_splits.py:263(split_bounds)
+        1    0.000    0.000    0.006    0.006 batched_splits.py:244(_forward_chunk)
+        4    0.000    0.000    0.003    0.001 measure_speedup_ladder.py:202(precise_sigmoid)
+        4    0.000    0.000    0.003    0.001 eval_frame.py:1146(compile_wrapper)
+        4    0.000    0.000    0.002    0.001 measure_speedup_ladder.py:196(core)
+       20    0.000    0.000    0.002    0.000 eval_frame.py:1523(_fn)
+        4    0.000    0.000    0.002    0.000 aot_autograd.py:1281(forward)
+        4    0.000    0.000    0.002    0.000 runtime_wrappers.py:1177(runtime_wrapper)
+        4    0.000    0.000    0.002    0.000 codegen.py:codegen(runtime_wrapper_orchestration):1(_runtime_wrapper)
+        4    0.000    0.000    0.002    0.000 output_code.py:785(__call__)
+        4    0.000    0.000    0.002    0.000 c7cvgcohd7onspdmm3nlee5exr4edpca6mv36lyoriwgwewsjahe.py:3457(call)
+        5    0.001    0.000    0.001    0.000 batched_splits.py:160(affine)
+       56    0.000    0.000    0.001    0.000 triton_heuristics.py:2440(run)
+        4    0.000    0.000    0.000    0.000 batched_splits.py:171(_perturbation)
+        1    0.000    0.000    0.000    0.000 batched_splits.py:141(hazed_input)
+       92    0.000    0.000    0.000    0.000 {built-in method torch._C._dynamo.guards._empty_strided_cuda}
+        4    0.000    0.000    0.000    0.000 {built-in method torch.as_tensor}
+        8    0.000    0.000    0.000    0.000 driver.py:297(__call__)
+        8    0.000    0.000    0.000    0.000 {built-in method cuda_utils.launch}
+       16    0.000    0.000    0.000    0.000 _compile.py:42(inner)
+        4    0.000    0.000    0.000    0.000 <string>:1(launcher)
+        8    0.000    0.000    0.000    0.000 decorators.py:1177(mark_dynamic)
+        1    0.000    0.000    0.000    0.000 batched_splits.py:166(_bounds)
+
+
+
+cProfile, sorted by tottime
+         1256 function calls in 0.006 seconds
+
+   Ordered by: internal time
+   List reduced from 176 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        5    0.001    0.000    0.001    0.000 batched_splits.py:160(affine)
+        4    0.000    0.000    0.003    0.001 eval_frame.py:1146(compile_wrapper)
+       92    0.000    0.000    0.000    0.000 {built-in method torch._C._dynamo.guards._empty_strided_cuda}
+        4    0.000    0.000    0.000    0.000 {built-in method torch.as_tensor}
+        1    0.000    0.000    0.000    0.000 batched_splits.py:141(hazed_input)
+        4    0.000    0.000    0.002    0.000 c7cvgcohd7onspdmm3nlee5exr4edpca6mv36lyoriwgwewsjahe.py:3457(call)
+        1    0.000    0.000    0.006    0.006 batched_splits.py:244(_forward_chunk)
+        8    0.000    0.000    0.000    0.000 {built-in method cuda_utils.launch}
+       56    0.000    0.000    0.001    0.000 triton_heuristics.py:2440(run)
+        2    0.000    0.000    0.000    0.000 {built-in method torch.tensor}
+        4    0.000    0.000    0.000    0.000 batched_splits.py:171(_perturbation)
+        3    0.000    0.000    0.000    0.000 {method 'abs' of 'torch._C.TensorBase' objects}
+        1    0.000    0.000    0.006    0.006 batched_splits.py:263(split_bounds)
+        9    0.000    0.000    0.000    0.000 {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+        8    0.000    0.000    0.000    0.000 decorators.py:1177(mark_dynamic)
+        4    0.000    0.000    0.002    0.001 measure_speedup_ladder.py:196(core)
+        2    0.000    0.000    0.000    0.000 {method 'new_zeros' of 'torch._C.TensorBase' objects}
+       20    0.000    0.000    0.002    0.000 eval_frame.py:1523(_fn)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        4    0.000    0.000    0.002    0.000 codegen.py:codegen(runtime_wrapper_orchestration):1(_runtime_wrapper)
+        1    0.000    0.000    0.000    0.000 {method 'all' of 'torch._C.TensorBase' objects}
+        8    0.000    0.000    0.000    0.000 driver.py:297(__call__)
+        4    0.000    0.000    0.002    0.000 output_code.py:785(__call__)
+        1    0.000    0.000    0.000    0.000 {built-in method torch.stack}
+        1    0.000    0.000    0.000    0.000 batched_splits.py:166(_bounds)
+
+
+
+torch.profiler
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+triton_red_fused__unsafe_view_abs_acos_add_all_bitwi...         1.51%     117.798us         1.92%     149.669us      37.417us     841.536us        32.29%     841.536us     210.384us             4  
+triton_red_fused__unsafe_view_abs_acos_add_all_bitwi...         0.00%       0.000us         0.00%       0.000us       0.000us     841.536us        32.29%     841.536us     210.384us             4  
+                                               aten::mm         8.52%     663.075us        11.83%     921.207us      46.060us     713.349us        27.37%     713.349us      35.667us            20  
+sm80_xmma_gemm_f64f64_f64f64_f64_tn_n_tilesize64x64x...         0.00%       0.000us         0.00%       0.000us       0.000us     459.555us        17.64%     459.555us      76.592us             6  
+triton_poi_fused__unsafe_view_add_clone_copy_minimum...         1.07%      83.627us         1.48%     115.216us      28.804us     330.625us        12.69%     330.625us      82.656us             4  
+triton_poi_fused__unsafe_view_add_clone_copy_minimum...         0.00%       0.000us         0.00%       0.000us       0.000us     330.625us        12.69%     330.625us      82.656us             4  
+                             triton_red_fused_abs_sum_0         2.13%     165.628us         3.77%     293.309us      36.664us     281.634us        10.81%     281.634us      35.204us             8  
+                             triton_red_fused_abs_sum_0         0.00%       0.000us         0.00%       0.000us       0.000us     281.634us        10.81%     281.634us      35.204us             8  
+void cutlass::Kernel2<cutlass_80_tensorop_d884gemm_3...         0.00%       0.000us         0.00%       0.000us       0.000us     237.347us         9.11%     237.347us      16.953us            14  
+triton_per_fused_abs_add_amax_bitwise_and_bitwise_no...         1.71%     133.315us         2.12%     164.999us      41.250us      98.336us         3.77%      98.336us      24.584us             4  
+triton_per_fused_abs_add_amax_bitwise_and_bitwise_no...         0.00%       0.000us         0.00%       0.000us       0.000us      98.336us         3.77%      98.336us      24.584us             4  
+triton_poi_fused_mean_mul_rsub_select_sigmoid_slice_...         0.67%      52.102us         1.05%      81.822us      20.456us      52.703us         2.02%      52.703us      13.176us             4  
+triton_poi_fused_mean_mul_rsub_select_sigmoid_slice_...         0.00%       0.000us         0.00%       0.000us       0.000us      52.703us         2.02%      52.703us      13.176us             4  
+                                              aten::add         2.31%     179.996us         3.73%     290.363us      29.036us      37.122us         1.42%      37.122us       3.712us            10  
+triton_poi_fused_add_div_mul_select_slice_stack_wher...         1.11%      86.673us         1.51%     117.457us      29.364us      28.928us         1.11%      28.928us       7.232us             4  
+triton_poi_fused_add_div_mul_select_slice_stack_wher...         0.00%       0.000us         0.00%       0.000us       0.000us      28.928us         1.11%      28.928us       7.232us             4  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      28.642us         1.10%      28.642us       4.092us             7  
+                            triton_poi_fused_mean_sub_3         1.03%      79.944us         1.72%     133.654us      16.707us      24.257us         0.93%      24.257us       3.032us             8  
+                            triton_poi_fused_mean_sub_3         0.00%       0.000us         0.00%       0.000us       0.000us      24.257us         0.93%      24.257us       3.032us             8  
+triton_poi_fused_add_arange_clone_copy_div_expand_mu...         1.04%      80.910us         1.46%     113.953us      28.488us      22.720us         0.87%      22.720us       5.680us             4  
+triton_poi_fused_add_arange_clone_copy_div_expand_mu...         0.00%       0.000us         0.00%       0.000us       0.000us      22.720us         0.87%      22.720us       5.680us             4  
+triton_poi_fused__unsafe_view_abs_add_clone_mul_rsub...         1.22%      95.069us         1.69%     131.300us      32.825us      19.456us         0.75%      19.456us       4.864us             4  
+triton_poi_fused__unsafe_view_abs_add_clone_mul_rsub...         0.00%       0.000us         0.00%       0.000us       0.000us      19.456us         0.75%      19.456us       4.864us             4  
+triton_poi_fused__unsafe_view_add_clone_mul_rsub_sel...         0.85%      65.839us         1.22%      95.202us      23.801us      18.336us         0.70%      18.336us       4.584us             4  
+triton_poi_fused__unsafe_view_add_clone_mul_rsub_sel...         0.00%       0.000us         0.00%       0.000us       0.000us      18.336us         0.70%      18.336us       4.584us             4  
+                                              aten::sum         0.34%      26.399us         0.48%      37.327us      37.327us      17.792us         0.68%      17.792us      17.792us             1  
+void at::native::reduce_kernel<256, 2, at::native::R...         0.00%       0.000us         0.00%       0.000us       0.000us      17.792us         0.68%      17.792us      17.792us             1  
+                                            aten::copy_         1.31%     101.747us        18.48%       1.439ms     179.914us      17.119us         0.66%      17.119us       2.140us             8  
+triton_poi_fused_copy_diagonal_max_maximum_min_nan_t...         0.69%      53.705us         1.06%      82.285us      20.571us      14.240us         0.55%      14.240us       3.560us             4  
+triton_poi_fused_copy_diagonal_max_maximum_min_nan_t...         0.00%       0.000us         0.00%       0.000us       0.000us      14.240us         0.55%      14.240us       3.560us             4  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 7.787ms
+Self CUDA time total: 2.606ms

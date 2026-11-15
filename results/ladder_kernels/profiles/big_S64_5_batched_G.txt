@@ -1,0 +1,121 @@
+big, n_splits 64, step 5 batched_G (all splits in one pass, gelsd on the CPU), device cuda, image 0, eps index 0
+
+Stage breakdown of one instrumented pass (ms; device synchronized around every stage)
+  pass_ms              2433.161   100.0%
+  affine_ms             234.488     9.6%
+  sigmoid_ms           2194.184    90.2%
+  grid_ms                 5.784     0.2%
+  fit_ms               2047.169    84.1%
+  error_check_ms         29.540     1.2%
+  sigmoid_rest_ms       111.691     4.6%
+  other_ms                4.489     0.2%
+  calls: {'affine': 10, 'grid': 8, 'fit': 8, 'error_check': 16, 'sigmoid': 8}
+  counts: {'operator_calls': 1054706, 'cuda_events': 1959, 'cuda_memcpy': 51, 'cuda_kernels': 1908}
+
+cProfile, sorted by cumulative
+         2007 function calls (2006 primitive calls) in 2.418 seconds
+
+   Ordered by: cumulative time
+   List reduced from 118 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      2/1    0.000    0.000    2.418    2.418 measure_speedup_ladder.py:237(run)
+        1    0.000    0.000    2.418    2.418 batched_splits.py:286(lipschitz_bound)
+        2    0.036    0.018    2.411    1.205 batched_splits.py:244(_forward_chunk)
+        8    0.007    0.001    2.332    0.292 batched_splits.py:186(precise_sigmoid)
+        8    0.156    0.019    2.278    0.285 precise_transformer.py:143(lin_reg_tensor_batched)
+        8    1.827    0.228    1.827    0.228 {built-in method torch._C._linalg.linalg_lstsq}
+        1    0.000    0.000    1.221    1.221 batched_splits.py:263(split_bounds)
+       16    0.279    0.017    0.279    0.017 {method 'cpu' of 'torch._C.TensorBase' objects}
+        8    0.001    0.000    0.040    0.005 batched_splits.py:171(_perturbation)
+        8    0.039    0.005    0.039    0.005 {built-in method torch.as_tensor}
+        8    0.001    0.000    0.026    0.003 precise_transformer.py:459(check_nonlinear_boundary_tensor)
+        9    0.016    0.002    0.016    0.002 {built-in method torch.cat}
+       16    0.000    0.000    0.011    0.001 precise_transformer.py:252(inverse_sigmoid_2nd_deriv)
+       16    0.002    0.000    0.008    0.000 precise_transformer.py:203(inverse_poly_real_tensor)
+       64    0.004    0.000    0.007    0.000 precise_transformer.py:245(filter_range)
+        8    0.000    0.000    0.006    0.001 precise_transformer.py:58(get_linspace_batched)
+       24    0.005    0.000    0.005    0.000 {method 'to' of 'torch._C.TensorBase' objects}
+       16    0.002    0.000    0.005    0.000 precise_transformer.py:445(_max_objective_over_x_candidates)
+       16    0.003    0.000    0.004    0.000 precise_transformer.py:41(_linspace_rows)
+        8    0.002    0.000    0.004    0.000 precise_transformer.py:339(check_corners_tensor)
+       64    0.003    0.000    0.004    0.000 precise_transformer.py:226(<genexpr>)
+      114    0.000    0.000    0.003    0.000 _tensor.py:32(wrapped)
+        1    0.003    0.003    0.003    0.003 {method 'item' of 'torch._C.TensorBase' objects}
+       48    0.001    0.000    0.003    0.000 precise_transformer.py:100(inv_sigmoid)
+      114    0.000    0.000    0.003    0.000 _tensor.py:1116(__rsub__)
+
+
+
+cProfile, sorted by tottime
+         2007 function calls (2006 primitive calls) in 2.418 seconds
+
+   Ordered by: internal time
+   List reduced from 118 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        8    1.827    0.228    1.827    0.228 {built-in method torch._C._linalg.linalg_lstsq}
+       16    0.279    0.017    0.279    0.017 {method 'cpu' of 'torch._C.TensorBase' objects}
+        8    0.156    0.019    2.278    0.285 precise_transformer.py:143(lin_reg_tensor_batched)
+        8    0.039    0.005    0.039    0.005 {built-in method torch.as_tensor}
+        2    0.036    0.018    2.411    1.205 batched_splits.py:244(_forward_chunk)
+        9    0.016    0.002    0.016    0.002 {built-in method torch.cat}
+        8    0.007    0.001    2.332    0.292 batched_splits.py:186(precise_sigmoid)
+       24    0.005    0.000    0.005    0.000 {method 'to' of 'torch._C.TensorBase' objects}
+       64    0.004    0.000    0.007    0.000 precise_transformer.py:245(filter_range)
+        1    0.003    0.003    0.003    0.003 {method 'item' of 'torch._C.TensorBase' objects}
+       64    0.003    0.000    0.004    0.000 precise_transformer.py:226(<genexpr>)
+      114    0.003    0.000    0.003    0.000 {built-in method torch.rsub}
+       16    0.003    0.000    0.004    0.000 precise_transformer.py:41(_linspace_rows)
+       10    0.003    0.000    0.003    0.000 batched_splits.py:160(affine)
+       16    0.002    0.000    0.005    0.000 precise_transformer.py:445(_max_objective_over_x_candidates)
+        8    0.002    0.000    0.002    0.000 {built-in method torch.ones}
+       50    0.002    0.000    0.002    0.000 {built-in method torch.stack}
+        8    0.002    0.000    0.004    0.000 precise_transformer.py:339(check_corners_tensor)
+       16    0.002    0.000    0.008    0.000 precise_transformer.py:203(inverse_poly_real_tensor)
+       64    0.002    0.000    0.002    0.000 {built-in method torch.logical_and}
+       54    0.001    0.000    0.001    0.000 {method 'abs' of 'torch._C.TensorBase' objects}
+       64    0.001    0.000    0.001    0.000 {built-in method torch.logical_not}
+       32    0.001    0.000    0.001    0.000 {built-in method torch.max}
+       56    0.001    0.000    0.001    0.000 {built-in method torch.sigmoid}
+        8    0.001    0.000    0.026    0.003 precise_transformer.py:459(check_nonlinear_boundary_tensor)
+
+
+
+torch.profiler
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                               aten::mm         0.04%       1.664ms         0.06%       2.276ms      56.891us     231.962ms        62.61%     231.962ms       5.799ms            40  
+void cutlass::Kernel2<cutlass_80_tensorop_d884gemm_6...         0.00%       0.000us         0.00%       0.000us       0.000us     224.687ms        60.65%     224.687ms      18.724ms            12  
+                                            aten::copy_         0.61%      22.732ms         9.29%     345.288ms       2.080ms      47.846ms        12.92%      48.383ms     291.467us           166  
+                                              aten::mul         0.10%       3.821ms         0.17%       6.196ms      20.118us      29.483ms         7.96%      29.483ms      95.724us           308  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      28.901ms         7.80%      28.901ms     206.434us           140  
+                       Memcpy DtoH (Device -> Pageable)         0.00%       0.000us         0.00%       0.000us       0.000us      28.148ms         7.60%      28.148ms       1.759ms            16  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      19.143ms         5.17%      19.143ms     251.879us            76  
+                                              aten::abs         0.03%       1.147ms         0.11%       4.235ms      30.249us      18.603ms         5.02%      37.206ms     265.755us           140  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us      18.603ms         5.02%      18.603ms     265.755us            70  
+                                              aten::add         0.07%       2.650ms         0.11%       4.198ms      19.801us      14.503ms         3.91%      14.503ms      68.410us           212  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us      14.291ms         3.86%      14.291ms      89.322us           160  
+                                            aten::fill_         0.07%       2.728ms         0.08%       3.077ms      41.576us      14.058ms         3.79%      14.058ms     189.979us            74  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us      14.058ms         3.79%      14.058ms     351.461us            40  
+                                              aten::sum         0.05%       1.770ms         0.06%       2.382ms      99.252us       9.332ms         2.52%       9.332ms     388.825us            24  
+void at::native::reduce_kernel<128, 4, at::native::R...         0.00%       0.000us         0.00%       0.000us       0.000us       9.260ms         2.50%       9.260ms     578.721us            16  
+void cutlass::Kernel2<cutlass_80_tensorop_d884gemm_3...         0.00%       0.000us         0.00%       0.000us       0.000us       6.837ms         1.85%       6.837ms       1.709ms             4  
+                                              aten::sub         0.09%       3.332ms         0.15%       5.393ms      19.973us     874.371us         0.24%     874.371us       3.238us           270  
+                                              aten::cat         0.52%      19.211ms         0.54%      19.972ms     298.088us     589.157us         0.16%     589.157us       8.793us            67  
+                       Memcpy HtoD (Pageable -> Device)         0.00%       0.000us         0.00%       0.000us       0.000us     555.648us         0.15%     555.648us      30.869us            18  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us     457.641us         0.12%     457.641us       4.487us           102  
+                                              aten::div         0.03%       1.297ms         0.06%       2.088ms      20.879us     412.575us         0.11%     412.575us       4.126us           100  
+                                          aten::sigmoid         0.02%     745.787us         0.03%       1.221ms      21.802us     403.043us         0.11%     403.043us       7.197us            56  
+void cutlass::Kernel2<cutlass_80_tensorop_d884gemm_3...         0.00%       0.000us         0.00%       0.000us       0.000us     378.973us         0.10%     378.973us      15.791us            24  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     359.043us         0.10%     359.043us       3.150us           114  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     358.984us         0.10%     358.984us       4.079us            88  
+void at::native::(anonymous namespace)::CatArrayBatc...         0.00%       0.000us         0.00%       0.000us       0.000us     300.257us         0.08%     300.257us      37.532us             8  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     282.367us         0.08%     282.367us       2.941us            96  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     269.242us         0.07%     269.242us       2.747us            98  
+                                              aten::log         0.01%     502.955us         0.02%     846.592us      17.637us     243.334us         0.07%     243.334us       5.069us            48  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     243.334us         0.07%     243.334us       5.069us            48  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 3.719s
+Self CUDA time total: 370.462ms

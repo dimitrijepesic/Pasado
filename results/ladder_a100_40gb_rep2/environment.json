@@ -1,0 +1,47 @@
+{
+ "date_utc": "2026-11-15T18:10:59Z",
+ "commit": "418752f549187217b8fe340f0730e6937f1ceed1",
+ "python": "3.13.16",
+ "torch": "2.14.1+cu130",
+ "numpy": "2.4.6",
+ "os": "Linux-6.6.159+-x86_64-with-glibc2.39",
+ "cpu": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+ "cpu_count": 12,
+ "torch_threads": 6,
+ "device": "cuda",
+ "dtype": "float64",
+ "seed": 7,
+ "networks": [
+  "5layer",
+  "big"
+ ],
+ "splits": [
+  1,
+  64
+ ],
+ "steps": [
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8
+ ],
+ "num_images": 3,
+ "eps_indices": [
+  0,
+  8
+ ],
+ "warmup": 2,
+ "repeats": 5,
+ "step_budget_s": 180.0,
+ "samples": 4001,
+ "baseline": "step 0 = current code with all selectors off (upstream code + b526762)",
+ "gpu": "NVIDIA A100-SXM4-40GB",
+ "vram_total_gib": 39.4935302734375,
+ "vram_free_gib": 38.6197509765625,
+ "cuda": "13.0"
+}

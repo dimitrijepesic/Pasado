@@ -102,7 +102,7 @@ How the total splits between the two devices:
   | 5layer, 1 split | about 1,030 | about 500 |
   | 5layer, 64 splits | about 930 | about 640 |
   | FFNNBig, 1 split | – | about 830 |
-  | FFNNBig, 64 splits | – | about 180 |
+  | FFNNBig, 64 splits | – | about 170 |
 
 ## Limits
 

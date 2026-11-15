@@ -1,0 +1,117 @@
+big, n_splits 64, step 8 compiled_sigmoid (whole precise_sigmoid compiled (fullgraph)), device cuda, image 0, eps index 0
+
+Stage breakdown of one instrumented pass (ms; device synchronized around every stage)
+  pass_ms               243.326   100.0%
+  affine_ms             184.548    75.8%
+  sigmoid_ms             53.959    22.2%
+  other_ms                4.818     2.0%
+  calls: {'affine': 10, 'sigmoid': 8}
+  counts: {'operator_calls': 404, 'cuda_events': 239, 'cuda_memcpy': 15, 'cuda_kernels': 224}
+
+cProfile, sorted by cumulative
+         2857 function calls in 0.238 seconds
+
+   Ordered by: cumulative time
+   List reduced from 178 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.238    0.238 measure_speedup_ladder.py:237(run)
+        1    0.000    0.000    0.238    0.238 batched_splits.py:286(lipschitz_bound)
+        1    0.000    0.000    0.235    0.235 batched_splits.py:263(split_bounds)
+        2    0.107    0.053    0.235    0.117 batched_splits.py:244(_forward_chunk)
+        8    0.000    0.000    0.117    0.015 batched_splits.py:171(_perturbation)
+        8    0.117    0.015    0.117    0.015 {built-in method torch.as_tensor}
+        8    0.000    0.000    0.007    0.001 measure_speedup_ladder.py:202(precise_sigmoid)
+        8    0.001    0.000    0.006    0.001 eval_frame.py:1146(compile_wrapper)
+        8    0.000    0.000    0.005    0.001 measure_speedup_ladder.py:196(core)
+       88    0.000    0.000    0.004    0.000 eval_frame.py:1523(_fn)
+        8    0.000    0.000    0.004    0.001 aot_autograd.py:1281(forward)
+        8    0.000    0.000    0.004    0.001 runtime_wrappers.py:1177(runtime_wrapper)
+        8    0.000    0.000    0.004    0.000 codegen.py:codegen(runtime_wrapper_orchestration):1(_runtime_wrapper)
+        8    0.000    0.000    0.004    0.000 output_code.py:785(__call__)
+        8    0.001    0.000    0.004    0.000 ccc4di5v3eakl7znd6vfpb22qlkohoae5evy5qyo3h7rmvufrekv.py:3408(call)
+        1    0.003    0.003    0.003    0.003 {method 'item' of 'torch._C.TensorBase' objects}
+       10    0.002    0.000    0.002    0.000 batched_splits.py:160(affine)
+      104    0.000    0.000    0.002    0.000 triton_heuristics.py:2440(run)
+        2    0.001    0.000    0.001    0.000 batched_splits.py:141(hazed_input)
+      184    0.001    0.000    0.001    0.000 {built-in method torch._C._dynamo.guards._empty_strided_cuda}
+       16    0.000    0.000    0.001    0.000 driver.py:297(__call__)
+       80    0.000    0.000    0.000    0.000 _compile.py:42(inner)
+       16    0.000    0.000    0.000    0.000 {built-in method cuda_utils.launch}
+        2    0.000    0.000    0.000    0.000 batched_splits.py:166(_bounds)
+       16    0.000    0.000    0.000    0.000 decorators.py:1177(mark_dynamic)
+
+
+
+cProfile, sorted by tottime
+         2857 function calls in 0.238 seconds
+
+   Ordered by: internal time
+   List reduced from 178 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        8    0.117    0.015    0.117    0.015 {built-in method torch.as_tensor}
+        2    0.107    0.053    0.235    0.117 batched_splits.py:244(_forward_chunk)
+        1    0.003    0.003    0.003    0.003 {method 'item' of 'torch._C.TensorBase' objects}
+       10    0.002    0.000    0.002    0.000 batched_splits.py:160(affine)
+        8    0.001    0.000    0.006    0.001 eval_frame.py:1146(compile_wrapper)
+      184    0.001    0.000    0.001    0.000 {built-in method torch._C._dynamo.guards._empty_strided_cuda}
+        8    0.001    0.000    0.004    0.000 ccc4di5v3eakl7znd6vfpb22qlkohoae5evy5qyo3h7rmvufrekv.py:3408(call)
+        2    0.001    0.000    0.001    0.000 batched_splits.py:141(hazed_input)
+        8    0.000    0.000    0.117    0.015 batched_splits.py:171(_perturbation)
+       16    0.000    0.000    0.000    0.000 {built-in method cuda_utils.launch}
+      104    0.000    0.000    0.002    0.000 triton_heuristics.py:2440(run)
+       88    0.000    0.000    0.004    0.000 eval_frame.py:1523(_fn)
+        6    0.000    0.000    0.000    0.000 {method 'abs' of 'torch._C.TensorBase' objects}
+       18    0.000    0.000    0.000    0.000 {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+        8    0.000    0.000    0.005    0.001 measure_speedup_ladder.py:196(core)
+        1    0.000    0.000    0.235    0.235 batched_splits.py:263(split_bounds)
+        2    0.000    0.000    0.000    0.000 {built-in method torch.tensor}
+        2    0.000    0.000    0.000    0.000 {method 'sum' of 'torch._C.TensorBase' objects}
+        4    0.000    0.000    0.000    0.000 {method 'new_zeros' of 'torch._C.TensorBase' objects}
+       16    0.000    0.000    0.000    0.000 decorators.py:1177(mark_dynamic)
+        8    0.000    0.000    0.004    0.000 codegen.py:codegen(runtime_wrapper_orchestration):1(_runtime_wrapper)
+       80    0.000    0.000    0.000    0.000 _compile.py:42(inner)
+        8    0.000    0.000    0.000    0.000 <string>:2(guard)
+        2    0.000    0.000    0.000    0.000 {built-in method torch.stack}
+        2    0.000    0.000    0.000    0.000 batched_splits.py:166(_bounds)
+
+
+
+torch.profiler
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                               aten::mm         0.54%       1.289ms         0.77%       1.839ms      45.987us     182.289ms        77.84%     182.289ms       4.557ms            40  
+void cutlass::Kernel2<cutlass_80_tensorop_d884gemm_6...         0.00%       0.000us         0.00%       0.000us       0.000us     175.134ms        74.79%     175.134ms      14.594ms            12  
+triton_poi_fused__unsafe_view_add_clone_copy_minimum...         0.06%     151.352us         0.09%     213.284us      26.661us      34.852ms        14.88%      34.852ms       4.356ms             8  
+triton_poi_fused__unsafe_view_add_clone_copy_minimum...         0.00%       0.000us         0.00%       0.000us       0.000us      34.852ms        14.88%      34.852ms       4.356ms             8  
+                             triton_red_fused_abs_sum_0         0.13%     304.971us         0.23%     540.973us      33.811us       9.641ms         4.12%       9.641ms     602.593us            16  
+                             triton_red_fused_abs_sum_0         0.00%       0.000us         0.00%       0.000us       0.000us       9.641ms         4.12%       9.641ms     602.593us            16  
+void cutlass::Kernel2<cutlass_80_tensorop_d884gemm_3...         0.00%       0.000us         0.00%       0.000us       0.000us       6.789ms         2.90%       6.789ms       1.697ms             4  
+triton_red_fused__unsafe_view_abs_acos_add_all_bitwi...         0.12%     282.804us         0.15%     350.062us      43.758us       5.635ms         2.41%       5.635ms     704.423us             8  
+triton_red_fused__unsafe_view_abs_acos_add_all_bitwi...         0.00%       0.000us         0.00%       0.000us       0.000us       5.635ms         2.41%       5.635ms     704.423us             8  
+triton_per_fused_abs_add_amax_bitwise_and_bitwise_no...         0.12%     288.999us         0.15%     357.282us      44.660us     743.332us         0.32%     743.332us      92.916us             8  
+triton_per_fused_abs_add_amax_bitwise_and_bitwise_no...         0.00%       0.000us         0.00%       0.000us       0.000us     743.332us         0.32%     743.332us      92.916us             8  
+void cutlass::Kernel2<cutlass_80_tensorop_d884gemm_3...         0.00%       0.000us         0.00%       0.000us       0.000us     320.676us         0.14%     320.676us      13.361us            24  
+triton_poi_fused_mean_mul_rsub_select_sigmoid_slice_...         0.05%     109.972us         0.07%     174.572us      21.821us     286.017us         0.12%     286.017us      35.752us             8  
+triton_poi_fused_mean_mul_rsub_select_sigmoid_slice_...         0.00%       0.000us         0.00%       0.000us       0.000us     286.017us         0.12%     286.017us      35.752us             8  
+triton_poi_fused_add_arange_clone_copy_div_expand_mu...         0.06%     144.414us         0.09%     210.162us      26.270us     163.713us         0.07%     163.713us      20.464us             8  
+triton_poi_fused_add_arange_clone_copy_div_expand_mu...         0.00%       0.000us         0.00%       0.000us       0.000us     163.713us         0.07%     163.713us      20.464us             8  
+triton_poi_fused_add_div_mul_select_slice_stack_wher...         0.08%     190.516us         0.11%     259.296us      32.412us      76.222us         0.03%      76.222us       9.528us             8  
+triton_poi_fused_add_div_mul_select_slice_stack_wher...         0.00%       0.000us         0.00%       0.000us       0.000us      76.222us         0.03%      76.222us       9.528us             8  
+triton_poi_fused_copy_diagonal_max_maximum_min_nan_t...         0.05%     115.286us         0.07%     174.483us      21.810us      63.394us         0.03%      63.394us       7.924us             8  
+triton_poi_fused_copy_diagonal_max_maximum_min_nan_t...         0.00%       0.000us         0.00%       0.000us       0.000us      63.394us         0.03%      63.394us       7.924us             8  
+                                              aten::add         0.14%     336.126us         0.22%     529.691us      26.485us      60.802us         0.03%      60.802us       3.040us            20  
+                            triton_poi_fused_mean_sub_3         0.07%     166.820us         0.12%     276.320us      17.270us      55.807us         0.02%      55.807us       3.488us            16  
+                            triton_poi_fused_mean_sub_3         0.00%       0.000us         0.00%       0.000us       0.000us      55.807us         0.02%      55.807us       3.488us            16  
+                                              aten::abs         0.04%     101.619us         0.17%     393.359us      32.780us      52.000us         0.02%     104.000us       8.667us            12  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us      52.000us         0.02%      52.000us       8.667us             6  
+triton_poi_fused__unsafe_view_abs_add_clone_mul_rsub...         0.08%     196.091us         0.11%     263.393us      32.924us      50.591us         0.02%      50.591us       6.324us             8  
+triton_poi_fused__unsafe_view_abs_add_clone_mul_rsub...         0.00%       0.000us         0.00%       0.000us       0.000us      50.591us         0.02%      50.591us       6.324us             8  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      47.649us         0.02%      47.649us       3.403us            14  
+void cublasLt::splitKreduce_kernel<32, 16, int, doub...         0.00%       0.000us         0.00%       0.000us       0.000us      46.237us         0.02%      46.237us       2.890us            16  
+triton_poi_fused__unsafe_view_add_clone_mul_rsub_sel...         0.06%     136.300us         0.08%     199.286us      24.911us      45.182us         0.02%      45.182us       5.648us             8  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 237.714ms
+Self CUDA time total: 234.172ms
