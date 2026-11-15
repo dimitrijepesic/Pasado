@@ -1,0 +1,13 @@
+Colab A100-SXM4-80GB, torch 2.14.1+cu130, commit f89a5d5, pasted from the notebook output.
+== batched                 (test_batched_splits.py --device cuda)
+ALL CHECKS PASSED
+== batched --closed-form   (test_batched_splits.py --device cuda --closed-form)
+ALL CHECKS PASSED
+== batched --compiled      (test_batched_splits.py --device cuda --compiled)
+ALL CHECKS PASSED
+== planar_fit              (test_planar_fit.py --device cuda)
+ALL CHECKS PASSED
+== planar_fit compiled     (test_planar_fit.py --device cuda --compiled)
+ALL CHECKS PASSED
+== auto                    (test_auto_plane_fit.py)
+ALL CHECKS PASSED
