@@ -1,0 +1,48 @@
+{
+ "source": "results/compiled_sigmoid_v3_cuda_2026-10-29/gate_d_contract.csv",
+ "torch": "2.12.1",
+ "mpmath": "1.4.1",
+ "check1_recount": {
+  "eager": {
+   "boxes": 4992,
+   "below": 2562,
+   "below_pct": 51.32211538461539,
+   "max_ulp_eps_def": 2.351556338314668,
+   "median_ulp_eps_def_all": 0.004132987597666201,
+   "median_ulp_eps_def_below": 0.196208652323851,
+   "max_ulp_ulp_def": 3.8970069885253906,
+   "median_ulp_ulp_def_all": 0.006165981292724609,
+   "median_ulp_ulp_def_below": 0.2730700969696045,
+   "max_shortfall_abs": 2.486460473280494e-14,
+   "max_shortfall_over_W": 3.437041416050687e-09
+  },
+  "compiled": {
+   "boxes": 4992,
+   "below": 2383,
+   "below_pct": 47.736378205128204,
+   "max_ulp_eps_def": 2.356092245295827,
+   "median_ulp_eps_def_all": 0.0,
+   "median_ulp_eps_def_below": 0.15664976287066149,
+   "max_ulp_ulp_def": 3.949615478515625,
+   "median_ulp_ulp_def_all": 0.0,
+   "median_ulp_ulp_def_below": 0.21513938903808594,
+   "max_shortfall_abs": 2.4939089422054694e-14,
+   "max_shortfall_over_W": 3.8635751903698146e-09
+  }
+ },
+ "check3_cpu_recompute": {
+  "boxes": 4992,
+  "cpu_equal_to_cuda_bitwise": 4564,
+  "cpu_max_rel_diff_to_cuda": 4.724355650683921e-09,
+  "cpu_below_D_true": 2560,
+  "cpu_below_pct": 51.282051282051285,
+  "cpu_max_ulp_eps_def": 2.351556338314668,
+  "cpu_median_ulp_eps_def_all": 0.003709270178713671
+ },
+ "check2_independent_oracle": {
+  "boxes_checked": 400,
+  "largest_excess_of_independent_over_D_true_rel": 1.0733022817281682e-16,
+  "classification_mismatches": 0,
+  "mismatch_examples": []
+ }
+}

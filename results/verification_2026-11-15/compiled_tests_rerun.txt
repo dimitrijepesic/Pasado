@@ -1,0 +1,6 @@
+== test_planar_fit.py --compiled
+
+ALL CHECKS PASSED
+== test_batched_splits.py --quick --compiled
+
+ALL CHECKS PASSED
