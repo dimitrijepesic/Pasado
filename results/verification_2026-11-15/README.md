@@ -1,5 +1,7 @@
 # Verification of the speedup ladder and of soundness (2026-11-15/16, M1 Pro, local)
 
+A plain-language account in Serbian of how and why each check was done: [IZVESTAJ.md](IZVESTAJ.md).
+
 Independent checks of the claims in [`../ladder_a100_40gb/README.md`](../ladder_a100_40gb/README.md) and the presentation. They recompute from scratch or read the archived files; none reuses the ladder's own report code.
 
 - **Code:** transformer and batched sources unchanged since `91ebd88` (`git diff 91ebd88 -- forward_mode_tensorized_src Section_5_4` is empty).
