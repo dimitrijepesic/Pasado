@@ -340,7 +340,10 @@ def torch_profiler_pass(step, side, compiled_sigmoid, img, eps, n_splits, rows=3
 
     configure(step, compiled_sigmoid)
     cuda = side.device.type == "cuda"
-    activities = [ProfilerActivity.CPU] + ([ProfilerActivity.CUDA] if cuda else [])
+    # Request CUDA activity whenever a GPU exists, also for the CPU steps: after one CPU-only
+    # profile, later profiles in the same process record no device events (torch 2.14 on Colab,
+    # see experiments/diag_profiler_cuda.py).
+    activities = [ProfilerActivity.CPU] + ([ProfilerActivity.CUDA] if torch.cuda.is_available() else [])
     with profile(activities=activities) as prof:
         side.run(step, img, eps, n_splits)
         mss.sync_device(side.device)
