@@ -1,0 +1,121 @@
+5layer, n_splits 1, step 5 batched_G (all splits in one pass, gelsd on the CPU), device cuda, image 0, eps index 0
+
+Stage breakdown of one instrumented pass (ms; device synchronized around every stage)
+  pass_ms                30.538   100.0%
+  affine_ms               1.349     4.4%
+  sigmoid_ms             26.962    88.3%
+  grid_ms                 2.637     8.6%
+  fit_ms                  5.068    16.6%
+  error_check_ms         12.998    42.6%
+  sigmoid_rest_ms         6.259    20.5%
+  other_ms                2.227     7.3%
+  calls: {'affine': 5, 'grid': 4, 'fit': 4, 'error_check': 8, 'sigmoid': 4}
+  counts: {'operator_calls': 4581, 'cuda_events': 962, 'cuda_memcpy': 30, 'cuda_kernels': 932}
+
+cProfile, sorted by cumulative
+         1032 function calls in 0.028 seconds
+
+   Ordered by: cumulative time
+   List reduced from 111 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.028    0.028 measure_speedup_ladder.py:237(run)
+        1    0.000    0.000    0.028    0.028 batched_splits.py:286(lipschitz_bound)
+        1    0.000    0.000    0.027    0.027 batched_splits.py:263(split_bounds)
+        1    0.000    0.000    0.027    0.027 batched_splits.py:244(_forward_chunk)
+        4    0.003    0.001    0.025    0.006 batched_splits.py:186(precise_sigmoid)
+        4    0.000    0.000    0.011    0.003 precise_transformer.py:459(check_nonlinear_boundary_tensor)
+        4    0.000    0.000    0.005    0.001 precise_transformer.py:143(lin_reg_tensor_batched)
+        8    0.000    0.000    0.005    0.001 precise_transformer.py:252(inverse_sigmoid_2nd_deriv)
+        4    0.004    0.001    0.004    0.001 {built-in method torch._C._linalg.linalg_lstsq}
+        8    0.001    0.000    0.003    0.000 precise_transformer.py:203(inverse_poly_real_tensor)
+       32    0.002    0.000    0.003    0.000 precise_transformer.py:245(filter_range)
+        4    0.000    0.000    0.002    0.001 precise_transformer.py:58(get_linspace_batched)
+        8    0.001    0.000    0.002    0.000 precise_transformer.py:445(_max_objective_over_x_candidates)
+        8    0.001    0.000    0.002    0.000 precise_transformer.py:41(_linspace_rows)
+       32    0.001    0.000    0.002    0.000 precise_transformer.py:226(<genexpr>)
+        4    0.001    0.000    0.002    0.000 precise_transformer.py:339(check_corners_tensor)
+       57    0.000    0.000    0.001    0.000 _tensor.py:32(wrapped)
+       24    0.000    0.000    0.001    0.000 precise_transformer.py:100(inv_sigmoid)
+       57    0.000    0.000    0.001    0.000 _tensor.py:1116(__rsub__)
+       57    0.001    0.000    0.001    0.000 {built-in method torch.rsub}
+        5    0.001    0.000    0.001    0.000 batched_splits.py:160(affine)
+        9    0.000    0.000    0.001    0.000 batched_splits.py:166(_bounds)
+       25    0.001    0.000    0.001    0.000 {built-in method torch.stack}
+       27    0.001    0.000    0.001    0.000 {method 'abs' of 'torch._C.TensorBase' objects}
+       32    0.001    0.000    0.001    0.000 {built-in method torch.logical_and}
+
+
+
+cProfile, sorted by tottime
+         1032 function calls in 0.028 seconds
+
+   Ordered by: internal time
+   List reduced from 111 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        4    0.004    0.001    0.004    0.001 {built-in method torch._C._linalg.linalg_lstsq}
+        4    0.003    0.001    0.025    0.006 batched_splits.py:186(precise_sigmoid)
+       32    0.002    0.000    0.003    0.000 precise_transformer.py:245(filter_range)
+       32    0.001    0.000    0.002    0.000 precise_transformer.py:226(<genexpr>)
+       57    0.001    0.000    0.001    0.000 {built-in method torch.rsub}
+        8    0.001    0.000    0.002    0.000 precise_transformer.py:41(_linspace_rows)
+        8    0.001    0.000    0.002    0.000 precise_transformer.py:445(_max_objective_over_x_candidates)
+        5    0.001    0.000    0.001    0.000 batched_splits.py:160(affine)
+        4    0.001    0.000    0.002    0.000 precise_transformer.py:339(check_corners_tensor)
+       25    0.001    0.000    0.001    0.000 {built-in method torch.stack}
+        8    0.001    0.000    0.003    0.000 precise_transformer.py:203(inverse_poly_real_tensor)
+       27    0.001    0.000    0.001    0.000 {method 'abs' of 'torch._C.TensorBase' objects}
+       32    0.001    0.000    0.001    0.000 {built-in method torch.logical_and}
+       32    0.001    0.000    0.001    0.000 {built-in method torch.logical_not}
+       28    0.001    0.000    0.001    0.000 {built-in method torch.sigmoid}
+       16    0.000    0.000    0.000    0.000 {built-in method torch.max}
+      101    0.000    0.000    0.000    0.000 {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+       24    0.000    0.000    0.001    0.000 precise_transformer.py:100(inv_sigmoid)
+        4    0.000    0.000    0.011    0.003 precise_transformer.py:459(check_nonlinear_boundary_tensor)
+       24    0.000    0.000    0.000    0.000 {built-in method torch.cos}
+        8    0.000    0.000    0.000    0.000 {method 'cpu' of 'torch._C.TensorBase' objects}
+       24    0.000    0.000    0.000    0.000 {built-in method torch.log}
+       12    0.000    0.000    0.000    0.000 {method 'to' of 'torch._C.TensorBase' objects}
+        8    0.000    0.000    0.000    0.000 {built-in method torch.isinf}
+        9    0.000    0.000    0.001    0.000 batched_splits.py:166(_bounds)
+
+
+
+torch.profiler
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                              aten::mul         5.53%       1.714ms         9.02%       2.799ms      18.175us     481.820us        15.76%     481.820us       3.129us           154  
+                                              aten::sub         4.90%       1.520ms         7.86%       2.439ms      18.067us     366.304us        11.98%     366.304us       2.713us           135  
+                                              aten::add         3.86%       1.198ms         6.21%       1.927ms      18.178us     309.060us        10.11%     309.060us       2.916us           106  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us     259.809us         8.50%     259.809us       3.712us            70  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     233.475us         7.64%     233.475us       2.747us            85  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us     167.074us         5.47%     167.074us       3.632us            46  
+                                            aten::copy_         2.01%     622.940us         9.34%       2.897ms      40.799us     154.592us         5.06%     161.120us       2.269us            71  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     149.922us         4.90%     149.922us       2.630us            57  
+                                              aten::div         1.82%     564.247us         2.93%     908.817us      18.176us     144.351us         4.72%     144.351us       2.887us            50  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us     131.649us         4.31%     131.649us       2.743us            48  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     124.893us         4.09%     124.893us       2.549us            49  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     119.966us         3.92%     119.966us       2.727us            44  
+                                               aten::mm         1.73%     536.692us         2.42%     751.072us      37.554us     115.968us         3.79%     115.968us       5.798us            20  
+                                          aten::sigmoid         1.06%     329.883us         1.77%     549.177us      19.613us     115.678us         3.78%     115.678us       4.131us            28  
+                                               aten::le         1.47%     454.956us         2.39%     740.222us      18.506us     111.552us         3.65%     111.552us       2.789us            40  
+                                     aten::masked_fill_         0.98%     304.548us         1.92%     594.893us      14.872us     109.499us         3.58%     109.499us       2.737us            40  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     109.499us         3.58%     109.499us       2.737us            40  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us     102.045us         3.34%     102.045us       2.551us            40  
+                                              aten::cat         1.81%     561.324us         2.85%     885.101us      26.032us      99.292us         3.25%      99.292us       2.920us            34  
+                                              aten::sum         0.61%     189.149us         0.89%     275.647us      22.971us      97.441us         3.19%      97.441us       8.120us            12  
+                                              aten::abs         1.61%     498.142us         5.84%       1.810ms      25.857us      91.617us         3.00%     183.234us       2.618us            70  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us      91.617us         3.00%      91.617us       2.618us            35  
+void at::native::reduce_kernel<128, 4, at::native::R...         0.00%       0.000us         0.00%       0.000us       0.000us      89.185us         2.92%      89.185us      11.148us             8  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      87.808us         2.87%      87.808us       2.744us            32  
+                                              aten::cos         0.76%     235.892us         1.25%     386.580us      16.108us      87.199us         2.85%      87.199us       3.633us            24  
+void at::native::vectorized_elementwise_kernel<2, at...         0.00%       0.000us         0.00%       0.000us       0.000us      87.199us         2.85%      87.199us       3.633us            24  
+void at::native::elementwise_kernel<128, 2, at::nati...         0.00%       0.000us         0.00%       0.000us       0.000us      86.081us         2.82%      86.081us       3.587us            24  
+                                      aten::logical_not         1.16%     359.210us         4.62%       1.432ms      22.368us      86.081us         2.82%     172.162us       2.690us            64  
+void at::native::vectorized_elementwise_kernel<4, at...         0.00%       0.000us         0.00%       0.000us       0.000us      86.081us         2.82%      86.081us       2.690us            32  
+                                               aten::ge         1.06%     330.238us         1.83%     568.543us      17.767us      85.794us         2.81%      85.794us       2.681us            32  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 31.013ms
+Self CUDA time total: 3.057ms
