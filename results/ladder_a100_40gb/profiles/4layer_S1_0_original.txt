@@ -1,0 +1,120 @@
+4layer, n_splits 1, step 0 original (all selectors off, complex64 cubic, loop over the splits), device cpu, image 0, eps index 0
+
+Stage breakdown of one instrumented pass (ms; device synchronized around every stage)
+  pass_ms               146.128   100.0%
+  affine_ms               0.929     0.6%
+  sigmoid_ms            144.167    98.7%
+  grid_ms                12.890     8.8%
+  fit_ms                 31.456    21.5%
+  error_check_ms         77.355    52.9%
+  sigmoid_rest_ms        22.466    15.4%
+  other_ms                1.032     0.7%
+  calls: {'affine': 4, 'grid': 3, 'fit': 300, 'error_check': 3, 'sigmoid': 3}
+  counts: {'operator_calls': 96646}
+
+cProfile, sorted by cumulative
+         22552 function calls in 0.162 seconds
+
+   Ordered by: cumulative time
+   List reduced from 106 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.162    0.162 measure_speedup_ladder.py:237(run)
+        1    0.000    0.000    0.162    0.162 measure_split_sweep.py:298(eval_splits_once)
+        1    0.000    0.000    0.161    0.161 measure_split_sweep.py:285(forward_zono_precise)
+        3    0.002    0.001    0.159    0.053 precise_transformer.py:748(PreciseSigmoidDualZonotope)
+        3    0.009    0.003    0.155    0.052 precise_transformer.py:634(sigmoid_prime_product_tensor)
+        3    0.001    0.000    0.088    0.029 precise_transformer.py:588(compute_max_error)
+        3    0.008    0.003    0.053    0.018 precise_transformer.py:384(check_nonlinear_boundary)
+      900    0.005    0.000    0.047    0.000 precise_transformer.py:305(objective_fn)
+     1200    0.017    0.000    0.034    0.000 precise_transformer.py:71(sigmoid_prime_times_y)
+        3    0.008    0.003    0.033    0.011 precise_transformer.py:316(check_corners)
+      300    0.004    0.000    0.033    0.000 precise_transformer.py:124(lin_reg_tensor)
+      300    0.023    0.000    0.023    0.000 {built-in method torch._C._linalg.linalg_lstsq}
+      900    0.017    0.000    0.017    0.000 precise_transformer.py:93(PlanarApproximation)
+        3    0.004    0.001    0.014    0.005 precise_transformer.py:31(get_linspace)
+     1248    0.002    0.000    0.010    0.000 _tensor.py:32(wrapped)
+     1542    0.008    0.000    0.008    0.000 {built-in method torch.stack}
+     2424    0.007    0.000    0.007    0.000 {built-in method torch.sigmoid}
+     1224    0.001    0.000    0.007    0.000 _tensor.py:1116(__rsub__)
+      300    0.001    0.000    0.006    0.000 functional.py:1412(cartesian_prod)
+     1224    0.006    0.000    0.006    0.000 {built-in method torch.rsub}
+     1801    0.005    0.000    0.005    0.000 {built-in method torch.max}
+      300    0.005    0.000    0.005    0.000 {built-in method torch.cartesian_prod}
+        6    0.000    0.000    0.004    0.001 precise_transformer.py:252(inverse_sigmoid_2nd_deriv)
+      600    0.003    0.000    0.003    0.000 {built-in method torch.linspace}
+      600    0.003    0.000    0.003    0.000 {built-in method torch.nan_to_num}
+
+
+
+cProfile, sorted by tottime
+         22552 function calls in 0.162 seconds
+
+   Ordered by: internal time
+   List reduced from 106 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      300    0.023    0.000    0.023    0.000 {built-in method torch._C._linalg.linalg_lstsq}
+     1200    0.017    0.000    0.034    0.000 precise_transformer.py:71(sigmoid_prime_times_y)
+      900    0.017    0.000    0.017    0.000 precise_transformer.py:93(PlanarApproximation)
+        3    0.009    0.003    0.155    0.052 precise_transformer.py:634(sigmoid_prime_product_tensor)
+        3    0.008    0.003    0.053    0.018 precise_transformer.py:384(check_nonlinear_boundary)
+        3    0.008    0.003    0.033    0.011 precise_transformer.py:316(check_corners)
+     1542    0.008    0.000    0.008    0.000 {built-in method torch.stack}
+     2424    0.007    0.000    0.007    0.000 {built-in method torch.sigmoid}
+     1224    0.006    0.000    0.006    0.000 {built-in method torch.rsub}
+     1801    0.005    0.000    0.005    0.000 {built-in method torch.max}
+      300    0.005    0.000    0.005    0.000 {built-in method torch.cartesian_prod}
+      900    0.005    0.000    0.047    0.000 precise_transformer.py:305(objective_fn)
+      300    0.004    0.000    0.033    0.000 precise_transformer.py:124(lin_reg_tensor)
+        3    0.004    0.001    0.014    0.005 precise_transformer.py:31(get_linspace)
+      600    0.003    0.000    0.003    0.000 {built-in method torch.linspace}
+      600    0.003    0.000    0.003    0.000 {built-in method torch.nan_to_num}
+      317    0.003    0.000    0.003    0.000 {built-in method torch.cat}
+      600    0.003    0.000    0.003    0.000 {method 'abs' of 'torch._C.TensorBase' objects}
+     1248    0.002    0.000    0.010    0.000 _tensor.py:32(wrapped)
+      300    0.002    0.000    0.002    0.000 {method 'new_ones' of 'torch._C.TensorBase' objects}
+        3    0.002    0.001    0.159    0.053 precise_transformer.py:748(PreciseSigmoidDualZonotope)
+     1201    0.001    0.000    0.001    0.000 {method 'item' of 'torch._C.TensorBase' objects}
+        6    0.001    0.000    0.002    0.000 precise_transformer.py:172(inverse_poly_tensor)
+        8    0.001    0.000    0.001    0.000 SimpleZono.py:169(AffineZonotope)
+      609    0.001    0.000    0.001    0.000 {method 'size' of 'torch._C.TensorBase' objects}
+
+
+
+torch.profiler
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                          Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg    # of Calls  
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                  aten::select        12.10%      16.392ms        15.91%      21.544ms       2.044us         10538  
+            aten::linalg_lstsq        10.56%      14.308ms        51.53%      69.795ms     116.325us           600  
+                     aten::mul         6.58%       8.919ms         6.69%       9.061ms       2.103us          4308  
+              aten::as_strided         6.43%       8.715ms         6.43%       8.715ms       0.477us         18267  
+                     aten::cat         3.93%       5.322ms         4.14%       5.605ms       2.596us          2159  
+                 aten::sigmoid         3.88%       5.254ms         3.88%       5.254ms       2.167us          2424  
+                   aten::empty         3.81%       5.163ms         3.81%       5.163ms       0.842us          6134  
+                     aten::add         3.53%       4.783ms         3.61%       4.896ms       2.233us          2193  
+                   aten::stack         3.35%       4.537ms         9.60%      13.004ms       7.060us          1842  
+                     aten::sub         2.96%       4.006ms         3.09%       4.188ms       1.928us          2172  
+                   aten::copy_         2.70%       3.662ms         2.70%       3.662ms       1.445us          2535  
+               aten::unsqueeze         2.58%       3.495ms         4.21%       5.707ms       1.048us          5444  
+                     aten::abs         2.27%       3.069ms         3.92%       5.313ms       4.230us          1256  
+                    aten::rsub         2.08%       2.814ms         3.94%       5.332ms       4.357us          1224  
+                     aten::max         1.93%       2.616ms         3.78%       5.116ms       2.841us          1801  
+                   aten::slice         1.74%       2.352ms         2.39%       3.235ms       2.231us          1450  
+                  aten::arange         1.63%       2.204ms         3.34%       4.530ms       3.775us          1200  
+           aten::empty_strided         1.45%       1.962ms         1.45%       1.962ms       1.025us          1914  
+              aten::nan_to_num         1.42%       1.926ms         2.82%       3.818ms       3.182us          1200  
+                aten::_to_copy         1.27%       1.715ms         2.93%       3.969ms       3.926us          1011  
+                    aten::view         1.25%       1.694ms         1.25%       1.694ms       0.703us          2410  
+                    aten::item         1.23%       1.672ms         1.75%       2.370ms       0.965us          2456  
+                 aten::maximum         1.18%       1.593ms         1.18%       1.593ms       1.768us           901  
+                aten::linspace         1.09%       1.471ms         2.07%       2.807ms       2.339us          1200  
+                     aten::sum         1.01%       1.370ms         1.19%       1.615ms       7.341us           220  
+                  aten::narrow         0.96%       1.295ms         2.32%       3.145ms       2.735us          1150  
+                     aten::div         0.90%       1.223ms         0.90%       1.223ms       1.947us           628  
+                 aten::flatten         0.80%       1.088ms         3.13%       4.243ms       6.956us           610  
+                 aten::resize_         0.79%       1.074ms         0.79%       1.074ms       0.712us          1508  
+                      aten::to         0.77%       1.041ms         3.70%       5.011ms       3.200us          1566  
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 135.448ms

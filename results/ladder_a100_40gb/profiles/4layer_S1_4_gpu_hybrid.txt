@@ -1,0 +1,120 @@
+4layer, n_splits 1, step 4 gpu_hybrid (same code on the device, gelsd on the CPU, loop over the splits), device cuda, image 0, eps index 0
+
+Stage breakdown of one instrumented pass (ms; device synchronized around every stage)
+  pass_ms                24.342   100.0%
+  affine_ms               0.929     3.8%
+  sigmoid_ms             20.593    84.6%
+  grid_ms                 1.861     7.6%
+  fit_ms                  3.966    16.3%
+  error_check_ms          8.261    33.9%
+  sigmoid_rest_ms         6.504    26.7%
+  other_ms                2.820    11.6%
+  calls: {'affine': 4, 'grid': 3, 'fit': 3, 'error_check': 3, 'sigmoid': 3}
+  counts: {'operator_calls': 3644, 'cuda_events': 0, 'cuda_memcpy': 0, 'cuda_kernels': 0}
+
+cProfile, sorted by cumulative
+         1069 function calls in 0.020 seconds
+
+   Ordered by: cumulative time
+   List reduced from 135 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.020    0.020 measure_speedup_ladder.py:237(run)
+        1    0.000    0.000    0.020    0.020 measure_split_sweep.py:298(eval_splits_once)
+        1    0.000    0.000    0.019    0.019 measure_split_sweep.py:285(forward_zono_precise)
+        3    0.000    0.000    0.018    0.006 precise_transformer.py:748(PreciseSigmoidDualZonotope)
+        3    0.002    0.001    0.015    0.005 precise_transformer.py:634(sigmoid_prime_product_tensor)
+        3    0.000    0.000    0.007    0.002 precise_transformer.py:588(compute_max_error)
+        3    0.000    0.000    0.006    0.002 precise_transformer.py:459(check_nonlinear_boundary_tensor)
+        3    0.000    0.000    0.003    0.001 precise_transformer.py:143(lin_reg_tensor_batched)
+        3    0.003    0.001    0.003    0.001 {built-in method torch._C._linalg.linalg_lstsq}
+        6    0.000    0.000    0.003    0.000 precise_transformer.py:252(inverse_sigmoid_2nd_deriv)
+        3    0.001    0.000    0.002    0.001 SimpleZono.py:294(SigmoidZonotope)
+        6    0.000    0.000    0.002    0.000 precise_transformer.py:203(inverse_poly_real_tensor)
+       24    0.001    0.000    0.002    0.000 precise_transformer.py:245(filter_range)
+        3    0.000    0.000    0.001    0.000 precise_transformer.py:58(get_linspace_batched)
+        6    0.001    0.000    0.001    0.000 precise_transformer.py:445(_max_objective_over_x_candidates)
+        6    0.001    0.000    0.001    0.000 precise_transformer.py:41(_linspace_rows)
+        8    0.000    0.000    0.001    0.000 SimpleZono.py:16(traceify)
+        3    0.000    0.000    0.001    0.000 precise_transformer.py:339(check_corners_tensor)
+       42    0.000    0.000    0.001    0.000 _tensor.py:32(wrapped)
+       24    0.001    0.000    0.001    0.000 precise_transformer.py:226(<genexpr>)
+       18    0.000    0.000    0.001    0.000 precise_transformer.py:100(inv_sigmoid)
+       42    0.000    0.000    0.001    0.000 _tensor.py:1116(__rsub__)
+       20    0.000    0.000    0.001    0.000 SimpleZono.py:54(get_coeff_abs)
+       42    0.001    0.000    0.001    0.000 {built-in method torch.rsub}
+        4    0.000    0.000    0.001    0.000 SimpleZono.py:396(AffineDualZonotope)
+
+
+
+cProfile, sorted by tottime
+         1069 function calls in 0.020 seconds
+
+   Ordered by: internal time
+   List reduced from 135 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        3    0.003    0.001    0.003    0.001 {built-in method torch._C._linalg.linalg_lstsq}
+        3    0.002    0.001    0.015    0.005 precise_transformer.py:634(sigmoid_prime_product_tensor)
+       24    0.001    0.000    0.002    0.000 precise_transformer.py:245(filter_range)
+        6    0.001    0.000    0.001    0.000 precise_transformer.py:41(_linspace_rows)
+       42    0.001    0.000    0.001    0.000 {built-in method torch.rsub}
+        3    0.001    0.000    0.002    0.001 SimpleZono.py:294(SigmoidZonotope)
+       24    0.001    0.000    0.001    0.000 precise_transformer.py:226(<genexpr>)
+        6    0.001    0.000    0.001    0.000 precise_transformer.py:445(_max_objective_over_x_candidates)
+        8    0.001    0.000    0.001    0.000 SimpleZono.py:169(AffineZonotope)
+       39    0.000    0.000    0.000    0.000 {built-in method torch.sigmoid}
+       18    0.000    0.000    0.000    0.000 {built-in method torch.stack}
+        3    0.000    0.000    0.001    0.000 precise_transformer.py:339(check_corners_tensor)
+        6    0.000    0.000    0.002    0.000 precise_transformer.py:203(inverse_poly_real_tensor)
+       20    0.000    0.000    0.000    0.000 {built-in method torch.sum}
+       20    0.000    0.000    0.000    0.000 {built-in method torch.cat}
+       22    0.000    0.000    0.000    0.000 {built-in method torch.abs}
+        8    0.000    0.000    0.000    0.000 {built-in method torch.eye}
+       24    0.000    0.000    0.000    0.000 {built-in method torch.logical_and}
+        6    0.000    0.000    0.000    0.000 {built-in method torch.tensor}
+       18    0.000    0.000    0.001    0.000 precise_transformer.py:100(inv_sigmoid)
+        3    0.000    0.000    0.006    0.002 precise_transformer.py:459(check_nonlinear_boundary_tensor)
+       13    0.000    0.000    0.000    0.000 {built-in method torch.max}
+       24    0.000    0.000    0.000    0.000 {built-in method torch.logical_not}
+        6    0.000    0.000    0.000    0.000 {method 'cpu' of 'torch._C.TensorBase' objects}
+        1    0.000    0.000    0.020    0.020 measure_split_sweep.py:298(eval_splits_once)
+
+
+
+torch.profiler
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                          Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg    # of Calls  
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                   aten::empty         1.94%     338.144us         1.94%     338.144us       2.025us           167  
+                      aten::to         0.33%      57.275us         4.78%     834.941us      21.409us            39  
+                aten::_to_copy         0.42%      73.672us         4.45%     777.666us      43.204us            18  
+           aten::empty_strided         1.14%     199.072us         1.14%     199.072us       5.530us            36  
+                   aten::copy_         4.66%     814.315us         5.45%     952.603us      19.846us            48  
+              aten::lift_fresh         0.06%      10.995us         0.06%      10.995us       0.289us            38  
+                 aten::detach_         0.06%      10.467us         0.13%      22.415us       3.736us             6  
+                       detach_         0.07%      11.948us         0.07%      11.948us       1.991us             6  
+              aten::zeros_like         0.06%       9.911us         0.44%      76.689us      25.563us             3  
+              aten::empty_like         0.17%      28.871us         0.60%     105.321us       5.015us            21  
+                   aten::zero_         0.24%      41.296us         1.58%     276.595us      11.525us            24  
+                   aten::fill_         2.22%     387.074us         2.22%     387.074us       8.415us            46  
+                      aten::le         2.25%     393.603us         2.25%     393.603us      11.577us            34  
+                     aten::all         1.06%     185.096us         1.49%     260.747us      20.057us            13  
+                 aten::view_as         0.04%       6.616us         0.07%      12.052us       3.013us             4  
+                    aten::view         0.17%      29.304us         0.17%      29.304us       1.172us            25  
+              aten::is_nonzero         0.09%      15.200us         1.54%     269.064us      26.906us            10  
+                    aten::item         0.34%      59.521us         1.91%     333.956us       7.105us            47  
+     aten::_local_scalar_dense         1.57%     274.435us         1.57%     274.435us       5.839us            47  
+                  aten::select         3.36%     587.537us         5.25%     916.394us       1.443us           635  
+              aten::as_strided         3.09%     539.366us         3.09%     539.366us       0.599us           901  
+                 aten::flatten         0.12%      20.822us         0.20%      34.763us       2.173us            16  
+                     aten::add         5.42%     946.536us         5.42%     946.536us      10.880us            87  
+                     aten::div         2.52%     440.346us         2.52%     440.346us      11.009us            40  
+                     aten::sub         6.33%       1.105ms         6.33%       1.105ms      10.528us           105  
+                  aten::expand         0.51%      88.256us         0.64%     111.935us       5.597us            20  
+                     aten::eye         0.62%     108.548us         3.78%     659.927us      41.245us            16  
+                 aten::resize_         1.58%     276.521us         1.58%     276.521us       2.195us           126  
+                     aten::mul         7.40%       1.292ms         7.40%       1.292ms      10.254us           126  
+                     aten::cat         4.07%     710.916us         4.16%     725.821us      17.703us            41  
+------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 17.463ms

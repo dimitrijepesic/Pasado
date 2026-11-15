@@ -1,0 +1,116 @@
+big, n_splits 1, step 8 compiled_sigmoid (whole precise_sigmoid compiled (fullgraph)), device cuda, image 0, eps index 0
+
+Stage breakdown of one instrumented pass (ms; device synchronized around every stage)
+  pass_ms                12.204   100.0%
+  affine_ms               4.791    39.3%
+  sigmoid_ms              5.194    42.6%
+  other_ms                2.219    18.2%
+  calls: {'affine': 5, 'sigmoid': 4}
+  counts: {'operator_calls': 210, 'cuda_events': 0, 'cuda_memcpy': 0, 'cuda_kernels': 0}
+
+cProfile, sorted by cumulative
+         1354 function calls in 0.010 seconds
+
+   Ordered by: cumulative time
+   List reduced from 178 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.010    0.010 measure_speedup_ladder.py:237(run)
+        1    0.000    0.000    0.010    0.010 batched_splits.py:286(lipschitz_bound)
+        1    0.000    0.000    0.010    0.010 batched_splits.py:263(split_bounds)
+        1    0.003    0.003    0.010    0.010 batched_splits.py:244(_forward_chunk)
+        4    0.000    0.000    0.003    0.001 measure_speedup_ladder.py:202(precise_sigmoid)
+        4    0.000    0.000    0.003    0.001 eval_frame.py:1146(compile_wrapper)
+        4    0.000    0.000    0.003    0.001 batched_splits.py:171(_perturbation)
+        4    0.002    0.001    0.002    0.001 {built-in method torch.as_tensor}
+        4    0.000    0.000    0.002    0.001 measure_speedup_ladder.py:196(core)
+       28    0.000    0.000    0.002    0.000 eval_frame.py:1523(_fn)
+        4    0.000    0.000    0.002    0.000 aot_autograd.py:1281(forward)
+        4    0.000    0.000    0.002    0.000 runtime_wrappers.py:1177(runtime_wrapper)
+        4    0.000    0.000    0.002    0.000 codegen.py:codegen(runtime_wrapper_orchestration):1(_runtime_wrapper)
+        4    0.000    0.000    0.002    0.000 output_code.py:785(__call__)
+        4    0.000    0.000    0.002    0.000 cjsyt6qaquagh3zvmkd3t5ynpzoo5er6wpl4vryqayectroxlgjp.py:3378(call)
+        5    0.001    0.000    0.001    0.000 batched_splits.py:160(affine)
+       52    0.000    0.000    0.001    0.000 triton_heuristics.py:2440(run)
+        1    0.000    0.000    0.000    0.000 batched_splits.py:141(hazed_input)
+       92    0.000    0.000    0.000    0.000 {built-in method torch._C._dynamo.guards._empty_strided_cuda}
+        8    0.000    0.000    0.000    0.000 driver.py:297(__call__)
+        4    0.000    0.000    0.000    0.000 <string>:1(launcher)
+       24    0.000    0.000    0.000    0.000 _compile.py:42(inner)
+        8    0.000    0.000    0.000    0.000 {built-in method cuda_utils.launch}
+        8    0.000    0.000    0.000    0.000 decorators.py:1177(mark_dynamic)
+        1    0.000    0.000    0.000    0.000 batched_splits.py:166(_bounds)
+
+
+
+cProfile, sorted by tottime
+         1354 function calls in 0.010 seconds
+
+   Ordered by: internal time
+   List reduced from 178 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.003    0.003    0.010    0.010 batched_splits.py:244(_forward_chunk)
+        4    0.002    0.001    0.002    0.001 {built-in method torch.as_tensor}
+        5    0.001    0.000    0.001    0.000 batched_splits.py:160(affine)
+        4    0.000    0.000    0.003    0.001 eval_frame.py:1146(compile_wrapper)
+        4    0.000    0.000    0.002    0.000 cjsyt6qaquagh3zvmkd3t5ynpzoo5er6wpl4vryqayectroxlgjp.py:3378(call)
+       92    0.000    0.000    0.000    0.000 {built-in method torch._C._dynamo.guards._empty_strided_cuda}
+        1    0.000    0.000    0.000    0.000 batched_splits.py:141(hazed_input)
+        4    0.000    0.000    0.003    0.001 batched_splits.py:171(_perturbation)
+       52    0.000    0.000    0.001    0.000 triton_heuristics.py:2440(run)
+        8    0.000    0.000    0.000    0.000 {built-in method cuda_utils.launch}
+        2    0.000    0.000    0.000    0.000 {built-in method torch.tensor}
+        1    0.000    0.000    0.010    0.010 batched_splits.py:263(split_bounds)
+       28    0.000    0.000    0.002    0.000 eval_frame.py:1523(_fn)
+        3    0.000    0.000    0.000    0.000 {method 'abs' of 'torch._C.TensorBase' objects}
+        4    0.000    0.000    0.002    0.001 measure_speedup_ladder.py:196(core)
+        8    0.000    0.000    0.000    0.000 decorators.py:1177(mark_dynamic)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        4    0.000    0.000    0.002    0.000 codegen.py:codegen(runtime_wrapper_orchestration):1(_runtime_wrapper)
+        9    0.000    0.000    0.000    0.000 {method 'unsqueeze' of 'torch._C.TensorBase' objects}
+        4    0.000    0.000    0.002    0.000 output_code.py:785(__call__)
+        2    0.000    0.000    0.000    0.000 {method 'new_zeros' of 'torch._C.TensorBase' objects}
+        8    0.000    0.000    0.000    0.000 driver.py:297(__call__)
+       24    0.000    0.000    0.000    0.000 {built-in method torch._C._dynamo.guards._reinterpret_tensor}
+        4    0.000    0.000    0.000    0.000 <string>:2(guard)
+        1    0.000    0.000    0.000    0.000 {built-in method torch.cat}
+
+
+
+torch.profiler
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                            aten::empty         0.42%      41.454us         0.42%      41.454us       5.182us             8  
+                                               aten::to         0.11%      11.202us        19.14%       1.878ms     312.954us             6  
+                                         aten::_to_copy         0.38%      37.703us        19.02%       1.867ms     311.087us             6  
+                                    aten::empty_strided         0.67%      65.787us         0.67%      65.787us      10.964us             6  
+                                            aten::copy_        18.25%       1.791ms        18.25%       1.791ms     255.837us             7  
+                                       aten::lift_fresh         0.10%       9.949us         0.10%       9.949us       1.658us             6  
+                                          aten::detach_         0.03%       3.124us         0.09%       8.761us       4.380us             2  
+                                                detach_         0.06%       5.637us         0.06%       5.637us       2.819us             2  
+                                            aten::slice         0.22%      21.489us         0.28%      27.412us       9.137us             3  
+                                       aten::as_strided         0.28%      27.498us         0.28%      27.498us       1.058us            26  
+                                              aten::add         1.92%     188.094us         1.92%     188.094us      18.809us            10  
+                                              aten::div         0.39%      38.701us         0.39%      38.701us      19.350us             2  
+                                              aten::sub         0.55%      53.619us         0.55%      53.619us      17.873us             3  
+                                             aten::rsub         0.06%       6.058us         0.20%      19.863us      19.863us             1  
+                                        aten::unsqueeze         0.47%      46.385us         0.62%      60.764us       4.674us            13  
+                                              aten::mul         0.33%      32.248us         0.33%      32.248us      16.124us             2  
+                                        aten::new_zeros         0.09%       9.205us         0.70%      69.067us      34.534us             2  
+                                        aten::new_empty         0.05%       5.247us         0.19%      18.551us       9.276us             2  
+                                            aten::zero_         0.06%       5.867us         0.42%      41.311us      20.655us             2  
+                                            aten::fill_         0.36%      35.444us         0.36%      35.444us      17.722us             2  
+                                              aten::neg         0.28%      27.959us         0.28%      27.959us      13.979us             2  
+                                           aten::select         0.08%       7.379us         0.09%       8.482us       8.482us             1  
+                                           aten::expand         0.21%      20.659us         0.24%      23.141us       4.628us             5  
+                                           aten::matmul         0.82%      80.293us         7.80%     764.937us      38.247us            20  
+                                               aten::mm         6.37%     624.595us         6.37%     624.595us      31.230us            20  
+                                          aten::reshape         0.12%      12.031us         0.45%      43.938us       4.394us            10  
+                                             aten::view         0.33%      31.907us         0.33%      31.907us       3.191us            10  
+                                     aten::_unsafe_view         0.16%      16.111us         0.16%      16.111us       1.611us            10  
+                               TorchDynamo Cache Lookup         4.24%     416.254us         4.24%     416.254us     104.063us             4  
+                             Torch-Compiled Region: 1/2         4.43%     434.362us        34.29%       3.364ms     841.109us             4  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 9.813ms

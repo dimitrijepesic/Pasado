@@ -1,0 +1,120 @@
+5layer, n_splits 64, step 6 a2_eager (+ closed-form plane fit on the device), device cuda, image 0, eps index 0
+
+Stage breakdown of one instrumented pass (ms; device synchronized around every stage)
+  pass_ms                38.306   100.0%
+  affine_ms               1.804     4.7%
+  sigmoid_ms             34.358    89.7%
+  grid_ms                 2.184     5.7%
+  fit_ms                 16.893    44.1%
+  error_check_ms         10.048    26.2%
+  sigmoid_rest_ms         5.233    13.7%
+  other_ms                2.145     5.6%
+  calls: {'affine': 5, 'grid': 4, 'fit': 4, 'error_check': 8, 'sigmoid': 4}
+  counts: {'operator_calls': 4895, 'cuda_events': 0, 'cuda_memcpy': 0, 'cuda_kernels': 0}
+
+cProfile, sorted by cumulative
+         1584 function calls in 0.036 seconds
+
+   Ordered by: cumulative time
+   List reduced from 131 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    0.036    0.036 measure_speedup_ladder.py:237(run)
+        1    0.000    0.000    0.036    0.036 batched_splits.py:286(lipschitz_bound)
+        1    0.000    0.000    0.036    0.036 batched_splits.py:263(split_bounds)
+        1    0.000    0.000    0.035    0.035 batched_splits.py:244(_forward_chunk)
+        4    0.002    0.001    0.033    0.008 batched_splits.py:186(precise_sigmoid)
+        4    0.000    0.000    0.017    0.004 planar_fit.py:210(fit_planes)
+        4    0.001    0.000    0.010    0.002 planar_fit.py:195(gelsd_cutoff_axes)
+        4    0.006    0.002    0.009    0.002 planar_fit.py:154(gram_eigenvalues)
+        4    0.000    0.000    0.008    0.002 precise_transformer.py:459(check_nonlinear_boundary_tensor)
+        4    0.001    0.000    0.004    0.001 planar_fit.py:125(_fit_targets)
+        8    0.000    0.000    0.003    0.000 precise_transformer.py:252(inverse_sigmoid_2nd_deriv)
+        4    0.001    0.000    0.003    0.001 planar_fit.py:78(_stats)
+        8    0.001    0.000    0.002    0.000 precise_transformer.py:203(inverse_poly_real_tensor)
+       32    0.001    0.000    0.002    0.000 precise_transformer.py:245(filter_range)
+        4    0.000    0.000    0.002    0.000 precise_transformer.py:58(get_linspace_batched)
+       81    0.000    0.000    0.002    0.000 _tensor.py:32(wrapped)
+        8    0.001    0.000    0.002    0.000 precise_transformer.py:445(_max_objective_over_x_candidates)
+      120    0.002    0.000    0.002    0.000 {built-in method torch.where}
+       52    0.000    0.000    0.001    0.000 planar_fit.py:99(_safe)
+       16    0.000    0.000    0.001    0.000 planar_fit.py:60(_pow2_scale)
+        4    0.001    0.000    0.001    0.000 planar_fit.py:105(_min_norm)
+        8    0.001    0.000    0.001    0.000 precise_transformer.py:41(_linspace_rows)
+       32    0.001    0.000    0.001    0.000 precise_transformer.py:226(<genexpr>)
+        4    0.001    0.000    0.001    0.000 precise_transformer.py:339(check_corners_tensor)
+        5    0.001    0.000    0.001    0.000 batched_splits.py:160(affine)
+
+
+
+cProfile, sorted by tottime
+         1584 function calls in 0.036 seconds
+
+   Ordered by: internal time
+   List reduced from 131 to 25 due to restriction <25>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        4    0.006    0.002    0.009    0.002 planar_fit.py:154(gram_eigenvalues)
+        4    0.002    0.001    0.033    0.008 batched_splits.py:186(precise_sigmoid)
+      120    0.002    0.000    0.002    0.000 {built-in method torch.where}
+       32    0.001    0.000    0.002    0.000 precise_transformer.py:245(filter_range)
+        4    0.001    0.000    0.004    0.001 planar_fit.py:125(_fit_targets)
+        5    0.001    0.000    0.001    0.000 batched_splits.py:160(affine)
+        8    0.001    0.000    0.001    0.000 precise_transformer.py:41(_linspace_rows)
+       57    0.001    0.000    0.001    0.000 {built-in method torch.rsub}
+        4    0.001    0.000    0.003    0.001 planar_fit.py:78(_stats)
+       59    0.001    0.000    0.001    0.000 {method 'abs' of 'torch._C.TensorBase' objects}
+       76    0.001    0.000    0.001    0.000 {built-in method torch.ones_like}
+       32    0.001    0.000    0.001    0.000 precise_transformer.py:226(<genexpr>)
+        8    0.001    0.000    0.002    0.000 precise_transformer.py:445(_max_objective_over_x_candidates)
+        4    0.001    0.000    0.010    0.002 planar_fit.py:195(gelsd_cutoff_axes)
+       29    0.001    0.000    0.001    0.000 {built-in method torch.stack}
+        4    0.001    0.000    0.001    0.000 planar_fit.py:105(_min_norm)
+       33    0.001    0.000    0.001    0.000 {method 'sum' of 'torch._C.TensorBase' objects}
+        8    0.001    0.000    0.002    0.000 precise_transformer.py:203(inverse_poly_real_tensor)
+        4    0.001    0.000    0.001    0.000 precise_transformer.py:339(check_corners_tensor)
+        1    0.001    0.001    0.001    0.001 batched_splits.py:141(hazed_input)
+       32    0.000    0.000    0.000    0.000 {built-in method torch.logical_and}
+       28    0.000    0.000    0.000    0.000 {method 'mean' of 'torch._C.TensorBase' objects}
+        8    0.000    0.000    0.001    0.000 planar_fit.py:48(_centred)
+        1    0.000    0.000    0.035    0.035 batched_splits.py:244(_forward_chunk)
+       32    0.000    0.000    0.000    0.000 {built-in method torch.logical_not}
+
+
+
+torch.profiler
+-----------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                         Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg    # of Calls  
+-----------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                  aten::empty         2.10%     622.892us         2.10%     622.892us       2.155us           289  
+                     aten::to         0.17%      48.999us         1.53%     452.360us      10.770us            42  
+               aten::_to_copy         0.14%      40.275us         1.36%     403.361us      67.227us             6  
+          aten::empty_strided         1.93%     570.370us         1.93%     570.370us       3.610us           158  
+                  aten::copy_         2.42%     716.701us         2.42%     716.701us      16.289us            44  
+             aten::lift_fresh         0.08%      22.385us         0.08%      22.385us       0.487us            46  
+                aten::detach_         0.01%       3.276us         0.03%       8.998us       4.499us             2  
+                      detach_         0.02%       5.722us         0.02%       5.722us       2.861us             2  
+                  aten::slice         0.70%     207.850us         0.91%     269.165us       4.272us            63  
+             aten::as_strided         1.26%     372.227us         1.26%     372.227us       0.741us           502  
+                    aten::add         7.26%       2.149ms         7.26%       2.149ms       9.342us           230  
+                    aten::div         6.25%       1.850ms         6.25%       1.850ms       9.947us           186  
+                    aten::sub        10.29%       3.048ms        10.29%       3.048ms       9.799us           311  
+                   aten::rsub         0.73%     215.966us         3.00%     887.273us      15.566us            57  
+              aten::unsqueeze         1.38%     410.078us         1.89%     560.694us       2.584us           217  
+                    aten::mul        13.42%       3.973ms        13.42%       3.973ms       9.240us           430  
+              aten::new_zeros         0.12%      35.717us         0.69%     205.161us      20.516us            10  
+              aten::new_empty         0.05%      14.140us         0.21%      62.401us       6.240us            10  
+                  aten::zero_         0.13%      38.651us         0.68%     202.257us       9.193us            22  
+                  aten::fill_         2.62%     777.087us         2.62%     777.087us       7.331us           106  
+                    aten::neg         0.28%      82.559us         0.28%      82.559us      13.760us             6  
+                 aten::select         0.67%     198.641us         0.86%     255.418us       3.005us            85  
+                 aten::expand         0.15%      44.051us         0.19%      56.181us       3.305us            17  
+             aten::contiguous         0.06%      18.045us         0.15%      43.325us      43.325us             1  
+                  aten::clone         0.12%      35.958us         0.71%     209.694us      23.299us             9  
+             aten::empty_like         0.62%     184.195us         2.46%     729.606us       4.532us           161  
+                 aten::matmul         0.33%      97.459us         3.84%       1.137ms      56.828us            20  
+                     aten::mm         3.29%     973.175us         3.29%     973.175us      48.659us            20  
+                aten::reshape         0.34%     100.310us         1.10%     326.129us       6.039us            54  
+                   aten::view         0.42%     123.388us         0.42%     123.388us       2.468us            50  
+-----------------------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 29.609ms
