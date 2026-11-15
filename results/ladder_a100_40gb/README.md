@@ -31,7 +31,7 @@ Every optimization step from the original Pasado to the compiled sigmoid, timed 
 
 How the total splits between the two devices:
 
-- **CPU, steps 1–3:** 10.1–10.6× on the small networks and 5.6× on FFNNBig.
+- **CPU, steps 1–3:** 10.1–10.6× on the small networks and 5.5× on FFNNBig.
 - **GPU, steps 4–8 on top of step 3:** 169–195× on the small networks and 97× on FFNNBig.
 
 ## Soundness
