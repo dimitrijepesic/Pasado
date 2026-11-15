@@ -60,12 +60,49 @@ How the total splits between the two devices:
   | 7 compiled fit | 5,204 |
   | 8 compiled sigmoid | 404 |
 
-  The compiled sigmoid launches about 13–15 Triton kernels per sigmoid layer on the small networks (from cProfile). CUDA kernel counts are missing: the profiler recorded no device activity on this Colab image, so `cuda_kernels` is 0 everywhere and is not a measurement.
+  CUDA kernels per pass, from a profiling rerun on `1c74a35` (this run's profiler recorded no device events, see below):
+
+  | step | 5layer, 64 splits | FFNNBig, 64 splits |
+  |---|---:|---:|
+  | 5 batched G | 946 | 1,908 |
+  | 6 A2 eager | 2,198 | 4,412 |
+  | 7 compiled fit | 966 | 1,948 |
+  | 8 compiled sigmoid | 110 | 224 |
+
+  - **A2 adds kernels.** Step 6 launches more kernels than step 5 because the fit moves from host `gelsd` to the GPU.
+  - **Agreement with v3.** On 40 GB, FFNNBig's 64 splits run as two chunks of 32. Per chunk that is about 2,206 → 112, close to the v3 run's 2,229 → 103 with one chunk on 80 GB.
+  - **Why `cuda_kernels` is 0 in this run.** This run profiled CPU-only steps first. After a CPU-only profile, later profiles in the same process recorded no device events, so `cuda_kernels` is 0 and is not a measurement. [`experiments/diag_profiler_cuda.py`](../../experiments/diag_profiler_cuda.py) isolates this; `1c74a35` fixes it.
 - **Compilation costs time before it pays off.**
   - The first compiled pass costs 3.3–6.5 s on 3layer and about 19 s on FFNNBig, with the Inductor cache already warm from the probe run.
   - Against A2 eager that pays back after 150–1,000 passes, depending on the cell.
   - The compiled graph is reused across the later cells, so their first-pass times (≈0 s) and break-even values (≈0.2 passes) do not count compilation.
 - **VRAM peaks at 14.9 GiB.** That is batched G and A2 on FFNNBig with 64 splits. The compiled sigmoid needs 10.3 GiB.
+
+## Second session (same machine type, fresh Colab runtime)
+
+`418752f`, 5layer and FFNNBig at 1 and 64 splits, all steps, empty Inductor cache. The kernel rerun above (`1c74a35`) adds a third measurement of steps 5–8 at 64 splits.
+
+- **Bounds** are identical to this run.
+- **Steps 0–7** were 0–11% faster in the second session, on CPU and GPU alike (median 5%). The step ratios hardly move.
+- **The compiled sigmoid (step 8) depends on what was compiled before it in the process.**
+
+  | step 8 | first run | second session | kernel rerun |
+  |---|---:|---:|---:|
+  | 5layer, 64 splits | 5.82 ms | 4.70 ms | 4.61 ms |
+  | FFNNBig, 1 split | 9.74 ms | 10.89 ms | – |
+  | FFNNBig, 64 splits | 238.69 ms | 231.44 ms | 237.48 ms |
+
+  - In this run 5layer reused a graph compiled earlier for 3layer.
+  - When 5layer's graph is compiled for its own shapes, the time reproduces within 2%.
+  - Total speedups at 64 splits: 5layer 1,976× here and 2,365× in the second session; FFNNBig 537× and 547×.
+- **Compilation with an empty cache** takes 13–19 s, against 3.3–3.5 s warm. Against A2 eager it pays back after (second session; the kernel rerun had a warm Triton cache from it):
+
+  | cell | step 7 (passes) | step 8 (passes) |
+  |---|---:|---:|
+  | 5layer, 1 split | about 1,030 | about 500 |
+  | 5layer, 64 splits | about 930 | about 640 |
+  | FFNNBig, 1 split | – | about 830 |
+  | FFNNBig, 64 splits | – | about 180 |
 
 ## Limits
 
