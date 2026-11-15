@@ -117,7 +117,7 @@ MUTANTS = [
          new="        evaluation = objective_fn(ABCs[i][0], ABCs[i][1], ABCs[i][2], "
              "roots_paired_stacked[i])\n"),
     dict(id="M15", func="planar_fit._fit_targets", file=PLANAR_FIT,
-         why="the check that every perturbed A is nonzero lets A = 0 through",
+         why="slope A with the wrong sign",
          old="    a0 = torch.where(xdeg, zero, (st.dxn * (px / sx[:, None])).sum(1)\n",
          new="    a0 = torch.where(xdeg, zero, -(st.dxn * (px / sx[:, None])).sum(1)\n"),
     dict(id="M16", func="planar_fit._min_norm", file=PLANAR_FIT,
@@ -179,27 +179,22 @@ MUTANTS = [
          why="the nonzero test lets A == 0 through",
          old="    a_nonzero = ((As > 0) | (As < 0)).all()\n",
          new="    a_nonzero = ((As >= 0) | (As < 0)).all()\n"),
-    # A wrong plane must not make the bound unsound: D is computed for whatever plane
-    # comes out of the fit. M16 and M17 must be caught by the bit-identity tests of the
-    # fit and by the comparisons against the sequential code, while every lower-bound
-    # check (soundness: brute force D, sampled derivative) still passes.
-    dict(id="M16", func="planar_fit._fit_targets", file=PLANAR_FIT,
-         why="intercept with the wrong sign of the slope terms (a wrong but finite plane)",
+    # M30 plants a wrong but finite plane (intercept) in the closed-form fit. D is computed
+    # for whatever plane comes out of the fit, so this must be caught by the bit-identity
+    # and sequential-comparison tests, while the lower-bound checks (test_soundness) pass.
+    dict(id="M30", func="planar_fit._fit_targets", file=PLANAR_FIT,
+         why="intercept with the wrong sign of the x slope term (a wrong but finite plane)",
          old="    k = zbar - a0 * st.xbar - b0 * st.ybar\n",
          new="    k = zbar + a0 * st.xbar - b0 * st.ybar\n"),
-    dict(id="M17", func="planar_fit._fit_targets", file=PLANAR_FIT,
-         why="slope A with the wrong sign (a wrong but finite plane)",
-         old="    k = zbar - a0 * st.xbar - b0 * st.ybar\n",
-         new="    a0 = -a0\n    k = zbar - a0 * st.xbar - b0 * st.ybar\n"),
-    dict(id="M18", func="batched_splits.precise_sigmoid", file=BATCHED,
+    dict(id="M31", func="batched_splits.precise_sigmoid", file=BATCHED,
          why="D from the corners only, the nonlinear edges dropped (unsound)",
          old="    errors = torch.maximum(torch.maximum(corners, err_ly), err_uy)\n",
          new="    errors = corners\n"),
-    dict(id="M19", func="batched_splits.precise_sigmoid", file=BATCHED,
+    dict(id="M32", func="batched_splits.precise_sigmoid", file=BATCHED,
          why="sigmoid slope lambda from the larger endpoint derivative (unsound real part)",
          old="    lam = torch.min(s_lb * (1 - s_lb), s_ub * (1 - s_ub))\n",
          new="    lam = torch.max(s_lb * (1 - s_lb), s_ub * (1 - s_ub))\n"),
-    dict(id="M20", func="batched_splits.precise_sigmoid", file=BATCHED,
+    dict(id="M33", func="batched_splits.precise_sigmoid", file=BATCHED,
          why="the error generators D are not written into the dual part (unsound)",
          old="    new_dg[:, G0 + N:, :].diagonal(dim1=1, dim2=2).copy_(errors)\n",
          new="    new_dg[:, G0 + N:, :].diagonal(dim1=1, dim2=2).copy_(errors * 0)\n"),
