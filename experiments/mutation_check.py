@@ -117,7 +117,7 @@ MUTANTS = [
          new="        evaluation = objective_fn(ABCs[i][0], ABCs[i][1], ABCs[i][2], "
              "roots_paired_stacked[i])\n"),
     dict(id="M15", func="planar_fit._fit_targets", file=PLANAR_FIT,
-         why="slope A with the wrong sign",
+         why="the check that every perturbed A is nonzero lets A = 0 through",
          old="    a0 = torch.where(xdeg, zero, (st.dxn * (px / sx[:, None])).sum(1)\n",
          new="    a0 = torch.where(xdeg, zero, -(st.dxn * (px / sx[:, None])).sum(1)\n"),
     dict(id="M16", func="planar_fit._min_norm", file=PLANAR_FIT,
@@ -179,7 +179,33 @@ MUTANTS = [
          why="the nonzero test lets A == 0 through",
          old="    a_nonzero = ((As > 0) | (As < 0)).all()\n",
          new="    a_nonzero = ((As >= 0) | (As < 0)).all()\n"),
+    # A wrong plane must not make the bound unsound: D is computed for whatever plane
+    # comes out of the fit. M16 and M17 must be caught by the bit-identity tests of the
+    # fit and by the comparisons against the sequential code, while every lower-bound
+    # check (soundness: brute force D, sampled derivative) still passes.
+    dict(id="M16", func="planar_fit._fit_targets", file=PLANAR_FIT,
+         why="intercept with the wrong sign of the slope terms (a wrong but finite plane)",
+         old="    k = zbar - a0 * st.xbar - b0 * st.ybar\n",
+         new="    k = zbar + a0 * st.xbar - b0 * st.ybar\n"),
+    dict(id="M17", func="planar_fit._fit_targets", file=PLANAR_FIT,
+         why="slope A with the wrong sign (a wrong but finite plane)",
+         old="    k = zbar - a0 * st.xbar - b0 * st.ybar\n",
+         new="    a0 = -a0\n    k = zbar - a0 * st.xbar - b0 * st.ybar\n"),
+    dict(id="M18", func="batched_splits.precise_sigmoid", file=BATCHED,
+         why="D from the corners only, the nonlinear edges dropped (unsound)",
+         old="    errors = torch.maximum(torch.maximum(corners, err_ly), err_uy)\n",
+         new="    errors = corners\n"),
+    dict(id="M19", func="batched_splits.precise_sigmoid", file=BATCHED,
+         why="sigmoid slope lambda from the larger endpoint derivative (unsound real part)",
+         old="    lam = torch.min(s_lb * (1 - s_lb), s_ub * (1 - s_ub))\n",
+         new="    lam = torch.max(s_lb * (1 - s_lb), s_ub * (1 - s_ub))\n"),
+    dict(id="M20", func="batched_splits.precise_sigmoid", file=BATCHED,
+         why="the error generators D are not written into the dual part (unsound)",
+         old="    new_dg[:, G0 + N:, :].diagonal(dim1=1, dim2=2).copy_(errors)\n",
+         new="    new_dg[:, G0 + N:, :].diagonal(dim1=1, dim2=2).copy_(errors * 0)\n"),
 ]
+# tests that accept --device; mutation_check.py --device cuda runs them on the GPU
+DEVICE_TESTS = {"planar_fit", "batched", "batched_cf", "planar_cc", "batched_cc"}
 
 
 def clean_env():
@@ -228,10 +254,21 @@ def run_one_test(root, rel_path, args=()):
     return p.returncode, ("BITWISE LOST; " if bitwise_lost else "") + tail[:90]
 
 
+DEVICE = "cpu"
+
+
+def test_args(name, extra):
+    args = list(extra[0]) if extra else []
+    if DEVICE != "cpu" and name in DEVICE_TESTS:
+        args += ["--device", DEVICE]
+    return args
+
+
 def run_all_tests(root):
     """Run all tests in parallel; returns {name: (exit code, last line)}."""
     with cf.ThreadPoolExecutor(max_workers=3) as ex:
-        futs = {name: ex.submit(run_one_test, root, rel, *extra) for name, rel, *extra in TESTS}
+        futs = {name: ex.submit(run_one_test, root, rel, test_args(name, extra))
+                for name, rel, *extra in TESTS}
         return {name: f.result() for name, f in futs.items()}
 
 
@@ -247,7 +284,11 @@ def show_diff(m, original):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="+", help="run only these mutant ids, e.g. M3 M7")
+    ap.add_argument("--device", default="cpu",
+                    help="device for the tests that accept --device (planar fit, batched splits)")
     args = ap.parse_args()
+    global DEVICE
+    DEVICE = args.device
 
     known_ids = {m["id"] for m in MUTANTS}
     unknown = sorted(set(args.only or ()) - known_ids)
