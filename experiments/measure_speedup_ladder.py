@@ -671,6 +671,8 @@ def main():
         json.dump(env, f, indent=1)
     print(json.dumps(env, indent=1), flush=True)
 
+    # identifies the hardware of every cell; a resumed run must match it
+    machine = dict(cpu=env["cpu"], gpu=env.get("gpu", "none"), torch=env["torch"])
     cpu = torch.device("cpu")
     big_chunk = args.big_chunk or default_big_chunk(device)
     for network in args.networks:
@@ -680,10 +682,16 @@ def main():
         for n_splits in args.splits:
             path = os.path.join(out_dir, "cells", f"{network}_S{n_splits}.json")
             if os.path.exists(path):
-                print(f"\n== {network}, n_splits {n_splits}: done, skipped", flush=True)
+                old = json.load(open(path)).get("machine")
+                if old != machine:
+                    raise SystemExit(
+                        f"{path} was measured on {old}, this run is on {machine}. A ladder must come "
+                        "from one machine: use a new --out folder.")
+                print(f"\n== {network}, n_splits {n_splits}: done on this machine, skipped", flush=True)
                 continue
             print(f"\n== {network}, n_splits {n_splits}", flush=True)
             cell = run_cell(network, n_splits, sides, args, out_dir)
+            cell["machine"] = machine
             with open(path + ".tmp", "w") as f:
                 json.dump(cell, f, indent=1)
             os.replace(path + ".tmp", path)
