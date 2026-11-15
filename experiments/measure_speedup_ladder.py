@@ -546,9 +546,9 @@ def summarize(cells):
                     row["speedup_vs_previous"], row["rel_diff_vs_previous"] = compare(stats[previous], st)
                 # passes after which a compiled step has won its first pass back against a2_eager
                 if i in (7, 8) and stats.get(6):
-                    common = sorted(set(stats[6]) & set(st))
-                    if common:
-                        gain = statistics.mean(stats[6][k]["ms"] - st[k]["ms"] for k in common)
+                    shared = sorted(set(stats[6]) & set(st))
+                    if shared:
+                        gain = statistics.mean(stats[6][k]["ms"] - st[k]["ms"] for k in shared)
                         row["break_even_passes_vs_a2_eager"] = rec["first_pass_s"] * 1e3 / gain if gain > 0 else float("inf")
                 stages = rec.get("stages")
                 if stages:
