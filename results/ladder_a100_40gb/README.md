@@ -80,7 +80,7 @@ How the total splits between the two devices:
 
 ## Second session (same machine type, fresh Colab runtime)
 
-`418752f`, 5layer and FFNNBig at 1 and 64 splits, all steps, empty Inductor cache. The kernel rerun above (`1c74a35`) adds a third measurement of steps 5–8 at 64 splits.
+`418752f`, 5layer and FFNNBig at 1 and 64 splits, all steps, empty Inductor cache: [`../ladder_a100_40gb_rep2/`](../ladder_a100_40gb_rep2/summary.md). The kernel rerun (`1c74a35`, [`../ladder_kernels/`](../ladder_kernels/summary.md)) adds a third measurement of steps 5–8 at 64 splits.
 
 - **Bounds** are identical to this run.
 - **Steps 0–7** were 0–11% faster in the second session, on CPU and GPU alike (median 5%). The step ratios hardly move.
